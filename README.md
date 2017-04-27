@@ -7,6 +7,12 @@
 - Stephen Fleischman
 - Jingwei Zhang
 
+## Setup
+1. Clone repo
+2. Open terminal; Navigate to repo directory
+3. run `$ python -m SimpleHTTPServer 8080`
+4. Open [http://localhost:8080](http://localhost:8080)
+
 ## Project Goals
 
 We plan to expose the links and connections between news sources and to examine how user’s become separated into “Echo Chambers” via the Facebook “Filter Bubble” effect. Furthermore, we plan to utilize this to see how individual profiles compare with aggregate usage and trust trends. There are two identified end users of our visualization. Firstly, users of social media, specifically Facebook, will use this tool to examine their actual news spheres and how that compares to their demographic profile. Secondly, News Sources shall be able to utilize this tool to identify which news spheres demographic profiles (input) most likely will fall. 
