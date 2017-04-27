@@ -11,6 +11,10 @@ var simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 2));
 
+// Linear Scales for node plotting, this is what is missing! https://github.com/d3/d3-scale/blob/master/README.md#_continuous
+var x = d3.scaleLinear().range([0,width]);
+var y = d3.scaleLinear().range([height,0]);
+
 
 // async ajax call baked into d3 to grab data
 d3.json("/data/gdelt_weblinks.json", function (error, graph) {
@@ -30,7 +34,8 @@ function GlobalGraph (graph) {
 		.selectAll("line")
 		.data(graph.edges)
 		.enter().append("line")
-		.attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+		.attr("stroke-width", 1);
+		// .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
 	// d3 selection containing all node circles
 	var node = svg.append("g")
@@ -38,7 +43,7 @@ function GlobalGraph (graph) {
 		.selectAll("circle")
 		.data(graph.nodes)
 		.enter().append("circle")
-		.attr("r", 5)
+		.attr("r", 2)
 		.call(d3.drag()
 			.on("start", dragStarted)
 			.on("drag", dragged)
@@ -60,14 +65,14 @@ function GlobalGraph (graph) {
 	// call back function for simulation tick, re-renders all nodes and edges
 	function ticked () {
 		link
-			.attr("x1", function (d) { return d.source.x; })
-			.attr("y1", function (d) { return d.source.y; })
-			.attr("x2", function (d) { return d.target.x; })
-			.attr("y2", function (d) { return d.target.x; });
+			.attr("x1", function (d) { return x(d.source.x); })
+			.attr("y1", function (d) { return y(d.source.y); })
+			.attr("x2", function (d) { return x(d.target.x); })
+			.attr("y2", function (d) { return y(d.target.x); });
 
 		node
-			.attr("cx", function (d) { return d.x; })
-			.attr("cy", function (d) { return d.y; });
+			.attr("cx", function (d) { return x(d.x); })
+			.attr("cy", function (d) { return y(d.y); });
 	}
 }
 
