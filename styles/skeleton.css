@@ -110,7 +110,7 @@
   .offset-by-one-half.column,
   .offset-by-one-half.columns     { margin-left: 52%; }
 
-  .alpha.columns                  { margin-left: 0; }
+  .alpha.columns                  { margin-left: 0; clear:both; }
 
 }
 
