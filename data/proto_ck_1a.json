@@ -1,0 +1,51 @@
+{
+	"nodes"	:	[
+		{
+			"label"	:	"nbcnews.com",
+			"id"	:	"nbcnews.com",
+			"parent":	"nbc"
+		},
+		{
+			"label"	:	"today.com",
+			"id"	:	"today.com",
+			"parent":	"nbc"
+		},
+		{
+			"label"	:	"cnn.com",
+			"id"	:	"cnn.com",
+			"parent":	null
+		},
+		{
+			"label"	:	"bbc.co.uk",
+			"id"	:	"bbc.co.uk",
+			"parent":	"nbc"
+		}
+	],
+	"edges" :	[
+		{
+			"source":	"nbcnews.com",
+			"target":	"bbc.co.uk",
+			"count"	:	2
+		},
+		{
+			"source":	"nbcnews.com",
+			"target":	"today.com",
+			"count"	:	2
+		},
+		{
+			"source":	"today.com",
+			"target":	"nbcnews.com",
+			"count"	:	2
+		},
+		{
+			"source":	"cnn.com",
+			"target":	"bbc.co.uk",
+			"count"	:	2
+		},
+		{
+			"source":	"nbcnews.com",
+			"target":	"cnn.com",
+			"count"	:	2
+		}
+	]
+}

@@ -17,10 +17,11 @@ var y = d3.scaleLinear().range([height,0]);
 
 
 // async ajax call baked into d3 to grab data
-d3.json("/data/gdelt_weblinks.json", function (error, graph) {
+d3.json("/data/proto_ck_1a.json", function (error, graph) {
  	if (error) throw error;
  	window.globalGraph = new GlobalGraph(graph);
 });
+
 
 // GlobalGraph object to initialize and render the global news network graph
 // graph {} : json formated data retrieved by d3.json()
@@ -34,7 +35,7 @@ function GlobalGraph (graph) {
 		.selectAll("line")
 		.data(graph.edges)
 		.enter().append("line")
-		.attr("stroke-width", 1);
+		.attr("stroke-width", 2);
 		// .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
 	// d3 selection containing all node circles
@@ -43,7 +44,7 @@ function GlobalGraph (graph) {
 		.selectAll("circle")
 		.data(graph.nodes)
 		.enter().append("circle")
-		.attr("r", 2)
+		.attr("r", 5)
 		.call(d3.drag()
 			.on("start", dragStarted)
 			.on("drag", dragged)
@@ -65,14 +66,14 @@ function GlobalGraph (graph) {
 	// call back function for simulation tick, re-renders all nodes and edges
 	function ticked () {
 		link
-			.attr("x1", function (d) { return x(d.source.x); })
-			.attr("y1", function (d) { return y(d.source.y); })
-			.attr("x2", function (d) { return x(d.target.x); })
-			.attr("y2", function (d) { return y(d.target.x); });
+			.attr("x1", function (d) { return d.source.x; })
+			.attr("y1", function (d) { return d.source.y; })
+			.attr("x2", function (d) { return d.target.x; })
+			.attr("y2", function (d) { return d.target.y; });
 
 		node
-			.attr("cx", function (d) { return x(d.x); })
-			.attr("cy", function (d) { return y(d.y); });
+			.attr("cx", function (d) { return d.x; })
+			.attr("cy", function (d) { return d.y; });
 	}
 }
 
