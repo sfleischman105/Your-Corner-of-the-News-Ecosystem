@@ -29,7 +29,7 @@ function GlobalGraph (graph) {
 		.attr("class", "links")
 		.selectAll("line")
 		.data(graph.edges)
-		.enter().append("line");
+		.enter().append("line")
 		.attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
 	// d3 selection containing all node circles
