@@ -8,7 +8,7 @@ var color = ''; // todo: make this an actual color or handle with css
 // simulation actually renders the graph and handles force animations
 var simulation = d3.forceSimulation()
 	.force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody())
+    .force("charge", d3.forceManyBody().strength([-250])) // default strength -30
     .force("center", d3.forceCenter(width / 2, height / 2));
 
 // Linear Scales for node plotting, this is what is missing! https://github.com/d3/d3-scale/blob/master/README.md#_continuous
@@ -17,6 +17,7 @@ var y = d3.scaleLinear().range([height,0]);
 
 
 // async ajax call baked into d3 to grab data
+// proto_ck_1a	gdelt_weblinks
 d3.json("/data/proto_ck_1a.json", function (error, graph) {
  	if (error) throw error;
  	window.globalGraph = new GlobalGraph(graph);
