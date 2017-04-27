@@ -31,6 +31,7 @@ d3.json("/data/proto_ck_1b.json", function (error, graph) {
 function GlobalGraph (graph) {
 	var self = this;
 
+	this.user = {};
 
 	// d3 selection containing all edge lines
 	this.link = svg.append("g") // todo: change this var name to edge?
@@ -105,3 +106,30 @@ function dragEnded (d) {
 	d.fx = null;
 	d.fy = null;
 }
+
+
+var userData = {
+	"proflie"	: {
+		"age"	: 	30,
+		"gender": 	"male"
+	},
+	"history"	: [
+		{
+			"id"	: 	"nbcnews.com",
+			"count"	: 	15
+		},
+		{
+			"id"	:	"today.com",
+			"count"	: 	5 
+		},
+		{
+			"id" 	: 	"cnn.com",
+			"count"	:	8
+		},
+		{
+			"id"	: 	"bbc.co.uk",
+			"count"	: 	12
+		}
+	]
+};
+
