@@ -4,25 +4,25 @@
 			"label"	:	"nbcnews.com",
 			"id"	:	"nbcnews.com",
 			"parent":	"nbc",
-			"isActive"	:	true
+			"isActive"	:	false
 		},
 		{
 			"label"	:	"today.com",
 			"id"	:	"today.com",
 			"parent":	"nbc",
-			"isActive"	:	true
+			"isActive"	:	false
 		},
 		{
 			"label"	:	"cnn.com",
 			"id"	:	"cnn.com",
 			"parent":	null,
-			"isActive"	:	true
+			"isActive"	:	false
 		},
 		{
 			"label"	:	"bbc.co.uk",
 			"id"	:	"bbc.co.uk",
 			"parent":	"nbc",
-			"isActive"	:	true
+			"isActive"	:	false
 		},
 		{
 			"label"	:	"msnbc.com",
