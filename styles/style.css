@@ -48,6 +48,9 @@ line {
   stroke: black;
 }
 
+#graphContainer {
+  border-right: 1px solid grey;
+}
 
 
 

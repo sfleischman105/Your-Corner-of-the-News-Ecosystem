@@ -15,7 +15,7 @@ var simulation = d3.forceSimulation()
 
 
 // async ajax call baked into d3 to grab data
-d3.json("/data/proto_ck_1b.json", function (error, graph) {
+d3.json("/data/proto_ck_1a.json", function (error, graph) {
  	if (error) throw error;
  	window.globalGraph = new GlobalGraph(graph);
 });
@@ -25,29 +25,39 @@ d3.json("/data/proto_ck_1b.json", function (error, graph) {
 // graph.nodes [] : array of node objects
 // graph.edges [] : array of edge objects
 function GlobalGraph (graph) {
+	var self = this;
+
+	this.user = {};
 
 	// d3 selection containing all edge lines
-	var link = svg.append("g") // todo: change this var name to edge?
+	this.link = svg.append("g") // todo: change this var name to edge?
 		.attr("class", "links")
 		.selectAll("line")
 		.data(graph.edges)
 		.enter().append("line")
-		.attr("stroke-width", 1);
+		.attr("stroke-width", 2);
+		// .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
 	// d3 selection containing all node circles
-	var node = svg.append("g")
+	this.node = svg.append("g")
 		.attr("class", "nodes")
 		.selectAll("circle")
 		.data(graph.nodes)
 		.enter().append("circle")
-		.attr("r", 5)
+		.attr("r", function (d) {
+			if (d.count) return d.count;
+			return 5;
+		})
+		.attr("fill", function (d) {
+			return d.isActive ? "steelblue" : "black";
+		})
 		.call(d3.drag()
 			.on("start", dragStarted)
 			.on("drag", dragged)
 			.on("end", dragEnded));
 
 	// should enable browswer default tooltip on over
-	node.append("title")
+	this.node.append("title")
 		.text(function (d) { return d.id });
 
 	// simulation driving the animation via tick callback
@@ -61,13 +71,13 @@ function GlobalGraph (graph) {
 
 	// call back function for simulation tick, re-renders all nodes and edges
 	function ticked () {
-		link
+		self.link
 			.attr("x1", function (d) { return d.source.x; })
 			.attr("y1", function (d) { return d.source.y; })
 			.attr("x2", function (d) { return d.target.x; })
-			.attr("y2", function (d) { return d.target.x; });
+			.attr("y2", function (d) { return d.target.y; });
 
-		node
+		self.node
 			.attr("cx", function (d) { return d.x; })
 			.attr("cy", function (d) { return d.y; });
 	}
@@ -117,7 +127,7 @@ function ProtoApp (options) {
 	this.onAddStubData = function (e) {
 		var filenameString = $('#stubDataSelect').find('option:selected').attr('value');
 		var filePath = '/data/' + filenameString + '.json';
-		
+
 		$.ajax({
 			method: "GET",
 			url: filePath,
