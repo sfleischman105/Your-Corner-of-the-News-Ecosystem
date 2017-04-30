@@ -94,22 +94,49 @@ function dragEnded (d) {
 }
 
 
+// ProtoApp is the frontend app controllng the front-end and integrating D3 and user interactions
+function ProtoApp (options) {
+	options = arguments[0] || null;
 
-function ProtoApp () {
+	var self = this;
+	this.userData = {};
 
+	this.initialize = function () {
+		this.addEventListeners();
+	},
 
-	this.initialize = function (options) {
-		options = arguments[0] || null;
+	this.addEventListeners = function () {
+		$('#refreshGraph').on('click', this.onRefreshGraph);
+		$('#addStubData').on('click', this.onAddStubData);
+	},
+
+	this.onRefreshGraph = function (e) {
+		// tell D3 to do it's thing
+	},
+
+	this.onAddStubData = function (e) {
+		var filenameString = $('#stubDataSelect').find('option:selected').attr('value');
+		var filePath = '/data/' + filenameString + '.json';
+		
+		$.ajax({
+			method: "GET",
+			url: filePath,
+			dataType: 'json',
+			error: function(req, status, exeption) { console.log(status + " " + exeption); },
+			success: self.handleStubData
+		});
 	}
 
+	this.handleStubData = function (data) {
+		self.userData = data;
+		// console.log(data);
+		// do things with stub data
+	}
+
+	this.initialize();
 };
 
-ProtoApp.prototype = new ProtoApp();
-ProtoApp.prototype.constructor = ProtoApp;
-ProtoApp.constructor = ProtoApp.prototype.constructor;
-
 var protoApp = new ProtoApp();
-protoApp.initialize();
 
 
 
