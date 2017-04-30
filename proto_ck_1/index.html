@@ -15,9 +15,29 @@
   </style>
 </head>
 <body>
-	<main id="content" class="container content">
-		<svg width="960" height="600"></svg>	
+	<main class="container content">
+
+    <section id="graphContainer" class="eight columns alpha">
+      <svg height="500" width="500"></svg>  
+    </section>
+
+
+		<section id="graphControl" class="four columns">
+    <h1>Graph Control</h1>
+      <button id="refreshGraph">Refresh Graph</button>  <!--  -->
+    
+      <!-- Select Stub Data to bring in; value should be filename of json w/o extension -->
+      <select id="stubDataSelect">
+        <option value="stub1a">User Data 1a</option>
+        <option value="stub2">User Data 2</option>
+      </select>
+      <button id="addStubData">Add Stub Data</button>
+    
+    </section>
+
+
 	</main>
+  <script type="text/javascript" src="./../assets/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
 	<script type="text/javascript" src="./protoApp.js"></script>
 </body>

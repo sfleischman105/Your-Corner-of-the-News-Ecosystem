@@ -1,7 +1,9 @@
 // Init svg
 var svg = d3.select("svg"),
-    width = document.getElementById('content').offsetWidth,
-    height = document.getElementById('content').offsetWidth * .75;
+    width = document.getElementById('graphContainer').offsetWidth,
+	height = document.getElementById('graphContainer').offsetWidth * .75;
+
+// svg.attr('width', width).attr('height', height);
 
 var color = ''; // todo: make this an actual color or handle with css
 
@@ -34,9 +36,6 @@ function GlobalGraph (graph) {
 	this.user = {};
 	this.graph = graph;
 
-	svg.on("click", function () {
-		updateNodes(self.graph.nodes);
-	});
 
 	// d3 selection containing all edge lines
 	this.link = svg.append("g") // todo: change this var name to edge?
@@ -48,6 +47,7 @@ function GlobalGraph (graph) {
 		// .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
 	// d3 selection containing all node circles
+
 	updateNodes(self.graph.nodes)
 
 
@@ -142,28 +142,48 @@ function dragEnded (d) {
 }
 
 
-var userData = {
-	"proflie"	: {
-		"age"	: 	30,
-		"gender": 	"male"
+// ProtoApp is the frontend app controllng the front-end and integrating D3 and user interactions
+function ProtoApp (options) {
+	options = arguments[0] || null;
+
+	var self = this;
+	this.userData = {};
+
+	this.initialize = function () {
+		this.addEventListeners();
 	},
-	"history"	: [
-		{
-			"id"	: 	"nbcnews.com",
-			"count"	: 	15
-		},
-		{
-			"id"	:	"today.com",
-			"count"	: 	5 
-		},
-		{
-			"id" 	: 	"cnn.com",
-			"count"	:	8
-		},
-		{
-			"id"	: 	"bbc.co.uk",
-			"count"	: 	12
-		}
-	]
+
+	this.addEventListeners = function () {
+		$('#refreshGraph').on('click', this.onRefreshGraph);
+		$('#addStubData').on('click', this.onAddStubData);
+	},
+
+	this.onRefreshGraph = function (e) {
+		// tell D3 to do it's thing
+	},
+
+	this.onAddStubData = function (e) {
+		var filenameString = $('#stubDataSelect').find('option:selected').attr('value');
+		var filePath = '/data/' + filenameString + '.json';
+
+		$.ajax({
+			method: "GET",
+			url: filePath,
+			dataType: 'json',
+			error: function(req, status, exeption) { console.log(status + " " + exeption); },
+			success: self.handleStubData
+		});
+	}
+
+	this.handleStubData = function (data) {
+		self.userData = data;
+		console.log('ajax data', data);
+		// do things with stub data
+	}
+
+	this.initialize();
 };
+
+var protoApp = new ProtoApp();
+
 
