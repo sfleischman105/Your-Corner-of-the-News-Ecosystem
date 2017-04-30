@@ -1,0 +1,177 @@
+{
+	"nodes"	:	[
+		{
+			"label"	:	"nbcnews.com",
+			"id"	:	"nbcnews.com",
+			"parent":	"nbc",
+			"isActive"	:	true,
+			"count"	:	15
+		},
+		{
+			"label"	:	"today.com",
+			"id"	:	"today.com",
+			"parent":	"nbc",
+			"isActive"	:	true,
+			"count"	:	5
+		},
+		{
+			"label"	:	"cnn.com",
+			"id"	:	"cnn.com",
+			"parent":	null,
+			"isActive"	:	true,
+			"count"	:	8
+		},
+		{
+			"label"	:	"bbc.co.uk",
+			"id"	:	"bbc.co.uk",
+			"parent":	"nbc",
+			"isActive"	:	true,
+			"count"	:	12
+		},
+		{
+			"label"	:	"msnbc.com",
+			"id"	:	"msnbc.com",
+			"parent":	"nbc",
+			"isActive"	:	false
+		},
+		{
+			"label"	:	"foxnews.com",
+			"id"	:	"foxnews.com",
+			"parent":	null,
+			"isActive"	:	false
+		},
+		{
+			"label"	:	"nytimes.com",
+			"id"	:	"nytimes.com",
+			"parent":	null,
+			"isActive"	:	false
+		},
+		{
+			"label"	:	"gizmodo.com",
+			"id"	:	"gizmodo.com",
+			"parent":	null,
+			"isActive"	:	false
+		},
+		{
+			"label"	:	"latimes.com",
+			"id"	:	"latimes.com",
+			"parent":	null,
+			"isActive"	:	false
+		},
+		{
+			"label"	:	"seattletimes.com",
+			"id"	:	"seattletimes.com",
+			"parent":	null,
+			"isActive"	:	false
+		}
+	],
+	"edges" :	[
+		{
+			"source":	"nbcnews.com",
+			"target":	"bbc.co.uk",
+			"count"	:	2
+		},
+		{
+			"source":	"nbcnews.com",
+			"target":	"today.com",
+			"count"	:	2
+		},
+		{
+			"source":	"today.com",
+			"target":	"nbcnews.com",
+			"count"	:	2
+		},
+		{
+			"source":	"cnn.com",
+			"target":	"bbc.co.uk",
+			"count"	:	2
+		},
+		{
+			"source":	"nbcnews.com",
+			"target":	"cnn.com",
+			"count"	:	2
+		},
+
+
+
+		{
+			"source":	"nytimes.com",
+			"target":	"latimes.com",
+			"count"	:	2
+		},
+		{
+			"source":	"latimes.com",
+			"target":	"seattletimes.com",
+			"count"	:	2
+		},
+		{
+			"source":	"msnbc.com",
+			"target":	"nbcnews.com",
+			"count"	:	2
+		},
+		{
+			"source":	"nbcnews.com",
+			"target":	"msnbc.com",
+			"count"	:	2
+		},
+		{
+			"source":	"today.com",
+			"target":	"msnbc.com",
+			"count"	:	2
+		},
+
+
+
+		{
+			"source":	"seattletimes.com",
+			"target":	"nytimes.com",
+			"count"	:	2
+		},
+		{
+			"source":	"seattletimes.com",
+			"target":	"gizmodo.com",
+			"count"	:	2
+		},
+		{
+			"source":	"today.com",
+			"target":	"nbcnews.com",
+			"count"	:	2
+		},
+		{
+			"source":	"nytimes.com",
+			"target":	"bbc.co.uk",
+			"count"	:	2
+		},
+		{
+			"source":	"cnn.com",
+			"target":	"nytimes.com",
+			"count"	:	2
+		},
+
+
+
+
+		{
+			"source":	"latimes.com",
+			"target":	"foxnews.com",
+			"count"	:	2
+		},
+		{
+			"source":	"foxnews.com",
+			"target":	"cnn.com",
+			"count"	:	2
+		},
+		{
+			"source":	"foxnews.com",
+			"target":	"nytimes.com",
+			"count"	:	2
+		},
+		{
+			"source":	"today.com",
+			"target":	"gizmodo.com",
+			"count"	:	2
+		}
+
+
+	]
+}
