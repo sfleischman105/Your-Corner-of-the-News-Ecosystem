@@ -1,19 +1,21 @@
 // Init svg
 var svg = d3.select("svg"),
-    width = +svg.attr("width"),
-    height = +svg.attr("height");
+    width = document.getElementById('graphContainer').offsetWidth,
+	height = document.getElementById('graphContainer').offsetWidth * .75;
+
+// svg.attr('width', width).attr('height', height);
 
 var color = ''; // todo: make this an actual color or handle with css
 
 // simulation actually renders the graph and handles force animations
 var simulation = d3.forceSimulation()
 	.force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody())
+    .force("charge", d3.forceManyBody().strength([-250])) // default strength -30)
     .force("center", d3.forceCenter(width / 2, height / 2));
 
 
 // async ajax call baked into d3 to grab data
-d3.json("/data/proto_ck_1a.json", function (error, graph) {
+d3.json("/data/proto_ck_1b.json", function (error, graph) {
  	if (error) throw error;
  	window.globalGraph = new GlobalGraph(graph);
 });
@@ -30,7 +32,7 @@ function GlobalGraph (graph) {
 		.selectAll("line")
 		.data(graph.edges)
 		.enter().append("line")
-		.attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+		.attr("stroke-width", 1);
 
 	// d3 selection containing all node circles
 	var node = svg.append("g")
