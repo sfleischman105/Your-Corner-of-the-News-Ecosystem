@@ -13,7 +13,7 @@ var simulation = d3.forceSimulation()
 
 
 // async ajax call baked into d3 to grab data
-d3.json("/data/gdelt_weblinks.json", function (error, graph) {
+d3.json("/data/proto_ck_1a.json", function (error, graph) {
  	if (error) throw error;
  	window.globalGraph = new GlobalGraph(graph);
 });
@@ -90,3 +90,24 @@ function dragEnded (d) {
 	d.fx = null;
 	d.fy = null;
 }
+
+
+
+function ProtoApp () {
+
+
+	this.initialize = function (options) {
+		options = arguments[0] || null;
+	}
+
+};
+
+ProtoApp.prototype = new ProtoApp();
+ProtoApp.prototype.constructor = ProtoApp;
+ProtoApp.constructor = ProtoApp.prototype.constructor;
+
+var protoApp = new ProtoApp();
+protoApp.initialize();
+
+
+

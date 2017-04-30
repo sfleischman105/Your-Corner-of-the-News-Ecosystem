@@ -13,7 +13,25 @@
 </head>
 <body>
 	<main class="container content">
-		<svg width="960" height="600"></svg>	
+    <section class="twelve columns alpha">
+      <svg width="960" height="600"></svg>  
+    </section>
+
+
+		<section class="four columns alpha">
+
+      <button id="refreshGraph">Refresh Graph</button>  <!--  -->
+    
+      <!-- Select Stub Data to bring in; value should be filename of json w/o extension -->
+      <select>
+        <option value="stub1a">User Data 1a</option>
+        <option value="stub2">User Data 2</option>
+      </select>
+      <button id="addStubData">Add Stub Data</button>
+    
+    </section>
+
+
 	</main>
 	<script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
 	<script type="text/javascript" src="./protoApp.js"></script>
