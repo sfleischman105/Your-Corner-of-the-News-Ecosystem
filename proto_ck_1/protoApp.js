@@ -11,6 +11,15 @@ var simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody().strength([-250])) // default strength -30
     .force("center", d3.forceCenter(width / 2, height / 2));
 
+//tool-tip initialization
+var tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([-10, 0])
+    .html(function(d) {
+        return "<strong>Domain:</strong> <span style='color:red'>" + d.label + "</span>";
+    });
+
+svg.call(tip);
 
 // Linear Scales for node plotting, this is what is missing! https://github.com/d3/d3-scale/blob/master/README.md#_continuous
 var x = d3.scaleLinear().range([0,width]);
@@ -37,17 +46,18 @@ function GlobalGraph (graph) {
 	this.graph = graph; // the data used by the simulation
 	this.toggleNode = null; // for test purposes, this is a variable to contain removed node
 	this.toggleNodeEdges = []; // for test purposes, this is an array to conatin removed edges
+	this.radius = 5; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
 
+	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
+	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
 
 	// d3 selection containing all edge lines
 	this.link = svg.append("g")
-		.attr("class", "links")
 		.selectAll("line")
 		.data(graph.edges);
 
 	// d3 selection containing all node circles
 	this.node = svg.append("g")
-		.attr("class", "nodes")
 		.selectAll("circle")
 		.data(self.graph.nodes);
 
@@ -55,7 +65,14 @@ function GlobalGraph (graph) {
 	this.simulation = d3.forceSimulation()
 		.force("link", d3.forceLink().id(function(d) { return d.id; }))
 	    .force("charge", d3.forceManyBody().strength([-200])) // default strength -30
-	    .force("center", d3.forceCenter(width / 2, height / 2));
+	    .force("center", d3.forceCenter(width / 2, height / 2))
+		.force("x", d3.forceX(width / 2).strength([0.1]))
+    	.force("y", d3.forceY(height / 2).strength([0.1]));
+
+	// this is a list of sub-graphs and their simulations
+	this.sub_graphs = [];
+	this.sub_simulations = [];
+
 
 	// Call this function to apply manipulated data to the simulation
 	this.resetSimulation = function () {
@@ -69,7 +86,7 @@ function GlobalGraph (graph) {
 
 		self.runSimulation(); // re-define simulation
 		self.simulation.alphaTarget(0.3).restart(); // reset simulation
-	}
+	};
 
 	// Modular function for declaring what to do with nodes
 	this.renderNodes = function () {
@@ -79,9 +96,9 @@ function GlobalGraph (graph) {
 				if (d.count) return d.count;
 				return 5;
 			})
-			.attr("fill", function (d) {
-				return d.isActive ? "steelblue" : "black";
-			})
+            .attr("id", function (d) {
+                return d.uuid;
+            })
 			.call(d3.drag()
 				.on("start", self.dragStarted)
 				.on("drag", self.dragged)
@@ -89,8 +106,8 @@ function GlobalGraph (graph) {
 			.merge(self.node);
 
 		self.node.append("title")
-			.text(function (d) { return d.id });
-	}
+			.text(function (d) { return d.label });
+	};
 
 	// Modular function for declaring what to do with edges
 	this.renderLinks = function () {
@@ -98,7 +115,7 @@ function GlobalGraph (graph) {
 			.append("line")
 			.attr("stroke-width", 2)
 			.merge(self.link);
-	}
+	};
 
 	// Callback function for "tick" event (entropy occuring over time!)
 	this.ticked = function () {
@@ -108,36 +125,65 @@ function GlobalGraph (graph) {
 			.attr("x2", function (d) { return d.target.x; })
 			.attr("y2", function (d) { return d.target.y; });
 
-		self.node
-			.attr("cx", function (d) { return d.x; })
-			.attr("cy", function (d) { return d.y; });
-	}
+        // Math.max and radius calculation allow us to bound the position of the nodes within a box
+        self.node
+        	.attr("cx", function(d) { return d.x = Math.max(self.radius, Math.min(width - self.radius, d.x)); })
+            .attr("cy", function(d) { return d.y = Math.max(self.radius, Math.min(height - self.radius, d.y)); });
+	};
 
 	// Re-apply updated node and link to simulation
 	this.runSimulation = function () {
 		self.simulation.nodes(self.graph.nodes).on("tick", self.ticked);
 		self.simulation.force("link").links(self.graph.edges);
-	}
+	};
 
 	// Drag Start Event Handler
 	this.dragStarted = function (d) {
-		if (!d3.event.active) self.simulation.alphaTarget(0.3).restart();
+		if (!d3.event.active) {
+			self.simulation.alphaTarget(0.3).restart();
+			for (i = 0; i < self.sub_simulations.length; i++) {
+				self.sub_simulations[i].alphaTarget(0.3).restart();
+			}
+        }
 		d.fx = d.x;
 		d.fy = d.y;
-	}
+	};
 
 	// Drag Event Handler
 	this.dragged = function (d) {
 		d.fx = d3.event.x;
 		d.fy = d3.event.y;
-	}
+	};
 
 	// Drag End Event Handler
 	this.dragEnded = function (d) {
-		if (!d3.event.active) self.simulation.alphaTarget(0);
+		if (!d3.event.active) {
+			self.simulation.alphaTarget(0);
+            for (i = 0; i < self.sub_simulations.length; i++) {
+                self.sub_simulations[i].alphaTarget(0).restart();
+            }
+        }
 		d.fx = null;
 		d.fy = null;
-	}
+	};
+
+	this.highlightSubGraph = function (node_ids) {
+		var subgraph_nodes = [];
+		for (var i=0; i < node_ids.length; i++) {
+			var node_id = node_ids[i];
+			var node = self.node_index[node_id];
+			document.getElementById(node.uuid).setAttribute("class", "selected_node");
+            subgraph_nodes.push(node);
+		}
+		this.sub_graphs.push(subgraph_nodes);
+		this.sub_simulations.push(
+			d3.forceSimulation()
+				.force("charge", d3.forceManyBody().strength([-15]))
+                .force("x", d3.forceX(width * 0.8).strength([0.08]))
+				.force("y", d3.forceY(height * 0.5).strength([0.08]))
+                .nodes(subgraph_nodes)
+				.on("tick", self.ticked));
+    };
 
 	// Actually render the graph once everything is defined
 	this.renderNodes();
@@ -221,12 +267,27 @@ function ProtoApp () {
 	// Callback function for what to do when we graph data from external source
 	this.handleStubData = function (data) {
 		self.userData = data;
-		console.log('ajax data', data);
 		// do things with stub data
-	}
+		window.globalGraph.highlightSubGraph(data.nodes.map(function (d) { return d.id }));
+	};
 
 	this.initialize(); // kick it off!
 };
+
+function _index(objects) {
+   var index = {};
+   for (var i=0; i < objects.length; i++) {
+	   var n = objects[i];
+	   n.uuid = uuid();
+	   index[n.id] = n;
+   }
+   return index;
+}
+
+// generates UUID v4 identifiers. Math.random() isn't a perfect RNG, but should be more than fine for our purposes
+function uuid(a) {
+	return a ? (a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,uuid)
+}
 
 window.protoApp = new ProtoApp(); // new it up!
 
