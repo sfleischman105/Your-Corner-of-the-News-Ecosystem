@@ -7,11 +7,7 @@ var svg = d3.select("svg"),
 
 var color = ''; // todo: make this an actual color or handle with css
 
-// simulation actually renders the graph and handles force animations
-var simulation = d3.forceSimulation()
-	.force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody().strength([-250])) // default strength -30
-    .force("center", d3.forceCenter(width / 2, height / 2));
+
 
 // Linear Scales for node plotting, this is what is missing! https://github.com/d3/d3-scale/blob/master/README.md#_continuous
 var x = d3.scaleLinear().range([0,width]);
@@ -22,6 +18,7 @@ var y = d3.scaleLinear().range([height,0]);
 // proto_ck_1a	gdelt_weblinks
 d3.json("/data/proto_ck_1a.json", function (error, graph) {
  	if (error) throw error;
+ 	window.protoApp.globalGraphData = $.extend(true, {}, graph);
  	window.globalGraph = new GlobalGraph(graph);
 });
 
@@ -33,46 +30,47 @@ d3.json("/data/proto_ck_1a.json", function (error, graph) {
 function GlobalGraph (graph) {
 	var self = this;
 
-	this.user = {};
-	this.graph = graph;
+	this.user = {}; // future user data
+	this.graph = graph; // the data used by the simulation
+	this.toggleNode = null; // for test purposes, this is a variable to contain removed node
+	this.toggleNodeEdges = []; // for test purposes, this is an array to conatin removed edges
 
 
 	// d3 selection containing all edge lines
-	this.link = svg.append("g") // todo: change this var name to edge?
+	this.link = svg.append("g")
 		.attr("class", "links")
 		.selectAll("line")
-		.data(graph.edges)
-		.enter().append("line")
-		.attr("stroke-width", 2);
-		// .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+		.data(graph.edges);
 
 	// d3 selection containing all node circles
+	this.node = svg.append("g")
+		.attr("class", "nodes")
+		.selectAll("circle")
+		.data(self.graph.nodes);
 
-	updateNodes(self.graph.nodes)
+	// simulation actually renders the graph and handles force animations
+	this.simulation = d3.forceSimulation()
+		.force("link", d3.forceLink().id(function(d) { return d.id; }))
+	    .force("charge", d3.forceManyBody().strength([-200])) // default strength -30
+	    .force("center", d3.forceCenter(width / 2, height / 2));
 
+	// Call this function to apply manipulated data to the simulation
+	this.resetSimulation = function () {
+		self.node = self.node.data(self.graph.nodes); // apply data to node
+		self.node.exit().remove(); // remove exit selection
+		self.renderNodes(); // render the nodes
 
-	// should enable browswer default tooltip on over
-	this.node.append("title")
-		.text(function (d) { return d.id });
+		self.link = self.link.data(self.graph.edges); // apply data to link
+		self.link.exit().remove(); // remove exit selection
+		self.renderLinks(); // render the edges
 
-	// simulation driving the animation via tick callback
-	simulation
-		.nodes(graph.nodes)
-		.on("tick", ticked);
+		self.runSimulation(); // re-define simulation
+		self.simulation.alphaTarget(0.3).restart(); // reset simulation
+	}
 
-	// not sure I quite understand this yet...
-	simulation.force("link")
-		.links(graph.edges);
-
-
-	function updateNodes (nodes) {
-		var _nodes = (self.user && self.user.history) ? updateNodeData(nodes, self.user.history) : nodes;
-		console.log('updating nodes');
-		self.node = svg.append("g")
-			.attr("class", "nodes")
-			.selectAll("circle")
-			.data(_nodes)
-			.enter()
+	// Modular function for declaring what to do with nodes
+	this.renderNodes = function () {
+		self.node = self.node.enter()
 			.append("circle")
 			.attr("r", function (d) {
 				if (d.count) return d.count;
@@ -82,33 +80,25 @@ function GlobalGraph (graph) {
 				return d.isActive ? "steelblue" : "black";
 			})
 			.call(d3.drag()
-				.on("start", dragStarted)
-				.on("drag", dragged)
-				.on("end", dragEnded));
+				.on("start", self.dragStarted)
+				.on("drag", self.dragged)
+				.on("end", self.dragEnded))
+			.merge(self.node);
 
-
-		// This seems so wrong.... whatever happened to Don't Repeat Yourself....?
-		self.node.merge(self.node)
-			.attr("r", function (d) {
-				if (d.count) return d.count;
-				return 5;
-			})
-			.attr("fill", function (d) {
-				return d.isActive ? "steelblue" : "black";
-			});
-
-		// This doesn't seem to do anything...
-		self.node.exit().remove();
-
-
+		self.node.append("title")
+			.text(function (d) { return d.id });
 	}
 
-	function updateNodeData (gNodes, uNodes) {
-		return gNodes;
+	// Modular function for declaring what to do with edges
+	this.renderLinks = function () {
+		self.link = self.link.enter()
+			.append("line")
+			.attr("stroke-width", 2)
+			.merge(self.link);
 	}
 
-	// call back function for simulation tick, re-renders all nodes and edges
-	function ticked () {
+	// Callback function for "tick" event (entropy occuring over time!)
+	this.ticked = function () {
 		self.link
 			.attr("x1", function (d) { return d.source.x; })
 			.attr("y1", function (d) { return d.source.y; })
@@ -119,49 +109,67 @@ function GlobalGraph (graph) {
 			.attr("cx", function (d) { return d.x; })
 			.attr("cy", function (d) { return d.y; });
 	}
-}
 
-// drag start event handler on nodes
-function dragStarted (d) {
-	if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-	d.fx = d.x;
-	d.fy = d.y;
-}
+	// Re-apply updated node and link to simulation
+	this.runSimulation = function () {
+		self.simulation.nodes(self.graph.nodes).on("tick", self.ticked);
+		self.simulation.force("link").links(self.graph.edges);
+	}
 
-// drag event handler on nodes
-function dragged (d) {
-	d.fx = d3.event.x;
-	d.fy = d3.event.y;
-}
+	// Drag Start Event Handler
+	this.dragStarted = function (d) {
+		if (!d3.event.active) self.simulation.alphaTarget(0.3).restart();
+		d.fx = d.x;
+		d.fy = d.y;
+	}
 
-// drag end event handler on nodes
-function dragEnded (d) {
-	if (!d3.event.active) simulation.alphaTarget(0);
-	d.fx = null;
-	d.fy = null;
+	// Drag Event Handler
+	this.dragged = function (d) {
+		d.fx = d3.event.x;
+		d.fy = d3.event.y;
+	}
+
+	// Drag End Event Handler
+	this.dragEnded = function (d) {
+		if (!d3.event.active) self.simulation.alphaTarget(0);
+		d.fx = null;
+		d.fy = null;
+	}
+
+	// Actually render the graph once everything is defined
+	this.renderNodes();
+	this.renderLinks();
+	this.runSimulation();
 }
 
 
 // ProtoApp is the frontend app controllng the front-end and integrating D3 and user interactions
-function ProtoApp (options) {
-	options = arguments[0] || null;
+function ProtoApp () {
 
 	var self = this;
 	this.userData = {};
+	this.globalGraphData = null;
 
 	this.initialize = function () {
 		this.addEventListeners();
 	},
 
+	// Subscribe to button clicks
 	this.addEventListeners = function () {
 		$('#refreshGraph').on('click', this.onRefreshGraph);
 		$('#addStubData').on('click', this.onAddStubData);
+		$('#toggleNode').on('click', this.onToggleNode);
 	},
 
+	// Handling Refresh Graph Button
 	this.onRefreshGraph = function (e) {
-		// tell D3 to do it's thing
+		window.globalGraph.graph = $.extend(true, {}, self.globalGraphData);
+		window.globalGraph.toggleNode = null;
+		window.globalGraph.toggleNodeEdges.length = 0;
+		window.globalGraph.resetSimulation();
 	},
 
+	// Handles button click and fetches stub data file based on selected option
 	this.onAddStubData = function (e) {
 		var filenameString = $('#stubDataSelect').find('option:selected').attr('value');
 		var filePath = '/data/' + filenameString + '.json';
@@ -175,15 +183,48 @@ function ProtoApp (options) {
 		});
 	}
 
+	// For testing purposes
+	this.onToggleNode = function (e) {
+
+		// If node is saved, restore it and unsave it
+		if (window.globalGraph.toggleNode) {
+			window.globalGraph.graph.nodes.push(window.globalGraph.toggleNode);
+			window.globalGraph.graph.edges = window.globalGraph.graph.edges.concat(window.globalGraph.toggleNodeEdges);
+
+			window.globalGraph.toggleNode = null;
+			window.globalGraph.toggleNodeEdges.length = 0;
+
+		// If no node is saved, save the node
+		} else {
+			window.globalGraph.toggleNode = window.globalGraph.graph.nodes.pop();
+			var id = window.globalGraph.toggleNode.id;
+			var edges = []
+
+			window.globalGraph.graph.edges.forEach(function(d) {
+				if (d.source.id === id || d.target.id === id) {
+					window.globalGraph.toggleNodeEdges.push(d);
+				} else {
+					edges.push(d);
+				}
+			});
+
+			window.globalGraph.graph.edges = edges;
+		}
+
+		// Rerun the simulation
+		window.globalGraph.resetSimulation();
+	}
+
+	// Callback function for what to do when we graph data from external source
 	this.handleStubData = function (data) {
 		self.userData = data;
 		console.log('ajax data', data);
 		// do things with stub data
 	}
 
-	this.initialize();
+	this.initialize(); // kick it off!
 };
 
-var protoApp = new ProtoApp();
+window.protoApp = new ProtoApp(); // new it up!
 
 
