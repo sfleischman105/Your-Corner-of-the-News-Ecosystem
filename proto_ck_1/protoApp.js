@@ -11,16 +11,6 @@ var simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody().strength([-250])) // default strength -30
     .force("center", d3.forceCenter(width / 2, height / 2));
 
-//tool-tip initialization
-var tip = d3.tip()
-    .attr('class', 'd3-tip')
-    .offset([-10, 0])
-    .html(function(d) {
-        return "<strong>Domain:</strong> <span style='color:red'>" + d.label + "</span>";
-    });
-
-svg.call(tip);
-
 // Linear Scales for node plotting, this is what is missing! https://github.com/d3/d3-scale/blob/master/README.md#_continuous
 var x = d3.scaleLinear().range([0,width]);
 var y = d3.scaleLinear().range([height,0]);
