@@ -8,11 +8,20 @@
 # information for stuff like: link, upvotes, etc.
 #
 
-
-# from bs4 import BeautifulSoup
 import scrapy
-from scrapy.contrib.linkextractors import LinkExtractor
 import re
+
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences
+from reddit_scraper.items import RedditItem
+
+
+banned_domains = [
+        'i.imgur.com',
+        'imgur.com',
+        'i.redd.it',
+        'i.sli.mg',
+        'i.reddituploads.com'
+    ]
 
 
 class RedditSpider(scrapy.Spider):
@@ -31,35 +40,39 @@ class RedditSpider(scrapy.Spider):
 
     # Operations to be perfomed once HTML is received
     def parse(self, response):
-
-
-        site_table = response.css('div.siteTable')
-        posts = []
-
-        # for div in site_table:
-        #     if
-        #
-        #
-        # for post in response.css('div.siteTable '):
-
         page = response.url.split("/")[-3]
         count = 0
-
         last = response.url.split("/")[-1]
         num_posts = re.match(r'.*count=([0-9]+).*', last)
-        print(num_posts)
+
         if num_posts:
             count = int(num_posts.group(1))
 
-        self.log('Count %s',count)
-
         next_page = response.css('span.next-button a::attr(href)').extract_first()
-
         filename = ('sites/reddit-%s-%s.html' % (page, count))
-        with open(filename, 'wb') as f:
-            f.write(response.body)
 
-        if next_page is not None and count <= 200:
+        # with open(filename, 'wb') as f:
+        #     f.write(response.body)
+
+        selector_list = response.css('div.thing')
+
+        for selector in selector_list:
+            subreddit = selector.xpath('@data-subreddit').extract()
+            domain = selector.xpath('@data-domain').extract()
+            if "self." + subreddit[0] != domain[0] and domain[0] not in banned_domains:
+                item = RedditItem()
+                item['domain'] = domain
+                item['url'] = selector.xpath('@data-url').extract()
+                item['subreddit'] = subreddit
+                item['title'] = selector.xpath('div/p/a/text()').extract()
+                item['posting_time'] = selector.xpath('@data-timestamp').extract()
+                item['votes'] = selector.xpath('div[@class="midcol unvoted"]/div[@class="score likes"]/@title').extract()
+                item['comments'] = selector.xpath('div[@class="entry unvoted"]/ul/li/a/text()').extract()
+                item['post_num'] = selector.xpath('@data-rank').extract()
+
+                yield item
+
+        if next_page is not None and count <= 50:
             yield scrapy.Request(str(next_page), callback=self.parse)
 
 
@@ -73,6 +86,4 @@ def subreddits_scraped():
         domains.append(base + line.strip() + top)
     return domains
 
-
-#<span class="next-button"> <a href="https...."></a> next
 
