@@ -1,24 +1,9 @@
-// Init svg
-var width = $('#graphContainer').innerWidth(),
-	height = width * .75,
-    svg = d3.select("svg")
-    .attr("viewBox", "0 0 " + width  + " " + height)
-    .attr("preserveAspectRatio", "xMidYMid meet");
 
-// simulation actually renders the graph and handles force animations
-var simulation = d3.forceSimulation()
-	.force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody().strength([-250])) // default strength -30
-    .force("center", d3.forceCenter(width / 2, height / 2));
-
-// Linear Scales for node plotting, this is what is missing! https://github.com/d3/d3-scale/blob/master/README.md#_continuous
-var x = d3.scaleLinear().range([0,width]);
-var y = d3.scaleLinear().range([height,0]);
 
 
 // async ajax call baked into d3 to grab data
-// proto_ck_1a	gdelt_weblinks
-d3.json("/data/gdelt_50_52.json", function (error, graph) {
+// proto_ck_1a	gdelt_weblinks  gdelt_50_52
+d3.json("/data/proto_ck_1a.json", function (error, graph) {
  	if (error) throw error;
  	window.protoApp.globalGraphData = $.extend(true, {}, graph);
  	window.globalGraph = new GlobalGraph(graph);
@@ -41,6 +26,13 @@ function GlobalGraph (graph) {
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
 
+	this.width = $('#graphContainer').innerWidth();
+	this.height = this.width * .5;
+
+	this.svg = svg = d3.select("svg")
+    	.attr("viewBox", "0 0 " + this.width  + " " + this.height)
+    	.attr("preserveAspectRatio", "xMidYMid meet");
+
 	// d3 selection containing all edge lines
 	this.link = svg.append("g")
 		.selectAll("line")
@@ -55,9 +47,9 @@ function GlobalGraph (graph) {
 	this.simulation = d3.forceSimulation()
 		.force("link", d3.forceLink().id(function(d) { return d.id; }))
 	    .force("charge", d3.forceManyBody().strength([-200])) // default strength -30
-	    .force("center", d3.forceCenter(width / 2, height / 2))
-		.force("x", d3.forceX(width / 2).strength([0.1]))
-    	.force("y", d3.forceY(height / 2).strength([0.1]));
+	    .force("center", d3.forceCenter(this.width / 2, this.height / 2))
+		.force("x", d3.forceX(this.width / 2).strength([0.1]))
+    	.force("y", d3.forceY(this.height / 2).strength([0.1]));
 
 	// this is a list of sub-graphs and their simulations
 	this.sub_graphs = [];
@@ -117,8 +109,8 @@ function GlobalGraph (graph) {
 
         // Math.max and radius calculation allow us to bound the position of the nodes within a box
         self.node
-        	.attr("cx", function(d) { return d.x = Math.max(self.radius, Math.min(width - self.radius, d.x)); })
-            .attr("cy", function(d) { return d.y = Math.max(self.radius, Math.min(height - self.radius, d.y)); });
+        	.attr("cx", function(d) { return d.x = Math.max(self.radius, Math.min(self.width - self.radius, d.x)); })
+            .attr("cy", function(d) { return d.y = Math.max(self.radius, Math.min(self.height - self.radius, d.y)); });
 	};
 
 	// Re-apply updated node and link to simulation
@@ -169,8 +161,8 @@ function GlobalGraph (graph) {
 		this.sub_simulations.push(
 			d3.forceSimulation()
 				.force("charge", d3.forceManyBody().strength([-15]))
-                .force("x", d3.forceX(width * 0.8).strength([0.08]))
-				.force("y", d3.forceY(height * 0.5).strength([0.08]))
+                .force("x", d3.forceX(self.width * 0.8).strength([0.08]))
+				.force("y", d3.forceY(self.height * 0.5).strength([0.08]))
                 .nodes(subgraph_nodes)
 				.on("tick", self.ticked));
     };
