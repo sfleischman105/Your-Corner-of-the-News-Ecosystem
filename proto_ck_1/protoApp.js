@@ -1,129 +1,203 @@
-// Init svg
-var svg = d3.select("svg"),
-    width = document.getElementById('graphContainer').offsetWidth,
-	height = document.getElementById('graphContainer').offsetWidth * .75;
-
-// svg.attr('width', width).attr('height', height);
-
-var color = ''; // todo: make this an actual color or handle with css
-
-// simulation actually renders the graph and handles force animations
-var simulation = d3.forceSimulation()
-	.force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody().strength([-250])) // default strength -30)
-    .force("center", d3.forceCenter(width / 2, height / 2));
-
-
 // async ajax call baked into d3 to grab data
+// proto_ck_1a	gdelt_weblinks  gdelt_50_52
 d3.json("/data/proto_ck_1a.json", function (error, graph) {
  	if (error) throw error;
+ 	window.protoApp.globalGraphData = $.extend(true, {}, graph);
  	window.globalGraph = new GlobalGraph(graph);
 });
 
+
 // GlobalGraph object to initialize and render the global news network graph
-// graph {} : json formated data retrieved by d3.json()
+// graph {} : json formatted data retrieved by d3.json()
 // graph.nodes [] : array of node objects
 // graph.edges [] : array of edge objects
 function GlobalGraph (graph) {
 	var self = this;
 
-	this.user = {};
+	this.user = {}; // future user data
+	this.graph = graph; // the data used by the simulation
+	this.toggleNode = null; // for test purposes, this is a variable to contain removed node
+	this.toggleNodeEdges = []; // for test purposes, this is an array to conatin removed edges
+	this.radius = 5; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
+
+	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
+	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
+
+	this.width = $('#graphContainer').innerWidth();
+	this.height = this.width * .5;
+
+	this.svg = svg = d3.select("svg")
+    	.attr("viewBox", "0 0 " + this.width  + " " + this.height)
+    	.attr("preserveAspectRatio", "xMidYMid meet");
 
 	// d3 selection containing all edge lines
-	this.link = svg.append("g") // todo: change this var name to edge?
-		.attr("class", "links")
+	this.link = svg.append("g")
 		.selectAll("line")
-		.data(graph.edges)
-		.enter().append("line")
-		.attr("stroke-width", 2);
-		// .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+		.data(graph.edges);
 
 	// d3 selection containing all node circles
 	this.node = svg.append("g")
-		.attr("class", "nodes")
 		.selectAll("circle")
-		.data(graph.nodes)
-		.enter().append("circle")
-		.attr("r", function (d) {
-			if (d.count) return d.count;
-			return 5;
-		})
-		.attr("fill", function (d) {
-			return d.isActive ? "steelblue" : "black";
-		})
-		.call(d3.drag()
-			.on("start", dragStarted)
-			.on("drag", dragged)
-			.on("end", dragEnded));
+		.data(self.graph.nodes);
 
-	// should enable browswer default tooltip on over
-	this.node.append("title")
-		.text(function (d) { return d.id });
+	// simulation actually renders the graph and handles force animations
+	this.simulation = d3.forceSimulation()
+		.force("link", d3.forceLink().id(function(d) { return d.id; }))
+	    .force("charge", d3.forceManyBody().strength([-200])) // default strength -30
+	    .force("center", d3.forceCenter(this.width / 2, this.height / 2))
+		.force("x", d3.forceX(this.width / 2).strength([0.1]))
+    	.force("y", d3.forceY(this.height / 2).strength([0.1]));
 
-	// simulation driving the animation via tick callback
-	simulation
-		.nodes(graph.nodes)
-		.on("tick", ticked);
+	// this is a list of sub-graphs and their simulations
+	this.sub_graphs = [];
+	this.sub_simulations = [];
 
-	// not sure I quite understand this yet...
-	simulation.force("link")
-		.links(graph.edges);
 
-	// call back function for simulation tick, re-renders all nodes and edges
-	function ticked () {
+	// Call this function to apply manipulated data to the simulation
+	this.resetSimulation = function () {
+		self.node = self.node.data(self.graph.nodes); // apply data to node
+		self.node.exit().remove(); // remove exit selection
+		self.renderNodes(); // render the nodes
+
+		self.link = self.link.data(self.graph.edges); // apply data to link
+		self.link.exit().remove(); // remove exit selection
+		self.renderLinks(); // render the edges
+
+		self.runSimulation(); // re-define simulation
+		self.simulation.alphaTarget(0.3).restart(); // reset simulation
+	};
+
+	// Modular function for declaring what to do with nodes
+	this.renderNodes = function () {
+		self.node = self.node.enter()
+			.append("circle")
+			.attr("r", function (d) {
+				if (d.count) return d.count;
+				return 5;
+			})
+            .attr("id", function (d) {
+                return d.uuid;
+            })
+			.call(d3.drag()
+				.on("start", self.dragStarted)
+				.on("drag", self.dragged)
+				.on("end", self.dragEnded))
+			.merge(self.node);
+
+		self.node.append("title")
+			.text(function (d) { return d.label });
+	};
+
+	// Modular function for declaring what to do with edges
+	this.renderLinks = function () {
+		self.link = self.link.enter()
+			.append("line")
+			.attr("stroke-width", 2)
+			.merge(self.link);
+	};
+
+	// Callback function for "tick" event (entropy occuring over time!)
+	this.ticked = function () {
 		self.link
 			.attr("x1", function (d) { return d.source.x; })
 			.attr("y1", function (d) { return d.source.y; })
 			.attr("x2", function (d) { return d.target.x; })
 			.attr("y2", function (d) { return d.target.y; });
 
-		self.node
-			.attr("cx", function (d) { return d.x; })
-			.attr("cy", function (d) { return d.y; });
-	}
-}
+        // Math.max and radius calculation allow us to bound the position of the nodes within a box
+        self.node
+        	.attr("cx", function(d) { return d.x = Math.max(self.radius, Math.min(self.width - self.radius, d.x)); })
+            .attr("cy", function(d) { return d.y = Math.max(self.radius, Math.min(self.height - self.radius, d.y)); });
+	};
 
-// drag start event handler on nodes
-function dragStarted (d) {
-	if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-	d.fx = d.x;
-	d.fy = d.y;
-}
+	// Re-apply updated node and link to simulation
+	this.runSimulation = function () {
+		self.simulation.nodes(self.graph.nodes).on("tick", self.ticked);
+		self.simulation.force("link").links(self.graph.edges);
+	};
 
-// drag event handler on nodes
-function dragged (d) {
-	d.fx = d3.event.x;
-	d.fy = d3.event.y;
-}
+	// Drag Start Event Handler
+	this.dragStarted = function (d) {
+		if (!d3.event.active) {
+			self.simulation.alphaTarget(0.3).restart();
+			for (i = 0; i < self.sub_simulations.length; i++) {
+				self.sub_simulations[i].alphaTarget(0.3).restart();
+			}
+        }
+		d.fx = d.x;
+		d.fy = d.y;
+	};
 
-// drag end event handler on nodes
-function dragEnded (d) {
-	if (!d3.event.active) simulation.alphaTarget(0);
-	d.fx = null;
-	d.fy = null;
+	// Drag Event Handler
+	this.dragged = function (d) {
+		d.fx = d3.event.x;
+		d.fy = d3.event.y;
+	};
+
+	// Drag End Event Handler
+	this.dragEnded = function (d) {
+		if (!d3.event.active) {
+			self.simulation.alphaTarget(0);
+            for (i = 0; i < self.sub_simulations.length; i++) {
+                self.sub_simulations[i].alphaTarget(0).restart();
+            }
+        }
+		d.fx = null;
+		d.fy = null;
+	};
+
+	this.highlightSubGraph = function (node_ids) {
+		var subgraph_nodes = [];
+		for (var i=0; i < node_ids.length; i++) {
+			var node_id = node_ids[i];
+			var node = self.node_index[node_id];
+			document.getElementById(node.uuid).setAttribute("class", "selected_node");
+            subgraph_nodes.push(node);
+		}
+		this.sub_graphs.push(subgraph_nodes);
+		this.sub_simulations.push(
+			d3.forceSimulation()
+				.force("charge", d3.forceManyBody().strength([-15]))
+                .force("x", d3.forceX(self.width * 0.8).strength([0.08]))
+				.force("y", d3.forceY(self.height * 0.5).strength([0.08]))
+                .nodes(subgraph_nodes)
+				.on("tick", self.ticked));
+    };
+
+	// Actually render the graph once everything is defined
+	this.renderNodes();
+	this.renderLinks();
+	this.runSimulation();
 }
 
 
 // ProtoApp is the frontend app controllng the front-end and integrating D3 and user interactions
-function ProtoApp (options) {
-	options = arguments[0] || null;
+function ProtoApp () {
 
 	var self = this;
 	this.userData = {};
+	this.globalGraphData = null;
 
 	this.initialize = function () {
 		this.addEventListeners();
 	},
 
+	// Subscribe to button clicks
 	this.addEventListeners = function () {
 		$('#refreshGraph').on('click', this.onRefreshGraph);
 		$('#addStubData').on('click', this.onAddStubData);
+		$('#toggleNode').on('click', this.onToggleNode);
 	},
 
+	// Handling Refresh Graph Button
 	this.onRefreshGraph = function (e) {
-		// tell D3 to do it's thing
+		window.globalGraph.graph = $.extend(true, {}, self.globalGraphData);
+		window.globalGraph.toggleNode = null;
+		window.globalGraph.toggleNodeEdges.length = 0;
+		window.globalGraph.resetSimulation();
 	},
 
+	// Handles button click and fetches stub data file based on selected option
 	this.onAddStubData = function (e) {
 		var filenameString = $('#stubDataSelect').find('option:selected').attr('value');
 		var filePath = '/data/' + filenameString + '.json';
@@ -137,16 +211,63 @@ function ProtoApp (options) {
 		});
 	}
 
-	this.handleStubData = function (data) {
-		self.userData = data;
-		// console.log(data);
-		// do things with stub data
+	// For testing purposes
+	this.onToggleNode = function (e) {
+
+		// If node is saved, restore it and unsave it
+		if (window.globalGraph.toggleNode) {
+			window.globalGraph.graph.nodes.push(window.globalGraph.toggleNode);
+			window.globalGraph.graph.edges = window.globalGraph.graph.edges.concat(window.globalGraph.toggleNodeEdges);
+
+			window.globalGraph.toggleNode = null;
+			window.globalGraph.toggleNodeEdges.length = 0;
+
+		// If no node is saved, save the node
+		} else {
+			window.globalGraph.toggleNode = window.globalGraph.graph.nodes.pop();
+			var id = window.globalGraph.toggleNode.id;
+			var edges = []
+
+			window.globalGraph.graph.edges.forEach(function(d) {
+				if (d.source.id === id || d.target.id === id) {
+					window.globalGraph.toggleNodeEdges.push(d);
+				} else {
+					edges.push(d);
+				}
+			});
+
+			window.globalGraph.graph.edges = edges;
+		}
+
+		// Rerun the simulation
+		window.globalGraph.resetSimulation();
 	}
 
-	this.initialize();
+	// Callback function for what to do when we graph data from external source
+	this.handleStubData = function (data) {
+		self.userData = data;
+		// do things with stub data
+		window.globalGraph.highlightSubGraph(data.nodes.map(function (d) { return d.id }));
+	};
+
+	this.initialize(); // kick it off!
 };
 
-var protoApp = new ProtoApp();
+function _index(objects) {
+   var index = {};
+   for (var i=0; i < objects.length; i++) {
+	   var n = objects[i];
+	   n.uuid = uuid();
+	   index[n.id] = n;
+   }
+   return index;
+}
 
+// generates UUID v4 identifiers. Math.random() isn't a perfect RNG, but should be more than fine for our purposes
+function uuid(a) {
+	return a ? (a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,uuid)
+}
+
+window.protoApp = new ProtoApp(); // new it up!
 
 
