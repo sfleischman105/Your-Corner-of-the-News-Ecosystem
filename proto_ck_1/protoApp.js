@@ -1,6 +1,3 @@
-
-
-
 // async ajax call baked into d3 to grab data
 // proto_ck_1a	gdelt_weblinks  gdelt_50_52
 d3.json("/data/proto_ck_1a.json", function (error, graph) {
