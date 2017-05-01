@@ -45,7 +45,11 @@ ol { margin: 1em; }
 
 line {
   stroke-width: 1;
-  stroke: black;
+  stroke: grey;
+}
+
+.selected_node {
+  fill: blue;
 }
 
 #graphContainer {
