@@ -45,7 +45,17 @@ ol { margin: 1em; }
 
 line {
   stroke-width: 1;
-  stroke: black;
+  stroke: grey;
+}
+
+.selected_node {
+  fill: steelblue;
+  stroke-width: 3px;
+  r: 8;
+}
+
+.selected_edge {
+  stroke: steelblue;
 }
 
 #graphContainer {
