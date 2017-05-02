@@ -38,3 +38,19 @@ ol { margin: 1em; }
 @media (min-width: 550px) {
   .alpha.columns, .alpha.column { margin-left: 0; }
 }
+
+
+
+/* PROTOTYPE SPECIFIC STYLING */
+
+line {
+  stroke-width: 1;
+  stroke: black;
+}
+
+#graphContainer {
+  border-right: 1px solid grey;
+}
+
+
+
