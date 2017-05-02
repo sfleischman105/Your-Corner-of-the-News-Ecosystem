@@ -32,7 +32,9 @@ banned_domains = [
         'sli.mg',
         's-media-cache-ak0.pinimg.com',
         'quickmeme.com',
-        '24.media.tumblr.com'
+        '24.media.tumblr.com',
+        'pbs.twimg.com',
+        ''
     ]
 
 # Number of posts To parse per subreddit
