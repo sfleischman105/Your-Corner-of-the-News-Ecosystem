@@ -41,7 +41,7 @@ banned_domains = [
     ]
 
 # Number of posts To parse per subreddit
-NUMBER_POSTS = 1750
+NUMBER_POSTS = 1550
 
 
 class RedditSpider(scrapy.Spider):
