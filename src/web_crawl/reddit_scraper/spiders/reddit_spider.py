@@ -34,7 +34,10 @@ banned_domains = [
         'quickmeme.com',
         '24.media.tumblr.com',
         'pbs.twimg.com',
-        ''
+        'i.imgflip.com',
+        '25.media.tumblr.com',
+        'pic.al'
+
     ]
 
 # Number of posts To parse per subreddit
