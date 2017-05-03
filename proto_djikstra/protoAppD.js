@@ -1,4 +1,6 @@
 // Init svg
+
+
 var svg = d3.select("svg"),
     width = document.getElementById('graphContainer').offsetWidth,
 	height = document.getElementById('graphContainer').offsetWidth * .75;
@@ -15,7 +17,7 @@ var simulation = d3.forceSimulation()
 
 
 // async ajax call baked into d3 to grab data
-d3.json("/data/reddit/reddit_data_test.json", function (error, graph) {
+d3.json("reddit_data_test.json", function (error, graph) {
  	if (error) throw error;
  	window.globalGraph = new GlobalGraph(graph);
 });
@@ -29,27 +31,27 @@ function GlobalGraph (graph) {
 
 	this.user = {};
 
-	// d3 selection containing all edge lines
-	this.link = svg.append("g") // todo: change this var name to edge?
-		.attr("class", "links")
-		.selectAll("line")
-		.data(graph.edges)
-		.enter().append("line")
-		.attr("stroke-width", 2);
-		// .attr("stroke-width", function(d) { return Math.sqrt(d.count); });
+	graph.nodes.forEach( function(d) {
+		d.links = [];
+	});
+
+	// graph.edges.forEach( function(d) {
+     //    var src = d.source;
+     //    src.links.push(d);
+	// });
 
 	// d3 selection containing all node circles
 	this.node = svg.append("g")
-		.attr("class", "nodes")
-		.selectAll("circle")
+		.attr("class", "node")
+		.selectAll(".node")
 		.data(graph.nodes)
 		.enter().append("circle")
 		.on("click", function() {
 			d3.select(this).attr("fill", "red")
         })
 		.attr("r", function (d) {
-			if (d.count) return d.count * 5;
-			return 5;
+			if (d.count) return d.count * 7;
+			return 8;
 		})
 		.attr("fill", function (d) {
 			return d.isActive ? "steelblue" : "black";
@@ -58,6 +60,23 @@ function GlobalGraph (graph) {
 			.on("start", dragStarted)
 			.on("drag", dragged)
 			.on("end", dragEnded));
+
+
+    // d3 selection containing all edge lines
+    this.link = svg.append("g") // todo: change this var name to edge?
+        .attr("class", "link")
+        .selectAll(".link")
+        .data(graph.edges)
+        .enter().append("line")
+        .attr("stroke-width", 2);
+    // .attr("stroke-width", function(d) { return Math.sqrt(d.count); });
+
+    // d3.selectAll(".link").call(update_node_src);
+    //
+    // function update_node_src() {
+		// var src = self.source;
+		// src.links.push(self);
+    // }
 
 	// should enable browswer default tooltip on over
 	this.node.append("title")
@@ -85,10 +104,40 @@ function GlobalGraph (graph) {
 			.attr("cy", function (d) { return d.y; });
 	}
 
-	var djiks
+	this.node.on("mouseover", function() {
+		d3.select(this)
+			.attr("r",10)
+	});
+
+    this.node.on("mouseout", function() {
+        d3.select(this)
+            .attr("r",7)
+    });
+
+    graph.edges.forEach( function(d) {
+        var src = d.source;
+        src.links.push(d);
+    });
 
 
+    var dijkstra = d3.dijkstra()
+		.nodes(this.node)
+		.edges(this.edges);
 
+
+    var color = d3.scaleLinear()
+        .domain([0, 1000, 2500])
+        .range(["green", "yellow", "red"]);
+
+    dijkstra.on("tick", function() {
+        node.style("fill", function(d) { return color(d.distance); });
+    });
+
+    dijkstra.on("end", function() {
+        console.log("Hello");
+    });
+
+    this.node.on("click", dijkstra.start);
 
 
 }
@@ -151,6 +200,7 @@ function ProtoApp (options) {
 };
 
 var protoApp = new ProtoApp();
+
 
 
 
