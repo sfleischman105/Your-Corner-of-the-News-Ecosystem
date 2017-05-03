@@ -68,9 +68,10 @@ function GlobalGraph (graph) {
 	// this is a list of sub-graphs and their simulations
 	this.sub_graphs = [];
 	this.sub_simulations = [];
+	this.sub_graph_color_scale = d3.scaleOrdinal(d3.schemeCategory10); //support colors for up to 10 subgraphs
 
 
-	// Call this function to apply manipulated data to the simulation
+    // Call this function to apply manipulated data to the simulation
 	this.resetSimulation = function () {
 		self.node = self.node.data(self.graph.nodes); // apply data to node
 		self.node.exit().remove(); // remove exit selection
@@ -82,9 +83,17 @@ function GlobalGraph (graph) {
 
 		self.runSimulation(); // re-define simulation
 		self.simulation.alphaTarget(0.3).restart(); // reset simulation
-		for (var sim in self.sub_simulations) {
-			sim.alphaTarget(0.3).restart();
+		for (var i = 0; i <self.sub_simulations.length; i++) {
+			var sim = self.sub_simulations[i];
+			sim.nodes([]);
+			sim.stop();
 		}
+		self.sub_simulations = [];
+        for (var i = 0; i <self.sub_graphs.length; i++) {
+            var sg = self.sub_graphs[i];
+            sg.clear(sg); // as a hack, have to pass itself as an argument
+        }
+		self.sub_graphs = [];
 	};
 
 	// Modular function for declaring what to do with nodes
@@ -95,6 +104,7 @@ function GlobalGraph (graph) {
 				if (d.count) return d.count;
 				return 5;
 			})
+			.attr("class", "node")
             .attr("id", function (d) {
                 return d.uuid;
             })
@@ -135,6 +145,7 @@ function GlobalGraph (graph) {
 		self.link = self.link.enter()
 			.append("line")
 			.attr("stroke-width", 2)
+			.attr("class", "link")
 			.merge(self.link);
 	};
 
@@ -189,20 +200,35 @@ function GlobalGraph (graph) {
 	};
 
 	this.highlightSubGraph = function (node_ids) {
-		var subgraph_nodes = [];
+		var subgraph_nodes = {};
+		subgraph_nodes.nodes = [];
 		for (var i=0; i < node_ids.length; i++) {
 			var node_id = node_ids[i];
 			var node = self.node_index[node_id];
-			document.getElementById(node.uuid).setAttribute("class", "selected_node");
-            subgraph_nodes.push(node);
+			d3.select("#" + node.uuid)
+				.style("fill",  self.sub_graph_color_scale(self.sub_graphs.length))
+				.style("stroke-width", 3)
+				.style("r", 8);
+            subgraph_nodes.nodes.push(node);
 		}
+		subgraph_nodes.clear = function (self) {
+            for (var i=0; i < self.nodes.length; i++) {
+                var node = self.nodes[i];
+                var elem = document.querySelector('.node');
+                var style =getComputedStyle(elem);
+                d3.select("#" + node.uuid)
+					.style("fill", style.fill)
+					.style("stroke-width", style.stroke_width)
+					.style("r", style.r)
+            }
+		};
 		this.sub_graphs.push(subgraph_nodes);
 		this.sub_simulations.push(
 			d3.forceSimulation()
 				.force("charge", d3.forceManyBody().strength([-15]))
                 .force("x", d3.forceX(self.width * 0.8).strength([0.08]))
 				.force("y", d3.forceY(self.height * 0.5).strength([0.08]))
-                .nodes(subgraph_nodes)
+                .nodes(subgraph_nodes.nodes)
 				.on("tick", self.ticked));
     };
 
@@ -211,7 +237,7 @@ function GlobalGraph (graph) {
         var index = {};
         for (var i=0; i < objects.length; i++) {
             var n = objects[i];
-            n.uuid = uuid();
+            n.uuid = "a" + uuid();
             index[n.id] = n;
         }
         return index;
@@ -279,7 +305,7 @@ function ProtoApp () {
 		} else {
 			window.globalGraph.toggleNode = window.globalGraph.graph.nodes.pop();
 			var id = window.globalGraph.toggleNode.id;
-			var edges = []
+			var edges = [];
 
 			window.globalGraph.graph.edges.forEach(function(d) {
 				if (d.source.id === id || d.target.id === id) {
@@ -299,6 +325,7 @@ function ProtoApp () {
 	// Callback function for what to do when we graph data from external source
 	this.handleStubData = function (data) {
 		self.userData = data;
+		console.log(data);
 		// do things with stub data
 		window.globalGraph.highlightSubGraph(data.nodes.map(function (d) { return d.id }));
 	};

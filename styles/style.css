@@ -43,19 +43,15 @@ ol { margin: 1em; }
 
 /* PROTOTYPE SPECIFIC STYLING */
 
-line {
+.link {
   stroke-width: 1;
   stroke: grey;
 }
 
-.selected_node {
-  fill: steelblue;
-  stroke-width: 3px;
-  r: 8;
-}
-
-.selected_edge {
-  stroke: steelblue;
+.node {
+  stroke-width: 2;
+  fill: #454545;
+  r: 5;
 }
 
 #graphContainer {
