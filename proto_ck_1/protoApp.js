@@ -22,6 +22,9 @@ function GlobalGraph (graph) {
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
 
+	this.doShowSteps = false;
+	this.stepCount = 1;
+
 	this.width = $('#graphContainer').innerWidth();
 	this.height = this.width * .5;
 
@@ -255,9 +258,11 @@ function ProtoApp () {
 	var self = this;
 	this.userData = {};
 	this.globalGraphData = null;
+	
 
 	this.initialize = function () {
 		this.addEventListeners();
+		this.buildStepsControl();
 	},
 
 	// Subscribe to button clicks
@@ -266,6 +271,39 @@ function ProtoApp () {
 		$('#addStubData').on('click', this.onAddStubData);
 		$('#toggleNode').on('click', this.onToggleNode);
 	},
+
+	this.buildStepsControl = function () {
+		self.stepsController = d3.select('#stepsControlContainer');
+
+		self.stepsController.append('h3').text('Steps Control');
+		
+		self.stepsController.append('input').attr('class', 'stepsControlToggle')
+			.attr('type', 'checkbox')
+			.attr('name', 'isStepsMode')
+			.on('click', function (d) {
+				window.globalGraph.doShowSteps = !window.globalGraph.doShowSteps;
+				// console.log('self.doShowSteps', window.globalGraph.doShowSteps);
+			});
+		self.stepsController.append('span')
+			.attr('class', 'onOff').text('on/off');
+
+		
+		self.stepsController.append('select')
+			.attr('class', 'stepsControlSelect')
+			.on('click', function (d) {
+				// update the state here
+				if (Number($('option:selected',this).attr('value')) !== window.globalGraph.stepCount) {
+					window.globalGraph.stepCount = Number($('option:selected',this).attr('value'));
+					// console.log('option:click', this);
+				}
+			});
+		for (var i = 0; i < 4; i++) {
+			self.stepsController.select('select')
+				.append('option')
+				.attr('value', i + 1)
+				.text(i + 1);
+		}
+	}
 
 	// Handling Refresh Graph Button
 	this.onRefreshGraph = function (e) {
