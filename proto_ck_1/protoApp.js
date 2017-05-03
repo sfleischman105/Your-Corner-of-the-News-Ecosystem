@@ -6,7 +6,6 @@ d3.json("/data/proto_ck_1a.json", function (error, graph) {
  	window.globalGraph = new GlobalGraph(graph);
 });
 
-
 // GlobalGraph object to initialize and render the global news network graph
 // graph {} : json formatted data retrieved by d3.json()
 // graph.nodes [] : array of node objects
@@ -82,10 +81,32 @@ function GlobalGraph (graph) {
 				.on("start", self.dragStarted)
 				.on("drag", self.dragged)
 				.on("end", self.dragEnded))
+
+			.on("click", self.onNodeClick)
 			.merge(self.node);
 
 		self.node.append("title")
 			.text(function (d) { return d.label });
+	};
+
+	// Handler for node clicks; d = node datum; this = 
+	this.onNodeClick = function (d) { 
+
+		// Do all the things 
+		self.toggleNodeIsActive(d);
+		// self.doOtherThings(d)
+		// self.doEvenMoreThings(d)
+	};
+
+	// Selecting and Deselecting Nodes
+	this.toggleNodeIsActive = function (d) {
+		if (typeof d.isActive === undefined) d.isActive = false; // saftey check
+
+		d3.select(this).transition()
+			.attr('r', function (d) { return d.isActive ? 5 : 15 })
+			.style('fill', function (d) { return d.isActive ? 'black' : 'green' });
+
+		d.isActive = !d.isActive; // update node state
 	};
 
 	// Modular function for declaring what to do with edges
