@@ -1,6 +1,6 @@
 // async ajax call baked into d3 to grab data
 // proto_ck_1a	gdelt_weblinks  gdelt_50_52
-d3.json("/data/proto_ck_1a.json", function (error, graph) {
+d3.json("/data/gdelt_50_52.json", function (error, graph) {
  	if (error) throw error;
  	window.protoApp.globalGraphData = $.extend(true, {}, graph);
  	window.globalGraph = new GlobalGraph(graph);
@@ -19,6 +19,7 @@ function GlobalGraph (graph) {
 	this.toggleNodeEdges = []; // for test purposes, this is an array to conatin removed edges
 	this.radius = 5; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
 
+
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
 
@@ -34,6 +35,20 @@ function GlobalGraph (graph) {
 		.selectAll("line")
 		.data(graph.edges);
 
+    //helper function for getting counts for each node.
+    self._counts = function () {
+        var counts = [];
+        for (var i = 0; i < self.graph.edges.length; i++) {
+            counts[i] = (parseInt(self.graph.edges[i].attributes.Count));
+        }
+        return counts;
+    };
+
+	//getting link means, stdevs
+	var link_counts = self._counts();
+	self.link_mean = d3.mean(link_counts);
+	self.link_stdev = d3.deviation(link_counts);
+
 	// d3 selection containing all node circles
 	this.node = svg.append("g")
 		.selectAll("circle")
@@ -41,7 +56,10 @@ function GlobalGraph (graph) {
 
 	// simulation actually renders the graph and handles force animations
 	this.simulation = d3.forceSimulation()
-		.force("link", d3.forceLink().id(function(d) { return d.id; }))
+		.force("link", d3.forceLink().distance(function (d) {
+            var shift = (parseInt(d.attributes.Count) - self.link_mean) / (0.05 * self.link_stdev);
+            return Math.max(Math.min(20 - shift, 5), 40);
+        }).strength(1).id(function(d) { return d.id; }))
 	    .force("charge", d3.forceManyBody().strength([-200])) // default strength -30
 	    .force("center", d3.forceCenter(this.width / 2, this.height / 2))
 		.force("x", d3.forceX(this.width / 2).strength([0.1]))
@@ -64,6 +82,9 @@ function GlobalGraph (graph) {
 
 		self.runSimulation(); // re-define simulation
 		self.simulation.alphaTarget(0.3).restart(); // reset simulation
+		for (var sim in self.sub_simulations) {
+			sim.alphaTarget(0.3).restart();
+		}
 	};
 
 	// Modular function for declaring what to do with nodes
@@ -185,6 +206,17 @@ function GlobalGraph (graph) {
 				.on("tick", self.ticked));
     };
 
+	// helper function for building an index of SVG elements by UUID
+    function _index(objects) {
+        var index = {};
+        for (var i=0; i < objects.length; i++) {
+            var n = objects[i];
+            n.uuid = uuid();
+            index[n.id] = n;
+        }
+        return index;
+    }
+
 	// Actually render the graph once everything is defined
 	this.renderNodes();
 	this.renderLinks();
@@ -273,16 +305,6 @@ function ProtoApp () {
 
 	this.initialize(); // kick it off!
 };
-
-function _index(objects) {
-   var index = {};
-   for (var i=0; i < objects.length; i++) {
-	   var n = objects[i];
-	   n.uuid = uuid();
-	   index[n.id] = n;
-   }
-   return index;
-}
 
 // generates UUID v4 identifiers. Math.random() isn't a perfect RNG, but should be more than fine for our purposes
 function uuid(a) {
