@@ -91,12 +91,14 @@ function GlobalGraph (graph) {
 
 	// Handler for node clicks; d = node datum; this = 
 	this.onNodeClick = function (d) { 
+		if (typeof d.isActive === undefined) d.isActive = false; // saftey check
 
 		// Do all the things 
 		d3.select(this).transition()
-			.attr('r', 15)
-			.style('fill', 'green');
+			.attr('r', function (d) { return d.isActive ? 5 : 15 })
+			.style('fill', function (d) { return d.isActive ? 'black' : 'green' });
 
+		d.isActive = !d.isActive; // update node state
 	};
 
 	// Modular function for declaring what to do with edges
