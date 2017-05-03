@@ -154,12 +154,11 @@ function GlobalGraph (graph) {
 
 
 	// Handler for node clicks; d = node datum; this = svg element
-	this.onNodeClick = function (d) { 
-
+	this.onNodeClick = function (d) {
 		// Do all the things 
 		self.toggleNodeIsActive(d, this);
 
-
+		// dijkstra!
 		self.dijkstra(d);
 		// self.doOtherThings(d)
 		// self.doEvenMoreThings(d)
@@ -173,21 +172,20 @@ function GlobalGraph (graph) {
 			.attr('r', function (d) { return d.isActive ? 5 : 15 })
 			.style('fill', function (d) { return d.isActive ? 'black' : 'green' });
 
-
 		d.isActive = !d.isActive; // update node state
 	};
 
 	// Modular function for declaring what to do with edges
 	this.renderLinks = function () {
-
 		self.link = self.link.enter()
 			.append("line")
 			.attr("stroke-width", 2)
 			.merge(self.link);
 	};
 
+    // Appends the list of links to each node to include links that have that node as the source
+    // Called during initialization & during Reset
 	this.addSources = function() {
-        // Appends the list of links to each node to include links that have that node as the source
         self.graph.edges.forEach( function(d) {
             var src = d.source;
             src.links.push(d);
@@ -261,18 +259,18 @@ function GlobalGraph (graph) {
         return "crimson";
     }
 
-    // Function to change the color of each node. Called by dijkstra
-    function tick() {
-        self.node.style("fill", function(d) {
-            return color(d.distance);
-        });
-    }
-
-
     // Given a starting node, runs djikstras algorthm to determine the distances each node is from
     // the starting node. Also calls 'tick'() to change color corresponding to distance
     // Modifies the distance attribute of each node
 	this.dijkstra = function(first) {
+
+        // Function to change the color of each node.
+        function tick() {
+            self.node.style("fill", function(d) {
+                return color(d.distance);
+            });
+        }
+
         var unvisited = [];
         this.graph.nodes.forEach(function (d) {
             if (d != first) {
@@ -343,7 +341,6 @@ function GlobalGraph (graph) {
 	this.renderNodes();
 	this.renderLinks();
 	this.runSimulation();
-
 }
 
 
