@@ -93,7 +93,7 @@ function GlobalGraph (graph) {
 	this.onNodeClick = function (d) { 
 
 		// Do all the things 
-		d3.select(this)
+		d3.select(this).transition()
 			.attr('r', 15)
 			.style('fill', 'green');
 
