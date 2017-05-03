@@ -91,9 +91,17 @@ function GlobalGraph (graph) {
 
 	// Handler for node clicks; d = node datum; this = 
 	this.onNodeClick = function (d) { 
-		if (typeof d.isActive === undefined) d.isActive = false; // saftey check
 
 		// Do all the things 
+		self.toggleNodeIsActive(d);
+		// self.doOtherThings(d)
+		// self.doEvenMoreThings(d)
+	};
+
+	// Selecting and Deselecting Nodes
+	this.toggleNodeIsActive = function (d) {
+		if (typeof d.isActive === undefined) d.isActive = false; // saftey check
+
 		d3.select(this).transition()
 			.attr('r', function (d) { return d.isActive ? 5 : 15 })
 			.style('fill', function (d) { return d.isActive ? 'black' : 'green' });
