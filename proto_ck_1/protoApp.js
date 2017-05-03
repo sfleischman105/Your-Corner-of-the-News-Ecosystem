@@ -89,20 +89,20 @@ function GlobalGraph (graph) {
 			.text(function (d) { return d.label });
 	};
 
-	// Handler for node clicks; d = node datum; this = 
+	// Handler for node clicks; d = node datum; this = svg element
 	this.onNodeClick = function (d) { 
 
 		// Do all the things 
-		self.toggleNodeIsActive(d);
+		self.toggleNodeIsActive(d, this);
 		// self.doOtherThings(d)
 		// self.doEvenMoreThings(d)
 	};
 
 	// Selecting and Deselecting Nodes
-	this.toggleNodeIsActive = function (d) {
+	this.toggleNodeIsActive = function (d, ele) {
 		if (typeof d.isActive === undefined) d.isActive = false; // saftey check
 
-		d3.select(this).transition()
+		d3.select(ele).transition()
 			.attr('r', function (d) { return d.isActive ? 5 : 15 })
 			.style('fill', function (d) { return d.isActive ? 'black' : 'green' });
 
