@@ -82,13 +82,16 @@ function GlobalGraph (graph) {
 				.on("drag", self.dragged)
 				.on("end", self.dragEnded))
 
-			.on("click", function (d) { // on('click') passes dataum to callback function
-				console.log('click', d); 
-			})
+			.on("click", self.onNodeClick)
 			.merge(self.node);
 
 		self.node.append("title")
 			.text(function (d) { return d.label });
+	};
+
+	// Handler for node clicks; d - node datum
+	this.onNodeClick = function (d) { 
+		// console.log('click', d); 
 	};
 
 	// Modular function for declaring what to do with edges
