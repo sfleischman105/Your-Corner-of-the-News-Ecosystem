@@ -93,9 +93,7 @@ function GlobalGraph (graph) {
 			.on("mouseover", self.onNodeMouseOver)
 
 			// Handle mouse out
-			.on("mouseout", function (d) {
-				// nothing here yet
-			})
+			.on("mouseout", self.onNodeMouseOut)
 
 			// handle click
 			.on("click", self.onNodeClick)
@@ -105,6 +103,10 @@ function GlobalGraph (graph) {
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
 		self.handleToolTipEvent(d);
+	}
+
+	this.onNodeMouseOut = function (d) {
+		// d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
 	}
 
 	// Tool Tip Div Setup
@@ -134,7 +136,7 @@ function GlobalGraph (graph) {
 			.style('opacity', 1);
 
 		d3.select('h3.toolTipTitle a') // Handle link url and text
-			.attr('href', d.id)
+			.attr('href', '//' + d.id)
 			.text(d.id);
 	
 	}
