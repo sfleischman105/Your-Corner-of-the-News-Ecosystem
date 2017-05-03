@@ -6,7 +6,6 @@ d3.json("/data/proto_ck_1a.json", function (error, graph) {
  	window.globalGraph = new GlobalGraph(graph);
 });
 
-
 // GlobalGraph object to initialize and render the global news network graph
 // graph {} : json formatted data retrieved by d3.json()
 // graph.nodes [] : array of node objects
@@ -82,6 +81,10 @@ function GlobalGraph (graph) {
 				.on("start", self.dragStarted)
 				.on("drag", self.dragged)
 				.on("end", self.dragEnded))
+
+			.on("click", function (d) { // on('click') passes dataum to callback function
+				console.log('click', d); 
+			})
 			.merge(self.node);
 
 		self.node.append("title")
