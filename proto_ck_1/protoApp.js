@@ -38,7 +38,12 @@ function GlobalGraph (graph) {
 	// d3 selection containing all node circles
 	this.node = svg.append("g")
 		.selectAll("circle")
-		.data(self.graph.nodes);
+		.data(self.graph.nodes)
+		//.on("mouseover", tip.show)
+		//.on("mouseout", tip.hide);
+
+	//svg.call(tip);
+	
 
 	// simulation actually renders the graph and handles force animations
 	this.simulation = d3.forceSimulation()
@@ -82,11 +87,28 @@ function GlobalGraph (graph) {
 				.on("start", self.dragStarted)
 				.on("drag", self.dragged)
 				.on("end", self.dragEnded))
+			.on("mouseover", function () {
+				tooltip.style("display", null);
+			})
+			.on("mouseout", function () {
+				tooltip.style("display", "none");
+			})
 			.merge(self.node);
 
 		self.node.append("title")
 			.text(function (d) { return d.label });
 	};
+
+	var tooltip = svg.append("g")
+		.attr("class", tooltip)
+		.style("display", "none");
+
+	tooltip.append("text")
+		.attr("x", 15)
+		.attr("dy", 1.2em)
+		.style("font-size", "1.25em")
+		.attr("font-weight", "bold");
+
 
 	// Modular function for declaring what to do with edges
 	this.renderLinks = function () {
