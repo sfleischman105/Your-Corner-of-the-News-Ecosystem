@@ -115,7 +115,7 @@ function GlobalGraph (graph) {
 	this.toolTipDiv.append('i') // add i element for close button
 		.attr('class', 'close fa fa-close') // add classes for font awesome styling
 		.on('click', function () { // lisent for click to hide tooltip
-			$('.toolTipDiv').css('opacity', 0);
+			d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0);
 		});
 
 	this.toolTipDiv.append('h3') // h3 for title
@@ -131,8 +131,7 @@ function GlobalGraph (graph) {
 			.call(function(){ // so i just call ananoynous function 
 				$('div.toolTipDiv').css('top', d.y).css('left',d.x); // to do it with jquery
 			})
-			.style('opacity', 1)
-			.on('click', function (e) { console.log('div:click', e) });
+			.style('opacity', 1);
 
 		d3.select('h3.toolTipTitle a') // Handle link url and text
 			.attr('href', d.id)
@@ -156,7 +155,7 @@ function GlobalGraph (graph) {
 	this.toggleNodeIsActive = function (d, ele) {
 		if (typeof d.isActive === undefined) d.isActive = false; // saftey check
 
-		d3.select(ele).transition()
+		d3.select(ele).transition().duration(200)
 			.attr('r', function (d) { return d.isActive ? 5 : 15 })
 			.style('fill', function (d) { return d.isActive ? 'black' : 'green' });
 
