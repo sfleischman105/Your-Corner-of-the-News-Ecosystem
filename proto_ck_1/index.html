@@ -4,22 +4,18 @@
   <title>proto_ck_1</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" media="all" rel="stylesheet">
   <link href="./../styles/normalize.css" media="all" rel="stylesheet" />
   <link href="./../styles/skeleton.css" media="all" rel="stylesheet" />
   <link href="./../styles/style.css" media="all" rel="stylesheet" />
-  <style>
-    
-  </style>
 </head>
 <body>
 	<main class="container content">
 
-    <section id="graphContainer" class="eight columns alpha">
-      <svg height="500" width="500"></svg>  
+    <section id="graphContainer" class="twelve columns alpha">
+      <svg></svg>
     </section>
-
-
-		<section id="graphControl" class="four columns">
+    <section id="graphControl" class="twelve columns alpha">
     <h1>Graph Control</h1>
       <button id="refreshGraph">Refresh Graph</button>  <!--  -->
     
@@ -27,15 +23,16 @@
       <select id="stubDataSelect">
         <option value="stub1a">User Data 1a</option>
         <option value="stub2">User Data 2</option>
+      <option value="stub_gdelt_ua">Some Russian and Ukrainian Domains</option>
       </select>
       <button id="addStubData">Add Stub Data</button>
-    
+      <button id="toggleNode">Toggle Point</button>
     </section>
 
 
 	</main>
   <script type="text/javascript" src="./../assets/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
-	<script type="text/javascript" src="./protoApp.js"></script>
+    <script type="text/javascript" src="./protoApp.js"></script>
 </body>
 </html>
