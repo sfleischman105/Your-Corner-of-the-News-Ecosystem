@@ -89,9 +89,14 @@ function GlobalGraph (graph) {
 			.text(function (d) { return d.label });
 	};
 
-	// Handler for node clicks; d - node datum
+	// Handler for node clicks; d = node datum; this = 
 	this.onNodeClick = function (d) { 
-		// console.log('click', d); 
+
+		// Do all the things 
+		d3.select(this)
+			.attr('r', 15)
+			.style('fill', 'green');
+
 	};
 
 	// Modular function for declaring what to do with edges
