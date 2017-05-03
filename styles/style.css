@@ -62,5 +62,15 @@ line {
   border-right: 1px solid grey;
 }
 
+.toolTipDiv {
+  display: block;
+  /*opacity: 0;*/
+  top: 0; left: 0;
+  transition: opactiy .5s;
+  position: absolute;
+  background-color: white;
+  border: 1px solid #888;
 
+  font-weight: bold;
+}
 

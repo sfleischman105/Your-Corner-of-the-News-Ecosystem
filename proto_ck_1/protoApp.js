@@ -94,20 +94,23 @@ function GlobalGraph (graph) {
 				console.log('mouseover d - ', d);
 
 				// show tool tip
-				tooltip // chain other styling here like position!
-					.attr('transform', 'translate(' + d.x + ',' + d.y + ')')
-					.transition()
-					.style("opacity", 1);
+				// self.toolTipDiv // chain other styling here like position!
+				// 	.style("top", d.x)
+				// 	.style("left", d.y)
+				// 	.transition()
+				// 	.style("opacity", 1);
+				$('.toolTipDiv').css('top', d.y).css('left', d.x).css('opacity', 1);
 
-				tooltip.select("text") // selects text within the tooltip g element
-						.text(d.id); // write text into text element; chain any other text attrs or styles here
+				// self.toolTipDiv.select("p") // selects text within the tooltip g element
+				// 		.text(d.id); // write text into text element; chain any other text attrs or styles here
 						// debugger;
-				tooltip.select('rect')
-					.attr('width', function(d) { return $('.tooltip text').innerWidth() + 30; })
-					.attr('height', function(d) { return $('.tooltip text').innerHeight() + 35; })
+				$('.toolTipDiv p').html('<h3>' + d.id + '</h3>');
+				// tooltip.select('rect')
+				// 	.attr('width', function(d) { return $('.tooltip text').innerWidth() + 30; })
+				// 	.attr('height', function(d) { return $('.tooltip text').innerHeight() + 35; })
 			})
 			.on("mouseout", function (d) {
-				tooltip.transition().style("opacity", 0);
+				$('.toolTipDiv').css('opacity', 0);
 			})
 
 			// handle click
@@ -117,6 +120,10 @@ function GlobalGraph (graph) {
 		// self.node.append("title")
 		// 	.text(function (d) { return d.label });
 	};
+
+	this.toolTipDiv = d3.select('#graphContainer').append('div')
+		.attr('class', 'toolTipDiv').append('p');
+
 
 	var tooltip = svg.append("g")
 		.attr("class", 'tooltip')
