@@ -37,7 +37,12 @@ function GlobalGraph (graph) {
 	// d3 selection containing all node circles
 	this.node = svg.append("g")
 		.selectAll("circle")
-		.data(self.graph.nodes);
+		.data(self.graph.nodes)
+		//.on("mouseover", tip.show)
+		//.on("mouseout", tip.hide);
+
+	//svg.call(tip);
+	
 
 	// simulation actually renders the graph and handles force animations
 	this.simulation = d3.forceSimulation()
@@ -77,34 +82,85 @@ function GlobalGraph (graph) {
             .attr("id", function (d) {
                 return d.uuid;
             })
+
+            // handle dragging
 			.call(d3.drag()
 				.on("start", self.dragStarted)
 				.on("drag", self.dragged)
 				.on("end", self.dragEnded))
 
+			// handle tooltip
+			.on("mouseover", self.onNodeMouseOver)
+
+			// Handle mouse out
+			.on("mouseout", self.onNodeMouseOut)
+
+			// handle click
 			.on("click", self.onNodeClick)
 			.merge(self.node);
-
-		self.node.append("title")
-			.text(function (d) { return d.label });
 	};
 
-	// Handler for node clicks; d = node datum; this = 
+	// Eventhandler callback function for all node mouseover events
+	this.onNodeMouseOver = function (d) {
+		self.handleToolTipEvent(d);
+	}
+
+	this.onNodeMouseOut = function (d) {
+		// d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
+	}
+
+	// Tool Tip Div Setup
+	this.toolTipDiv = d3.select('#graphContainer') //select div containing svg
+		.append('div')
+		.attr('class', 'toolTipDiv');
+
+	this.toolTipDiv.append('i') // add i element for close button
+		.attr('class', 'close fa fa-close') // add classes for font awesome styling
+		.on('click', function () { // lisent for click to hide tooltip
+			d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0);
+		});
+
+	this.toolTipDiv.append('h3') // h3 for title
+		.attr('class', 'toolTipTitle')
+			.append('a') // a within h3 for linking to domain
+			.attr('target', '_blank');
+
+	this.handleToolTipEvent = function (d) {
+		// show tool tip
+		d3.select('div.toolTipDiv')
+			// .style('top', d.y) // not sure why these two weren't working
+			// .style('left', d.x)
+			.call(function(){ // so i just call ananoynous function 
+				$('div.toolTipDiv').css('top', d.y).css('left',d.x); // to do it with jquery
+			})
+			.style('opacity', 1);
+
+		d3.select('h3.toolTipTitle a') // Handle link url and text
+			.attr('href', '//' + d.id)
+			.text(d.id);
+	
+	}
+
+
+
+	// Handler for node clicks; d = node datum; this = svg element
 	this.onNodeClick = function (d) { 
 
 		// Do all the things 
-		self.toggleNodeIsActive(d);
+		self.toggleNodeIsActive(d, this);
+
 		// self.doOtherThings(d)
 		// self.doEvenMoreThings(d)
 	};
 
 	// Selecting and Deselecting Nodes
-	this.toggleNodeIsActive = function (d) {
+	this.toggleNodeIsActive = function (d, ele) {
 		if (typeof d.isActive === undefined) d.isActive = false; // saftey check
 
-		d3.select(this).transition()
+		d3.select(ele).transition().duration(200)
 			.attr('r', function (d) { return d.isActive ? 5 : 15 })
 			.style('fill', function (d) { return d.isActive ? 'black' : 'green' });
+
 
 		d.isActive = !d.isActive; // update node state
 	};
@@ -126,6 +182,7 @@ function GlobalGraph (graph) {
 			.attr("y2", function (d) { return d.target.y; });
 
         // Math.max and radius calculation allow us to bound the position of the nodes within a box
+        // todo - convert this to using linear scales to keep nodes within box?
         self.node
         	.attr("cx", function(d) { return d.x = Math.max(self.radius, Math.min(self.width - self.radius, d.x)); })
             .attr("cy", function(d) { return d.y = Math.max(self.radius, Math.min(self.height - self.radius, d.y)); });
