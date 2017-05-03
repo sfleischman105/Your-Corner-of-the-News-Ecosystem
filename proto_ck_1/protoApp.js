@@ -91,62 +91,48 @@ function GlobalGraph (graph) {
 
 			// handle tooltip
 			.on("mouseover", function (d) {
-				console.log('mouseover d - ', d);
-
 				// show tool tip
-				// self.toolTipDiv // chain other styling here like position!
-				// 	.style("top", d.x)
-				// 	.style("left", d.y)
-				// 	.transition()
-				// 	.style("opacity", 1);
-				$('.toolTipDiv').css('top', d.y).css('left', d.x).css('opacity', 1);
+				d3.select('div.toolTipDiv')
+					// .style('top', d.y) // not sure why these two weren't working
+					// .style('left', d.x)
+					.call(function(){ // so i just call ananoynous function 
+						$('div.toolTipDiv').css('top', d.y).css('left',d.x); // to do it with jquery
+					})
+					.style('opacity', 1)
+					.on('click', function (e) { console.log('div:click', e) });
 
-				// self.toolTipDiv.select("p") // selects text within the tooltip g element
-				// 		.text(d.id); // write text into text element; chain any other text attrs or styles here
-						// debugger;
-				$('.toolTipDiv p').html('<h3>' + d.id + '</h3>');
-				// tooltip.select('rect')
-				// 	.attr('width', function(d) { return $('.tooltip text').innerWidth() + 30; })
-				// 	.attr('height', function(d) { return $('.tooltip text').innerHeight() + 35; })
+				d3.select('h3.toolTipTitle a')
+					.attr('href', d.id)
+					.text(d.id);
 			})
+
+			// Handle mouse out
 			.on("mouseout", function (d) {
-				$('.toolTipDiv').css('opacity', 0);
+				// nothing here yet
 			})
 
 			// handle click
 			.on("click", self.onNodeClick)
 			.merge(self.node);
-
-		// self.node.append("title")
-		// 	.text(function (d) { return d.label });
 	};
 
-	this.toolTipDiv = d3.select('#graphContainer').append('div')
-		.attr('class', 'toolTipDiv').append('p');
 
+	// Tool Tip Div Setup
+	this.toolTipDiv = d3.select('#graphContainer') //select div containing svg
+		.append('div')
+		.attr('class', 'toolTipDiv');
 
-	var tooltip = svg.append("g")
-		.attr("class", 'tooltip')
-		.style("opacity", 0);
+	this.toolTipDiv.append('i') // add i element for close button
+		.attr('class', 'close fa fa-close') // add classes for font awesome styling
+		.on('click', function () { // lisent for click to hide tooltip
+			$('.toolTipDiv').css('opacity', 0);
+		});
 
-	tooltip.append("rect")
-		.attr('class', 'tooltiprect')
-		.style('fill', 'white')
-		.style('stroke', '#888');
+	this.toolTipDiv.append('h3') // h3 for title
+		.attr('class', 'toolTipTitle')
+			.append('a') // a within h3 for linking to domain
+			.attr('target', '_blank');
 
-	tooltip.append("text")
-		.attr("class", "tooltiptext")
-		.attr("x", 15)
-		.attr("y", 0)
-		.attr("dy", "1.2em")
-		.style("font-size", "1.25em")
-		.attr("font-weight", "bold");
-// debugger;
-	
-	// 	.attr('width', function(d) {
-
-	// 		return tooltip.
-	// 	})
 
 
 	// Handler for node clicks; d = node datum; this = svg element

@@ -5,6 +5,11 @@ body {
   font-family: "Avenir", "Avenir Next", Helvetica Neue, Arial;
 }
 
+circle {
+  cursor: pointer;
+}
+
+
 a, a:visited { text-decoration: none; color: #7533f4; }
 a:hover { text-decoration: underline; color: #f4b014; }
 img { max-width: 100%; }
@@ -64,14 +69,50 @@ line {
 
 .toolTipDiv {
   display: block;
-  /*opacity: 0;*/
+  opacity: 0;
   top: 0; left: 0; 
   margin-left: 24px; margin-top: 18px;
+  padding: 0 12px;
   transition: opactiy .5s;
   position: absolute;
   background-color: white;
-  border: 1px solid #888;
+  border: 1px solid #aaa;
 
   font-weight: bold;
 }
+
+.toolTipDiv .close {
+
+  font-size: 18px;
+  text-align: center;
+  color: #666;
+  cursor: pointer;
+
+  display: block;
+  position: absolute;
+  right: -15px;
+  top: -15px;
+  height: 30px;
+  width: 30px;
+
+  transition: color .5s;
+}
+
+.toolTipDiv:after:hover {
+  color: black;
+}
+
+.toolTipDiv h3 {
+  font-weight: bold;
+  margin-top: 7px;
+  color: black;
+}
+
+.toolTipDiv h3 a,
+.toolTipDiv h3 a:hover {
+  color: black;
+  cursor: pointer;
+}
+
+
 
