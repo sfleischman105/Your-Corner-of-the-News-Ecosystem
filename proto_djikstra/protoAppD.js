@@ -31,38 +31,16 @@ function GlobalGraph (graph) {
 
     this.user = {};
 
+    // static variable to control size of each node
+    var init_size = 7;
+
+    // initializes fields for each node to be used later by dijkstra
     graph.nodes.forEach( function(d) {
         d.links = [];
         d.distance = 0;
         d.visited = false;
-        d.total_distance = 0;
     });
 
-    // graph.edges.forEach( function(d) {
-    //    var src = d.source;
-    //    src.links.push(d);
-    // });
-
-    // d3 selection containing all node circles
-    this.node = svg.append("g")
-        .attr("class", "node")
-        .selectAll(".node")
-        .data(graph.nodes)
-        .enter().append("circle")
-        // .on("click", function() {
-        // d3.select(this).attr("fill", "red")
-        // })
-        .attr("r", function (d) {
-            if (d.count) return d.count * 7;
-            return 8;
-        })
-        .attr("fill", function (d) {
-            return d.isActive ? "steelblue" : "black";
-        })
-        .call(d3.drag()
-            .on("start", dragStarted)
-            .on("drag", dragged)
-            .on("end", dragEnded));
 
 
     // d3 selection containing all edge lines
@@ -74,12 +52,23 @@ function GlobalGraph (graph) {
         .attr("stroke-width", 2);
     // .attr("stroke-width", function(d) { return Math.sqrt(d.count); });
 
-    // d3.selectAll(".link").call(update_node_src);
-    //
-    // function update_node_src() {
-    // var src = self.source;
-    // src.links.push(self);
-    // }
+    // d3 selection containing all node circles
+    this.node = svg.append("g")
+        .attr("class", "node")
+        .selectAll(".node")
+        .data(graph.nodes)
+        .enter().append("circle")
+        .attr("r", function (d) {
+            if (d.count) return d.count * init_size;
+            return init_size;
+        })
+        .attr("fill", function (d) {
+            return d.isActive ? "steelblue" : "black";
+        })
+        .call(d3.drag()
+            .on("start", dragStarted)
+            .on("drag", dragged)
+            .on("end", dragEnded));
 
     // should enable browswer default tooltip on over
     this.node.append("title")
@@ -107,36 +96,51 @@ function GlobalGraph (graph) {
             .attr("cy", function (d) { return d.y; });
     }
 
+    // Increases node size when mouse moves over
     this.node.on("mouseover", function() {
         d3.select(this)
-            .attr("r",10)
+            .attr("r",init_size + 4)
     });
 
+    // Reverts size back to normal after mouse moves out of eahc node
     this.node.on("mouseout", function() {
         d3.select(this)
-            .attr("r",7)
+            .attr("r",init_size)
     });
 
+    // Appends the list of links to each node to include links that have that node as the source
     graph.edges.forEach( function(d) {
         var src = d.source;
         src.links.push(d);
     });
 
-
-
-    var color = d3.scaleLinear()
-        .domain([0, 3, 5])
-        .range(["green", "yellow", "red"]);
-
-    var t = d3.transition().duration(2000);
-
-    function tick() {
-        self.node.transition(t).style("fill", function(d) { return color(d.distance); });
+    // Color scale for the Dijkstra's
+    // TODO: Fiddle around with this to Get it perfect
+    // This is a PATCH color scale, just to show proof of concept
+    function color(x) {
+        if(x <= 0)  return "green";
+        if(x <= 1)  return "lime";
+        if(x <= 2)  return "gold";
+        if(x <= 3)  return "orange";
+        if(x <= 4)  return "salmon";
+        if(x <= 5)  return "red";
+        return "crimson";
     }
-    // dijkstra.on("tick", function() {
-    //     self.node.style("fill", function(d) { return color(d.distance); });
-    // });
 
+
+    // d3 selector, when a node is clicked calls dijkstra with that node at the initial node
+    this.node.on("click", dijkstra);
+
+    // Function to change the color of each node. Called by dijkstra
+    function tick() {
+        self.node.style("fill", function(d) {
+            return color(d.distance);
+        });
+    }
+
+    // Given a starting node, runs djikstras algorthm to determine the distances each node is from
+    // the starting node. Also calls 'tick'() to change color corresponding to distance
+    // Modifies the distance attribute of each node
     function dijkstra(first) {
         var unvisited = [];
         graph.nodes.forEach(function (d) {
@@ -149,7 +153,6 @@ function GlobalGraph (graph) {
 
         var current = first;
         current.distance = 0;
-        // current.total_distance = 0;
         var done = false;
 
         function stepi() {
@@ -158,11 +161,13 @@ function GlobalGraph (graph) {
             current.links.forEach(function (link) {
                 var tar = link.target;
                 if (!tar.visited) {
+                    // USE LINK.COUNT for Weights. Otherwise we use just 1 for degrees of seperation
                     // var dist = current.distance + link.count;
                     var dist = current.distance + 1;
                     tar.distance = Math.min(dist, tar.distance);
                 }
             });
+            tick();
             if (unvisited.length == 0 || current.distance == Infinity) {
                 done = true;
             }
@@ -171,17 +176,22 @@ function GlobalGraph (graph) {
                 return b.distance - a.distance
             });
             current = unvisited.pop();
-            tick();
-
         }
 
-        if(!done) {
-            stepi();
-        }
+        // timer to update the color of the nodes evert x milliseconds
+        var last = 0;
+        var timer = d3.timer(function(elapsed) {
+            var t = elapsed - last;
+            last = elapsed;
+            if(elapsed > 500) {
+                if(!done) {
+                    stepi();
+                } else {
+                    timer.stop();
+                }
+            }
+        });
     }
-
-
-    this.node.on("click", dijkstra);
 }
 
 
