@@ -87,10 +87,15 @@ function GlobalGraph (graph) {
 				.on("start", self.dragStarted)
 				.on("drag", self.dragged)
 				.on("end", self.dragEnded))
-			.on("mouseover", function () {
-				tooltip.style("display", null);
+			.on("mouseover", function (d) {
+				console.log('mouseover d - ',vd);
+
+				// show tool tip
+				tooltip.style("display", "block") // chain other styling here like position!
+					.select("text") // selects text within the tooltip g element
+						.text(d.id); // write text into text element; chain any other text attrs or styles here
 			})
-			.on("mouseout", function () {
+			.on("mouseout", function (d) {
 				tooltip.style("display", "none");
 			})
 			.merge(self.node);
@@ -105,7 +110,7 @@ function GlobalGraph (graph) {
 
 	tooltip.append("text")
 		.attr("x", 15)
-		.attr("dy", 1.2em)
+		.attr("dy", "1.2em")
 		.style("font-size", "1.25em")
 		.attr("font-weight", "bold");
 
