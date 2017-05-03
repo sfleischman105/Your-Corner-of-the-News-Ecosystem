@@ -90,21 +90,7 @@ function GlobalGraph (graph) {
 				.on("end", self.dragEnded))
 
 			// handle tooltip
-			.on("mouseover", function (d) {
-				// show tool tip
-				d3.select('div.toolTipDiv')
-					// .style('top', d.y) // not sure why these two weren't working
-					// .style('left', d.x)
-					.call(function(){ // so i just call ananoynous function 
-						$('div.toolTipDiv').css('top', d.y).css('left',d.x); // to do it with jquery
-					})
-					.style('opacity', 1)
-					.on('click', function (e) { console.log('div:click', e) });
-
-				d3.select('h3.toolTipTitle a')
-					.attr('href', d.id)
-					.text(d.id);
-			})
+			.on("mouseover", self.onNodeMouseOver)
 
 			// Handle mouse out
 			.on("mouseout", function (d) {
@@ -116,6 +102,10 @@ function GlobalGraph (graph) {
 			.merge(self.node);
 	};
 
+	// Eventhandler callback function for all node mouseover events
+	this.onNodeMouseOver = function (d) {
+		self.handleToolTipEvent(d);
+	}
 
 	// Tool Tip Div Setup
 	this.toolTipDiv = d3.select('#graphContainer') //select div containing svg
@@ -132,6 +122,23 @@ function GlobalGraph (graph) {
 		.attr('class', 'toolTipTitle')
 			.append('a') // a within h3 for linking to domain
 			.attr('target', '_blank');
+
+	this.handleToolTipEvent = function (d) {
+		// show tool tip
+		d3.select('div.toolTipDiv')
+			// .style('top', d.y) // not sure why these two weren't working
+			// .style('left', d.x)
+			.call(function(){ // so i just call ananoynous function 
+				$('div.toolTipDiv').css('top', d.y).css('left',d.x); // to do it with jquery
+			})
+			.style('opacity', 1)
+			.on('click', function (e) { console.log('div:click', e) });
+
+		d3.select('h3.toolTipTitle a') // Handle link url and text
+			.attr('href', d.id)
+			.text(d.id);
+	
+	}
 
 
 

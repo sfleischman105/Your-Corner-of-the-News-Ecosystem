@@ -84,21 +84,22 @@ line {
 .toolTipDiv .close {
 
   font-size: 18px;
+  line-height: 24px;
   text-align: center;
   color: #666;
   cursor: pointer;
 
   display: block;
   position: absolute;
-  right: -15px;
-  top: -15px;
-  height: 30px;
-  width: 30px;
+  right: -12px;
+  top: -12px;
+  height: 24px;
+  width: 24px;
 
-  transition: color .5s;
+  transition: color .2s;
 }
 
-.toolTipDiv:after:hover {
+.toolTipDiv .close:hover {
   color: black;
 }
 
