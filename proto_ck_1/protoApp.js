@@ -6,7 +6,6 @@ d3.json("/data/proto_ck_1a.json", function (error, graph) {
  	window.globalGraph = new GlobalGraph(graph);
 });
 
-
 // GlobalGraph object to initialize and render the global news network graph
 // graph {} : json formatted data retrieved by d3.json()
 // graph.nodes [] : array of node objects
@@ -83,12 +82,16 @@ function GlobalGraph (graph) {
             .attr("id", function (d) {
                 return d.uuid;
             })
+
+            // handle dragging
 			.call(d3.drag()
 				.on("start", self.dragStarted)
 				.on("drag", self.dragged)
 				.on("end", self.dragEnded))
+
+			// handle tooltip
 			.on("mouseover", function (d) {
-				console.log('mouseover d - ',vd);
+				console.log('mouseover d - ', d);
 
 				// show tool tip
 				tooltip.style("display", "block") // chain other styling here like position!
@@ -98,6 +101,9 @@ function GlobalGraph (graph) {
 			.on("mouseout", function (d) {
 				tooltip.style("display", "none");
 			})
+
+			// handle click
+			.on("click", self.onNodeClick)
 			.merge(self.node);
 
 		self.node.append("title")
@@ -114,6 +120,26 @@ function GlobalGraph (graph) {
 		.style("font-size", "1.25em")
 		.attr("font-weight", "bold");
 
+	// Handler for node clicks; d = node datum; this = 
+	this.onNodeClick = function (d) { 
+
+		// Do all the things 
+		// self.toggleNodeIsActive(d);
+		// self.doOtherThings(d)
+		// self.doEvenMoreThings(d)
+	};
+
+	// Selecting and Deselecting Nodes
+	this.toggleNodeIsActive = function (d) {
+		var isActive = d && d.isActive;
+		if (typeof isActive === undefined) isActive = false; // saftey check
+
+		d3.select(this).transition()
+			.attr('r', function (d) { return isActive ? 5 : 15 })
+			.style('fill', function (d) { return isActive ? 'black' : 'green' });
+
+		d.isActive = !d.isActive; // update node state
+	};
 
 	// Modular function for declaring what to do with edges
 	this.renderLinks = function () {
