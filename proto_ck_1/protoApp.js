@@ -94,31 +94,53 @@ function GlobalGraph (graph) {
 				console.log('mouseover d - ', d);
 
 				// show tool tip
-				tooltip.style("display", "block") // chain other styling here like position!
-					.select("text") // selects text within the tooltip g element
+				tooltip // chain other styling here like position!
+					.attr('transform', 'translate(' + d.x + ',' + d.y + ')')
+					.transition()
+					.style("opacity", 1);
+
+				tooltip.select("text") // selects text within the tooltip g element
 						.text(d.id); // write text into text element; chain any other text attrs or styles here
+						// debugger;
+				tooltip.select('rect')
+					.attr('width', function(d) { return $('.tooltip text').innerWidth() + 30; })
+					.attr('height', function(d) { return $('.tooltip text').innerHeight() + 35; })
 			})
 			.on("mouseout", function (d) {
-				tooltip.style("display", "none");
+				tooltip.transition().style("opacity", 0);
 			})
 
 			// handle click
 			.on("click", self.onNodeClick)
 			.merge(self.node);
 
-		self.node.append("title")
-			.text(function (d) { return d.label });
+		// self.node.append("title")
+		// 	.text(function (d) { return d.label });
 	};
 
 	var tooltip = svg.append("g")
-		.attr("class", tooltip)
-		.style("display", "none");
+		.attr("class", 'tooltip')
+		.style("opacity", 0);
+
+	tooltip.append("rect")
+		.attr('class', 'tooltiprect')
+		.style('fill', 'white')
+		.style('stroke', '#888');
 
 	tooltip.append("text")
+		.attr("class", "tooltiptext")
 		.attr("x", 15)
+		.attr("y", 0)
 		.attr("dy", "1.2em")
 		.style("font-size", "1.25em")
 		.attr("font-weight", "bold");
+// debugger;
+	
+	// 	.attr('width', function(d) {
+
+	// 		return tooltip.
+	// 	})
+
 
 	// Handler for node clicks; d = node datum; this = svg element
 	this.onNodeClick = function (d) { 
@@ -159,6 +181,7 @@ function GlobalGraph (graph) {
 			.attr("y2", function (d) { return d.target.y; });
 
         // Math.max and radius calculation allow us to bound the position of the nodes within a box
+        // todo - convert this to using linear scales to keep nodes within box?
         self.node
         	.attr("cx", function(d) { return d.x = Math.max(self.radius, Math.min(self.width - self.radius, d.x)); })
             .attr("cy", function(d) { return d.y = Math.max(self.radius, Math.min(self.height - self.radius, d.y)); });
