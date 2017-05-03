@@ -65,7 +65,8 @@ line {
 .toolTipDiv {
   display: block;
   /*opacity: 0;*/
-  top: 0; left: 0;
+  top: 0; left: 0; 
+  margin-left: 24px; margin-top: 18px;
   transition: opactiy .5s;
   position: absolute;
   background-color: white;
