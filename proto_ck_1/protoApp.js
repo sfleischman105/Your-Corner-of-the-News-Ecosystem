@@ -23,8 +23,8 @@ function GlobalGraph (graph) {
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
 
 	this.doSelectNode = true;
-	this.doShowSteps = false;
-	this.stepCount = 1;
+	this.doShowSteps = true;
+	this.stepCount = 5;
 
 	this.width = $('#graphContainer').innerWidth();
 	this.height = this.width * .5;
@@ -159,12 +159,9 @@ function GlobalGraph (graph) {
 
 	// Handler for node clicks; d = node datum; this = svg element
 	this.onNodeClick = function (d) {
-		if (self.doShowSteps) {
-			// dijkstra!
-			self.dijkstra(d);
-		} else {
-			self.toggleNodeIsActive(d, this);
-		}
+		// dijkstra!
+		if (self.doShowSteps) self.dijkstra(d);
+		self.toggleNodeIsActive(d, this);
 	};
 
 	// Selecting and Deselecting Nodes
@@ -259,19 +256,28 @@ function GlobalGraph (graph) {
         if(x <= 3)  return "orange";
         if(x <= 4)  return "salmon";
         if(x <= 5)  return "red";
-        return "crimson";
+        return "black";
     }
+
+    this.firstStep = null;
 
     // Given a starting node, runs djikstras algorthm to determine the distances each node is from
     // the starting node. Also calls 'tick'() to change color corresponding to distance
     // Modifies the distance attribute of each node
 	this.dijkstra = function(first) {
+		if (typeof first === 'undefined') {
+			first = self.firstStep;
+			if (first === null) return false; // exit if no first
+		}
+		self.firstStep = first;
 
         // Function to change the color of each node.
         function tick() {
+        	var dis;
             self.node.transition(200).style("fill", function(d) {
+            	dis = d.distance;
                 return color(d.distance);
-            });
+            }).text(dis);
         }
 
         var unvisited = [];
@@ -286,6 +292,7 @@ function GlobalGraph (graph) {
         var current = first;
         current.distance = 0;
         var done = false;
+        var i = 0;
 
         function stepi() {
             current.visited = true;
@@ -300,8 +307,9 @@ function GlobalGraph (graph) {
                 }
             });
             tick();
-            if (unvisited.length == 0 || current.distance == Infinity) {
+            if ( i++ == self.stepCount || unvisited.length == 0 || current.distance == Infinity) {
                 done = true;
+                console.log('finally done?', i);
             }
 
             unvisited.sort(function (a, b) {
@@ -374,6 +382,7 @@ function ProtoApp () {
 		
 		self.stepsController.append('input').attr('class', 'stepsControlToggle')
 			.attr('type', 'checkbox')
+			.attr('checked', 'true')
 			.attr('name', 'isStepsMode')
 			.on('click', function (d) {
 				window.globalGraph.doShowSteps = !window.globalGraph.doShowSteps;
@@ -385,19 +394,22 @@ function ProtoApp () {
 		
 		self.stepsController.append('select')
 			.attr('class', 'stepsControlSelect')
-			.on('click', function (d) {
-				// update the state here
-				if (Number($('option:selected',this).attr('value')) !== window.globalGraph.stepCount) {
-					window.globalGraph.stepCount = Number($('option:selected',this).attr('value'));
-					// console.log('option:click', this);
-				}
-			});
-		for (var i = 0; i < 4; i++) {
+			;
+		for (var i = 0; i < 30; i++) {
 			self.stepsController.select('select')
 				.append('option')
 				.attr('value', i + 1)
 				.text(i + 1);
 		}
+
+		self.stepsController.append('button')
+			.attr('class', 'updateStepCount')
+			.text('set steps')
+			.on('click', function (d) {
+				// update the state here
+				window.globalGraph.stepCount = Number($('.stepsControlSelect option:selected').attr('value'));
+				if (window.globalGraph.firstStep) window.globalGraph.dijkstra();
+			});
 	}
 
 	// Handling Refresh Graph Button
