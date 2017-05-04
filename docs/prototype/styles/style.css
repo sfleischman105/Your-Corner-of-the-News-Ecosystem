@@ -116,7 +116,6 @@ line {
 
 
 .stepsControlSelect {
-  clear:both;
-  display: block;
+  margin: 10px 20px;
 }
 

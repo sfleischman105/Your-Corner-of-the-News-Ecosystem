@@ -24,7 +24,7 @@ function GlobalGraph (graph) {
 
 	this.doSelectNode = true;
 	this.doShowSteps = true;
-	this.stepCount = 5;
+	this.stepCount = 30;
 
 	this.width = $('#graphContainer').innerWidth();
 	this.height = this.width * .5;
@@ -398,6 +398,7 @@ function ProtoApp () {
 		for (var i = 0; i < 30; i++) {
 			self.stepsController.select('select')
 				.append('option')
+				.attr('selected', i == 30 ? 'true' : 'false')
 				.attr('value', i + 1)
 				.text(i + 1);
 		}
