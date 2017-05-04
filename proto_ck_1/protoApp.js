@@ -76,12 +76,12 @@ function GlobalGraph (graph) {
             var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
             return Math.max(Math.min(50 - shift, 5), 100);
         }).strength(0.1).id(function(d) { return d.id; }))
-	    .force("charge", d3.forceManyBody().strength([-300])) // default strength -30
-	    //.force("center", d3.forceCenter(this.width / 2, this.height / 2))
+	    .force("charge", d3.forceManyBody().strength([-250])) // default strength -30
+	    .force("center", d3.forceCenter(this.width / 2, this.height / 2))
         //.force("x", d3.forceX(0).strength([0.4]))
-        .force("x", d3.forceX(this.width / 2).strength([0.05]))
+        .force("x", d3.forceX(this.width / 2).strength([0.1]))
         //.force("y", d3.forceY(0).strength([0.4]))
-		.force("y", d3.forceY(this.height / 2).strength([0.1]));
+		.force("y", d3.forceY(this.height / 2).strength([0.2]));
 
 
 	// this is a list of sub-graphs and their simulations
