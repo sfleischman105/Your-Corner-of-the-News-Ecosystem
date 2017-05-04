@@ -45,6 +45,20 @@ function GlobalGraph (graph) {
 		.selectAll(".link")
 		.data(graph.edges);
 
+    //helper function for getting counts for each node.
+    self._counts = function () {
+        var counts = [];
+        for (var i = 0; i < self.graph.edges.length; i++) {
+            counts[i] = (parseInt(self.graph.edges[i].count));
+        }
+        return counts;
+    };
+
+	//getting link means, stdevs
+	var link_counts = self._counts();
+	self.link_mean = d3.mean(link_counts);
+	self.link_stdev = d3.deviation(link_counts);
+
 	// d3 selection containing all node circles
 	this.node = svg.append("g")
         .attr("class", "node")
@@ -58,19 +72,25 @@ function GlobalGraph (graph) {
 
 	// simulation actually renders the graph and handles force animations
 	this.simulation = d3.forceSimulation()
-		.force("link", d3.forceLink().id(function(d) { return d.id; }))
-	    .force("charge", d3.forceManyBody().strength([-200])) // default strength -30
+		.force("link", d3.forceLink().distance(function (d) {
+            var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
+            return Math.max(Math.min(50 - shift, 5), 100);
+        }).strength(0.1).id(function(d) { return d.id; }))
+	    .force("charge", d3.forceManyBody().strength([-250])) // default strength -30
 	    .force("center", d3.forceCenter(this.width / 2, this.height / 2))
-		.force("x", d3.forceX(this.width / 2).strength([0.1]))
-    	.force("y", d3.forceY(this.height / 2).strength([0.1]));
+        //.force("x", d3.forceX(0).strength([0.4]))
+        .force("x", d3.forceX(this.width / 2).strength([0.1]))
+        //.force("y", d3.forceY(0).strength([0.4]))
+		.force("y", d3.forceY(this.height / 2).strength([0.2]));
 
 
 	// this is a list of sub-graphs and their simulations
 	this.sub_graphs = [];
 	this.sub_simulations = [];
+	this.sub_graph_color_scale = d3.scaleOrdinal(d3.schemeCategory10); //support colors for up to 10 subgraphs
 
 
-	// Call this function to apply manipulated data to the simulation
+    // Call this function to apply manipulated data to the simulation
 	this.resetSimulation = function () {
 		self.node = self.node.data(self.graph.nodes); // apply data to node
 		self.node.exit().remove(); // remove exit selection
@@ -82,6 +102,17 @@ function GlobalGraph (graph) {
 
 		self.runSimulation(); // re-define simulation
 		self.simulation.alphaTarget(0.3).restart(); // reset simulation
+		for (var i = 0; i <self.sub_simulations.length; i++) {
+			var sim = self.sub_simulations[i];
+			sim.nodes([]);
+			sim.stop();
+		}
+		self.sub_simulations = [];
+        for (var i = 0; i <self.sub_graphs.length; i++) {
+            var sg = self.sub_graphs[i];
+            sg.clear(sg); // as a hack, have to pass itself as an argument
+        }
+		self.sub_graphs = [];
 	};
 
 	// Modular function for declaring what to do with nodes
@@ -92,6 +123,7 @@ function GlobalGraph (graph) {
 				if (d.count) return d.count * 8;
 				return 8;
 			})
+			.attr("class", "node")
             .attr("id", function (d) {
                 return d.uuid;
             })
@@ -177,6 +209,7 @@ function GlobalGraph (graph) {
 		self.link = self.link.enter()
 			.append("line")
 			.attr("stroke-width", 2)
+			.attr("class", "link")
 			.merge(self.link);
 	};
 
@@ -234,7 +267,7 @@ function GlobalGraph (graph) {
 		if (!d3.event.active) {
 			self.simulation.alphaTarget(0);
             for (i = 0; i < self.sub_simulations.length; i++) {
-                self.sub_simulations[i].alphaTarget(0).restart();
+                self.sub_simulations[i].alphaTarget(0);
             }
         }
 		d.fx = null;
@@ -328,22 +361,48 @@ function GlobalGraph (graph) {
     };
 
 	this.highlightSubGraph = function (node_ids) {
-		var subgraph_nodes = [];
+		var subgraph_nodes = {};
+		subgraph_nodes.nodes = [];
 		for (var i=0; i < node_ids.length; i++) {
 			var node_id = node_ids[i];
 			var node = self.node_index[node_id];
-			document.getElementById(node.uuid).setAttribute("class", "selected_node");
-            subgraph_nodes.push(node);
+			d3.select("#" + node.uuid)
+				.style("fill",  self.sub_graph_color_scale(self.sub_graphs.length))
+				.style("stroke-width", 3)
+				.style("r", 8);
+            subgraph_nodes.nodes.push(node);
 		}
+		subgraph_nodes.clear = function (self) {
+            for (var i=0; i < self.nodes.length; i++) {
+                var node = self.nodes[i];
+                var elem = document.querySelector('.node');
+                var style =getComputedStyle(elem);
+                d3.select("#" + node.uuid)
+					.style("fill", style.fill)
+					.style("stroke-width", style.stroke_width)
+					.style("r", style.r)
+            }
+		};
 		this.sub_graphs.push(subgraph_nodes);
 		this.sub_simulations.push(
 			d3.forceSimulation()
-				.force("charge", d3.forceManyBody().strength([-15]))
-                .force("x", d3.forceX(self.width * 0.8).strength([0.08]))
-				.force("y", d3.forceY(self.height * 0.5).strength([0.08]))
-                .nodes(subgraph_nodes)
+				.force("charge", d3.forceManyBody().strength([40]))
+                //.force("x", d3.forceX(self.width * 0.8).strength([0.08]))
+				//.force("y", d3.forceY(self.height * 0.5).strength([0.08]))
+                .nodes(subgraph_nodes.nodes)
 				.on("tick", self.ticked));
     };
+
+	// helper function for building an index of SVG elements by UUID
+    function _index(objects) {
+        var index = {};
+        for (var i=0; i < objects.length; i++) {
+            var n = objects[i];
+            n.uuid = "a" + uuid();
+            index[n.id] = n;
+        }
+        return index;
+    }
 
 	// Actually render the graph once everything is defined
 	this.renderNodes();
@@ -358,7 +417,7 @@ function ProtoApp () {
 	var self = this;
 	this.userData = {};
 	this.globalGraphData = null;
-	
+
 
 	this.initialize = function () {
 		this.addEventListeners();
@@ -376,7 +435,7 @@ function ProtoApp () {
 		self.stepsController = d3.select('#stepsControlContainer');
 
 		self.stepsController.append('h3').text('Steps Control');
-		
+
 		self.stepsController.append('input').attr('class', 'stepsControlToggle')
 			.attr('type', 'checkbox')
 			.attr('checked', 'true')
@@ -388,7 +447,7 @@ function ProtoApp () {
 		self.stepsController.append('span')
 			.attr('class', 'onOff').text('on/off');
 
-		
+
 		self.stepsController.append('select')
 			.attr('class', 'stepsControlSelect')
 			;
@@ -447,7 +506,7 @@ function ProtoApp () {
 		} else {
 			window.globalGraph.toggleNode = window.globalGraph.graph.nodes.pop();
 			var id = window.globalGraph.toggleNode.id;
-			var edges = []
+			var edges = [];
 
 			window.globalGraph.graph.edges.forEach(function(d) {
 				if (d.source.id === id || d.target.id === id) {
@@ -473,16 +532,6 @@ function ProtoApp () {
 
 	this.initialize(); // kick it off!
 };
-
-function _index(objects) {
-   var index = {};
-   for (var i=0; i < objects.length; i++) {
-	   var n = objects[i];
-	   n.uuid = uuid();
-	   index[n.id] = n;
-   }
-   return index;
-}
 
 // generates UUID v4 identifiers. Math.random() isn't a perfect RNG, but should be more than fine for our purposes
 function uuid(a) {
