@@ -21,6 +21,9 @@
       <p>
         <strong>Team Members</strong>: Conor Kelly, Brendan King, Stephen Fleischman, Jingwei Zhang
       </p>
+      <p>
+      <strong>Guiding Question :</strong> How might we allow the user to explore the interconnectivity of the online news ecosystem and allow the user to compare their personal filter bubble to the "global graph" network?
+      </p>
     </section>
 
     <section id="graphContainer" class="twelve columns alpha">
@@ -83,13 +86,25 @@
 
       <div class="six columns alpha">
         <h4>D3 Forces / Structuring</h4>
-        <p>About Forces / Structing here.</p>
+        <p>A significant challenge in getting any graph to visualize well is position nodes and edges in a meaningful way that allows users to easily interpret structure in the graph. With force layouts, it is challenging to make an arbitrary graph present well, so we focused on a concrete example. Future work will allow adjustments to forces and their parameters as an element of user interaction with the visualization, allowing users to have sub-graphs cluster, push apart, etc.</p>
+
+<p>In short, positioning is a vital part of a good network visualization but also one of the most challenging. In our prototype, we aimed to have all nodes visually separated and meaningfully dispersed.We also wanted the graph centered in the display, and for link structure to have some distinguishable impact on graph layout (i.e. nodes that are closely connected in the graph should appear closer together). We were able to accomplish these with simulated electrical charge, centering forces, and link based forces.</p>
+
+<p>We also support highlighting of subgraphs, provided to the visualization as a list of nodes (this could be a list of a user’s visited web sites, for example). Currently, our highlights primarily distinguish matching nodes by color. We made attempts at separating and clustering sub graphs with forces, but had mixed results. Next steps will involve meaningful force responses when selecting a sub graph, as well as highlighting edges (with shading) which participate in these sub graphs. Color and shading of edges will allow a user to quickly distinguish a component, and this can be enhanced with force interactions with the rest of the graph, as well as other labelled components.</p>
       </div>
 
       <div class="six columns">
         <h4>Djikstra algorithm</h4>
         <p>One the biggest difficulties when working with a connected graph is producing a visualization where insights can be gathered. Graphs provide great insight into the overall relation between nodes and groups of nodes, but they fall flat when trying to look at how a specific node relates to other nodes. To address this, we wanted a way to perceive the distance from a selected node to every other node. Luckily, a specific algorithm had already been invented for this very task; Dijkstra’s Algorithm! We implemented this so when a node is clicked, the rest of the nodes change their color based on their distance from the selected node. The color scale goes from Green to Red as the distance increases. In the future this will be a linear scale where transitions are more smooth. For now, this works fine as a proof of concept.</p>
       </div>
+    </section>
+
+    <section class='twelve columns alpha'>
+      <h2>Next Steps</h2>
+      <p>The hardest part so far has been finding a decent system and setup of visualization. Questions alike “How do we organize the data Schema” and “How do we handle Events” took a large time to both decide on, and to actually implement. Now that we’ve got these details mostly ironed out and implemented, our focus will be shifted towards using this framework to power a visualization where meaningful insights can be gathered. </p>
+      <p>One of the next steps for us is to further organize and Drill down our data. The datasets work well as prototypes, but they are very much unrefined. The question to “What defines a ‘link’ between sites?” is a big question that we will need to invest serious time towards. Scraping the web gives us many possibilities, but it’s up to us on figuring out a meaningful relation between the each site, and furthermore displaying that.</p>
+      <p>More so, our prototype needs serious refinement in the UI side. Buttons and Interactions are not very user-friendly, with unclear purposes. The design overall is very rough and messy, and tools alike our tooltip need serious refinement.</p>
+      <p>We might need a relational database in the future to organize user’s profile with history data for a larger dataset. For the relational database, it need to read data from the JSON file and we can get more information about users from that database easily.</p>
     </section>
 
     <div class="footer">
