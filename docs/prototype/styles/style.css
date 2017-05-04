@@ -64,7 +64,7 @@ line {
 }
 
 #graphContainer {
-  border-right: 1px solid grey;
+  position: relative;
 }
 
 .toolTipDiv {

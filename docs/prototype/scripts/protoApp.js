@@ -113,6 +113,12 @@ function GlobalGraph (graph) {
 			.merge(self.node);
 	};
 
+	// Handler for node clicks; d = node datum; this = svg element
+	this.onNodeClick = function (d) {
+		// dijkstra!
+		if (self.doShowSteps) self.dijkstra(d);
+		// self.toggleNodeIsActive(d, this);
+	};
 
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
@@ -154,15 +160,6 @@ function GlobalGraph (graph) {
 			.text(d.id);
 	
 	}
-
-
-
-	// Handler for node clicks; d = node datum; this = svg element
-	this.onNodeClick = function (d) {
-		// dijkstra!
-		if (self.doShowSteps) self.dijkstra(d);
-		self.toggleNodeIsActive(d, this);
-	};
 
 	// Selecting and Deselecting Nodes
 	this.toggleNodeIsActive = function (d, ele) {
