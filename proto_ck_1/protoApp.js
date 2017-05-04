@@ -22,6 +22,7 @@ function GlobalGraph (graph) {
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
 
+	this.doSelectNode = true;
 	this.doShowSteps = false;
 	this.stepCount = 1;
 
@@ -158,13 +159,12 @@ function GlobalGraph (graph) {
 
 	// Handler for node clicks; d = node datum; this = svg element
 	this.onNodeClick = function (d) {
-		// Do all the things 
-		self.toggleNodeIsActive(d, this);
-
-		// dijkstra!
-		self.dijkstra(d);
-		// self.doOtherThings(d)
-		// self.doEvenMoreThings(d)
+		if (self.doShowSteps) {
+			// dijkstra!
+			self.dijkstra(d);
+		} else {
+			self.toggleNodeIsActive(d, this);
+		}
 	};
 
 	// Selecting and Deselecting Nodes
@@ -172,7 +172,7 @@ function GlobalGraph (graph) {
 		if (typeof d.isActive === undefined) d.isActive = false; // saftey check
 
 		d3.select(ele).transition().duration(200)
-			.attr('r', function (d) { return d.isActive ? 5 : 15 })
+			.attr('r', function (d) { return d.isActive ? 8 : 15 })
 			.style('fill', function (d) { return d.isActive ? 'black' : 'green' });
 
 		d.isActive = !d.isActive; // update node state
