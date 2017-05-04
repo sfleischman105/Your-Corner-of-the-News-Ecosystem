@@ -480,7 +480,7 @@ function ProtoApp () {
 	// Handles button click and fetches stub data file based on selected option
 	this.onAddStubData = function (e) {
 		var filenameString = $('#stubDataSelect').find('option:selected').attr('value');
-		var filePath = '/data/' + filenameString + '.json';
+		var filePath = '/docs/scripts/' + filenameString + '.json';
 
 		$.ajax({
 			method: "GET",
