@@ -45,17 +45,51 @@
     <hr>
 
     <section class='twelve columns alpha'>
-      <h2 class='twelve columns alpha'>Design Rationale</h2>
-      <p>
-        [Add: A rationale for your design decisions. How did you choose your particular visual encodings and interaction techniques? What alternatives did you consider and how did you arrive at your ultimate choices?]
-      </p>
+      <h2>Design Rationale</h2>
+
+      <div class="six columns alpha">
+        <h4>Network Graph</h4>
+        <p>After an initial discussion about project goals and framing, and inspired by GDELT's visualization, we decided to use a network graph to represent connections between various sources of news media content. We are using nodes to represent user curated urls scrapped from reddit pages, binned by domain for the sake of scale. Edges are still being being defined but for this proof of concept they represent hyperlinks between sources.</p>
+      </div>
+
+      <div class="six columns">
+        <h4>Tooltip</h4>
+        <p>The tooltip is an important feature in this type of visualization as it provides the current primary means of drilling down into the data. Here we can include additional information and content relating to the node in focus. A challenge this method brings to the table is occlusion, when showing the tooltip the div container and content overlay other nodes, making them difficult to get to.</p>
+      </div>
+
+      <div class="six columns alpha">
+        <h4>Spatial/Structural Encoding</h4>
+        <p>Perhaps the most important ability of any exploratory visualization is the capacity to view a given dataset at different cross sections, promoting insights for the user. We chose to encode this cross sectioning via the spatial positioning of nodes to form an overall graph structure. Reshaping the graph according to various attribute affinities will allow users to quickly infer deeper relational patterns among nodes.</p>
+      </div>
+
+      <div class="six columns">
+        <h4>Color Encoding</h4>
+        <p>In this prototype we are using color encoding to indicate selection and node distance independently. When Step Mode is enabled, selecting a node will update the colors of connected nodes to encode their distance from the selected node. Currently this color scheme uses several standard css colors but can easily be converted to use a gradient scale, representing closer connections with more saturated color.</p>
+      </div>
     </section>
 
-    <section>
+    <section class='twelve columns alpha'>
       <h2>Development Process</h2>
-      <p>
-        [Add: An overview of your development process. Describe how the work was split among the team members. Include a commentary on the development process, including answers to the following questions: Roughly how much time did you spend developing your application (in people-hours)? What aspects took the most time?]
-      </p>
+      <p>In the early stages of the process our team identified key components to research, test, and build and diverged in independent exploration. We then converged on a subset of critical features to test in our prototyping assignment.</p>
+      <div class="six columns alpha">
+        <h4>Web Scraping</h4>
+        <p>While the Initial DataSet through the GDELT project was decent, we wanted to try and supplement that dataset with an additional dataset to analyze. As our visualization uses a simple graph model of nodes / edges, there were many possibilities. We decided to scrape reddit for information, as we felt the site was large enough to find some “links” between news sites. Politically-Oriented subreddits were chosen to be scraped, and the top 1000 or so posts were collected and processed. For the top news sites in each subreddit, we established an association between those sites. In the end, we are left with a graph of news sites linked by this associativity.</p>
+      </div>
+
+      <div class="six columns">
+        <h4>Front End Setup</h4>
+        <p>Our initial concept was to initialize a single page app which handled and manipulated D3 instances throughout the DOM. We initialize a new “GlobalGraph” object to render and maintain the main visualization while external data sources and user interactions are handled by the SPA. We attempted to use DRY (Don’t Repeat Yourself) coding resulting in somewhat fragmented code. I’m not too sure how to strike a balance between not repeating code and not dispersing functionality throughout the file. The GlobalGraph object grew way too big and will either have to be broken down or dissolved altogether. The initialization of the GlobalGraph chould be moved inside of the SPA to enable multiple graphs on a page.</p>
+      </div>
+
+      <div class="six columns alpha">
+        <h4>D3 Forces / Structuring</h4>
+        <p>About Forces / Structing here.</p>
+      </div>
+
+      <div class="six columns">
+        <h4>Djikstra algorithm</h4>
+        <p>One the biggest difficulties when working with a connected graph is producing a visualization where insights can be gathered. Graphs provide great insight into the overall relation between nodes and groups of nodes, but they fall flat when trying to look at how a specific node relates to other nodes. To address this, we wanted a way to perceive the distance from a selected node to every other node. Luckily, a specific algorithm had already been invented for this very task; Dijkstra’s Algorithm! We implemented this so when a node is clicked, the rest of the nodes change their color based on their distance from the selected node. The color scale goes from Green to Red as the distance increases. In the future this will be a linear scale where transitions are more smooth. For now, this works fine as a proof of concept.</p>
+      </div>
     </section>
 
     <div class="footer">
