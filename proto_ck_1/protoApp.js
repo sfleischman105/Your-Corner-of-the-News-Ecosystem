@@ -251,7 +251,7 @@ function GlobalGraph (graph) {
 		if (!d3.event.active) {
 			self.simulation.alphaTarget(0);
             for (i = 0; i < self.sub_simulations.length; i++) {
-                self.sub_simulations[i].alphaTarget(0).restart();
+                self.sub_simulations[i].alphaTarget(0);
             }
         }
 		d.fx = null;
@@ -284,9 +284,9 @@ function GlobalGraph (graph) {
 		this.sub_graphs.push(subgraph_nodes);
 		this.sub_simulations.push(
 			d3.forceSimulation()
-				.force("charge", d3.forceManyBody().strength([-15]))
-                .force("x", d3.forceX(self.width * 0.8).strength([0.08]))
-				.force("y", d3.forceY(self.height * 0.5).strength([0.08]))
+				.force("charge", d3.forceManyBody().strength([40]))
+                //.force("x", d3.forceX(self.width * 0.8).strength([0.08]))
+				//.force("y", d3.forceY(self.height * 0.5).strength([0.08]))
                 .nodes(subgraph_nodes.nodes)
 				.on("tick", self.ticked));
     };
