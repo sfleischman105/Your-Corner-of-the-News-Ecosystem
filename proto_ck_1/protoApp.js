@@ -1,6 +1,6 @@
 // async ajax call baked into d3 to grab data
 // proto_ck_1a	gdelt_weblinks  gdelt_50_52
-d3.json("/data/reddit/reddit_data_test.json", function (error, graph) {
+d3.json("reddit_data_test.json", function (error, graph) {
  	if (error) throw error;
  	window.protoApp.globalGraphData = $.extend(true, {}, graph);
  	window.globalGraph = new GlobalGraph(graph);
@@ -19,9 +19,12 @@ function GlobalGraph (graph) {
 	this.toggleNodeEdges = []; // for test purposes, this is an array to conatin removed edges
 	this.radius = 5; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
 
-
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
+
+	this.doSelectNode = true;
+	this.doShowSteps = true;
+	this.stepCount = 5;
 
 	this.width = $('#graphContainer').innerWidth();
 	this.height = this.width * .5;
@@ -30,9 +33,16 @@ function GlobalGraph (graph) {
     	.attr("viewBox", "0 0 " + this.width  + " " + this.height)
     	.attr("preserveAspectRatio", "xMidYMid meet");
 
+    this.graph.nodes.forEach( function(d) {
+        d.links = [];
+        d.distance = 0;
+        d.visited = false;
+    });
+
 	// d3 selection containing all edge lines
 	this.link = svg.append("g")
-		.selectAll("line")
+        .attr("class", "link")
+		.selectAll(".link")
 		.data(graph.edges);
 
     //helper function for getting counts for each node.
@@ -51,8 +61,9 @@ function GlobalGraph (graph) {
 
 	// d3 selection containing all node circles
 	this.node = svg.append("g")
-		.selectAll("circle")
-		.data(self.graph.nodes)
+        .attr("class", "node")
+		.selectAll(".node")
+		.data(self.graph.nodes);
 		//.on("mouseover", tip.show)
 		//.on("mouseout", tip.hide);
 
@@ -71,6 +82,7 @@ function GlobalGraph (graph) {
         .force("x", d3.forceX(this.width / 2).strength([0.05]))
         //.force("y", d3.forceY(0).strength([0.4]))
 		.force("y", d3.forceY(this.height / 2).strength([0.1]));
+
 
 	// this is a list of sub-graphs and their simulations
 	this.sub_graphs = [];
@@ -108,8 +120,8 @@ function GlobalGraph (graph) {
 		self.node = self.node.enter()
 			.append("circle")
 			.attr("r", function (d) {
-				if (d.count) return d.count;
-				return 5;
+				if (d.count) return d.count * 8;
+				return 8;
 			})
 			.attr("class", "node")
             .attr("id", function (d) {
@@ -132,6 +144,7 @@ function GlobalGraph (graph) {
 			.on("click", self.onNodeClick)
 			.merge(self.node);
 	};
+
 
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
@@ -177,13 +190,10 @@ function GlobalGraph (graph) {
 
 
 	// Handler for node clicks; d = node datum; this = svg element
-	this.onNodeClick = function (d) { 
-
-		// Do all the things 
+	this.onNodeClick = function (d) {
+		// dijkstra!
+		if (self.doShowSteps) self.dijkstra(d);
 		self.toggleNodeIsActive(d, this);
-
-		// self.doOtherThings(d)
-		// self.doEvenMoreThings(d)
 	};
 
 	// Selecting and Deselecting Nodes
@@ -191,9 +201,8 @@ function GlobalGraph (graph) {
 		if (typeof d.isActive === undefined) d.isActive = false; // saftey check
 
 		d3.select(ele).transition().duration(200)
-			.attr('r', function (d) { return d.isActive ? 5 : 15 })
+			.attr('r', function (d) { return d.isActive ? 8 : 15 })
 			.style('fill', function (d) { return d.isActive ? 'black' : 'green' });
-
 
 		d.isActive = !d.isActive; // update node state
 	};
@@ -205,6 +214,15 @@ function GlobalGraph (graph) {
 			.attr("stroke-width", 2)
 			.attr("class", "link")
 			.merge(self.link);
+	};
+
+    // Appends the list of links to each node to include links that have that node as the source
+    // Called during initialization & during Reset
+	this.addSources = function() {
+        self.graph.edges.forEach( function(d) {
+            var src = d.source;
+            src.links.push(d);
+        });
 	};
 
 	// Callback function for "tick" event (entropy occuring over time!)
@@ -226,6 +244,7 @@ function GlobalGraph (graph) {
 	this.runSimulation = function () {
 		self.simulation.nodes(self.graph.nodes).on("tick", self.ticked);
 		self.simulation.force("link").links(self.graph.edges);
+        self.addSources();
 	};
 
 	// Drag Start Event Handler
@@ -257,6 +276,92 @@ function GlobalGraph (graph) {
 		d.fx = null;
 		d.fy = null;
 	};
+
+
+
+    // Color scale for the Dijkstra's
+    // TODO: Fiddle around with this to Get it perfect
+    // This is a PATCH color scale, just to show proof of concept
+    function color(x) {
+        if(x <= 0)  return "green";
+        if(x <= 1)  return "lime";
+        if(x <= 2)  return "gold";
+        if(x <= 3)  return "orange";
+        if(x <= 4)  return "salmon";
+        if(x <= 5)  return "red";
+        return "black";
+    }
+
+    this.firstStep = null;
+
+    // Given a starting node, runs djikstras algorthm to determine the distances each node is from
+    // the starting node. Also calls 'tick'() to change color corresponding to distance
+    // Modifies the distance attribute of each node
+	this.dijkstra = function(first) {
+		if (typeof first === 'undefined') {
+			first = self.firstStep;
+			if (first === null) return false; // exit if no first
+		}
+		self.firstStep = first;
+
+        // Function to change the color of each node.
+        function tick() {
+        	var dis;
+            self.node.transition(200).style("fill", function(d) {
+            	dis = d.distance;
+                return color(d.distance);
+            }).text(dis);
+        }
+
+        var unvisited = [];
+        this.graph.nodes.forEach(function (d) {
+            if (d != first) {
+                d.distance = Infinity;
+                unvisited.push(d);
+                d.visited = false;
+            }
+        });
+
+        var current = first;
+        current.distance = 0;
+        var done = false;
+        var i = 0;
+
+        function stepi() {
+            current.visited = true;
+            // current.total_distance = 0;
+            current.links.forEach(function (link) {
+                var tar = link.target;
+                if (!tar.visited) {
+                    // USE LINK.COUNT for Weights. Otherwise we use just 1 for degrees of seperation
+                    // var dist = current.distance + link.count;
+                    var dist = current.distance + 1;
+                    tar.distance = Math.min(dist, tar.distance);
+                }
+            });
+            tick();
+            if ( i++ == self.stepCount || unvisited.length == 0 || current.distance == Infinity) {
+                done = true;
+                console.log('finally done?', i);
+            }
+
+            unvisited.sort(function (a, b) {
+                return b.distance - a.distance
+            });
+            current = unvisited.pop();
+        }
+
+        // timer to update the color of the nodes evert x milliseconds
+        var last = 0;
+        var timer = d3.timer(function(elapsed) {
+            var t = elapsed - last;
+            last = elapsed;
+            if(elapsed > 200) {
+                if(!done) stepi();
+                else  timer.stop();
+            }
+        });
+    };
 
 	this.highlightSubGraph = function (node_ids) {
 		var subgraph_nodes = {};
@@ -316,8 +421,10 @@ function ProtoApp () {
 	this.userData = {};
 	this.globalGraphData = null;
 
+
 	this.initialize = function () {
 		this.addEventListeners();
+		this.buildStepsControl();
 	},
 
 	// Subscribe to button clicks
@@ -326,6 +433,43 @@ function ProtoApp () {
 		$('#addStubData').on('click', this.onAddStubData);
 		$('#toggleNode').on('click', this.onToggleNode);
 	},
+
+	this.buildStepsControl = function () {
+		self.stepsController = d3.select('#stepsControlContainer');
+
+		self.stepsController.append('h3').text('Steps Control');
+
+		self.stepsController.append('input').attr('class', 'stepsControlToggle')
+			.attr('type', 'checkbox')
+			.attr('checked', 'true')
+			.attr('name', 'isStepsMode')
+			.on('click', function (d) {
+				window.globalGraph.doShowSteps = !window.globalGraph.doShowSteps;
+				// console.log('self.doShowSteps', window.globalGraph.doShowSteps);
+			});
+		self.stepsController.append('span')
+			.attr('class', 'onOff').text('on/off');
+
+
+		self.stepsController.append('select')
+			.attr('class', 'stepsControlSelect')
+			;
+		for (var i = 0; i < 30; i++) {
+			self.stepsController.select('select')
+				.append('option')
+				.attr('value', i + 1)
+				.text(i + 1);
+		}
+
+		self.stepsController.append('button')
+			.attr('class', 'updateStepCount')
+			.text('set steps')
+			.on('click', function (d) {
+				// update the state here
+				window.globalGraph.stepCount = Number($('.stepsControlSelect option:selected').attr('value'));
+				if (window.globalGraph.firstStep) window.globalGraph.dijkstra();
+			});
+	}
 
 	// Handling Refresh Graph Button
 	this.onRefreshGraph = function (e) {
@@ -384,7 +528,6 @@ function ProtoApp () {
 	// Callback function for what to do when we graph data from external source
 	this.handleStubData = function (data) {
 		self.userData = data;
-		console.log(data);
 		// do things with stub data
 		window.globalGraph.highlightSubGraph(data.nodes.map(function (d) { return d.id }));
 	};

@@ -111,4 +111,8 @@ ol { margin: 1em; }
 }
 
 
+.stepsControlSelect {
+  clear:both;
+  display: block;
+}
 
