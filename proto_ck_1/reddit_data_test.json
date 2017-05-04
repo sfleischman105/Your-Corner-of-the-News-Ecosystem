@@ -1,601 +1,467 @@
 {
-    "nodes" : [
-    {
-        "label": "31.media.tumblr.com",
-        "id": "31.media.tumblr.com",
+    "nodes" : [ 
+        {
+        "label": "alternet.org",
+        "id": "alternet.org",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "activistpost.com",
-        "id": "activistpost.com",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "advocate.com",
-        "id": "advocate.com",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "alternet.org",
         "id": "alternet.org",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "attitude.co.uk",
-        "id": "attitude.co.uk",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "bbc.co.uk",
         "id": "bbc.co.uk",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "bbc.co.uk",
+        "id": "bbc.co.uk",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "bbc.com",
         "id": "bbc.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "berniesanders.com",
-        "id": "berniesanders.com",
+        "label": "bbc.com",
+        "id": "bbc.com",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "bigstory.ap.org",
-        "id": "bigstory.ap.org",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "breitbart.com",
         "id": "breitbart.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "breitbart.com",
+        "id": "breitbart.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "businessinsider.com",
         "id": "businessinsider.com",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "buzzfeed.com",
-        "id": "buzzfeed.com",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "cbc.ca",
         "id": "cbc.ca",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "cnbc.com",
-        "id": "cnbc.com",
+        "label": "cbc.ca",
+        "id": "cbc.ca",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "cnn.com",
         "id": "cnn.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "cotwa.info",
-        "id": "cotwa.info",
+        "label": "cnn.com",
+        "id": "cnn.com",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "countercurrentnews.com",
-        "id": "countercurrentnews.com",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "dailycaller.com",
         "id": "dailycaller.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "dailycaller.com",
+        "id": "dailycaller.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "dailymail.co.uk",
         "id": "dailymail.co.uk",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "dailywire.com",
-        "id": "dailywire.com",
+        "label": "dailymail.co.uk",
+        "id": "dailymail.co.uk",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "deadstate.org",
-        "id": "deadstate.org",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "democracynow.org",
         "id": "democracynow.org",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "forbes.com",
-        "id": "forbes.com",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "foxnews.com",
         "id": "foxnews.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "go.berniesanders.com",
-        "id": "go.berniesanders.com",
+        "label": "foxnews.com",
+        "id": "foxnews.com",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "gp.org",
-        "id": "gp.org",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "greenpartywatch.org",
-        "id": "greenpartywatch.org",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "guardian.co.uk",
-        "id": "guardian.co.uk",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "hotair.com",
-        "id": "hotair.com",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "huffingtonpost.com",
         "id": "huffingtonpost.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "ijr.com",
-        "id": "ijr.com",
+        "label": "huffingtonpost.com",
+        "id": "huffingtonpost.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "independent.co.uk",
         "id": "independent.co.uk",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "inquisitr.com",
-        "id": "inquisitr.com",
+        "label": "independent.co.uk",
+        "id": "independent.co.uk",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "jacobinmag.com",
-        "id": "jacobinmag.com",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "jill2016.com",
-        "id": "jill2016.com",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "jillstein.org",
-        "id": "jillstein.org",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "lgbtqnation.com",
-        "id": "lgbtqnation.com",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "mediaite.com",
-        "id": "mediaite.com",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "motherjones.com",
         "id": "motherjones.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "motherjones.com",
+        "id": "motherjones.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "nationalreview.com",
         "id": "nationalreview.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "newnownext.com",
-        "id": "newnownext.com",
+        "label": "nationalreview.com",
+        "id": "nationalreview.com",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "nymag.com",
-        "id": "nymag.com",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "nypost.com",
         "id": "nypost.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "nytimes.com",
         "id": "nytimes.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "patheos.com",
-        "id": "patheos.com",
+        "label": "nytimes.com",
+        "id": "nytimes.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "pinknews.co.uk",
         "id": "pinknews.co.uk",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "politico.com",
         "id": "politico.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "politico.com",
+        "id": "politico.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "politicususa.com",
         "id": "politicususa.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "politicususa.com",
+        "id": "politicususa.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "politifact.com",
         "id": "politifact.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "rawstory.com",
         "id": "rawstory.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "rawstory.com",
+        "id": "rawstory.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "realclearpolitics.com",
         "id": "realclearpolitics.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "reason.com",
         "id": "reason.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "reuters.com",
         "id": "reuters.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "reuters.com",
+        "id": "reuters.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "rt.com",
         "id": "rt.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "rt.com",
+        "id": "rt.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "salon.com",
         "id": "salon.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "slate.com",
-        "id": "slate.com",
+        "label": "salon.com",
+        "id": "salon.com",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "telegraph.co.uk",
-        "id": "telegraph.co.uk",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "telesurtv.net",
-        "id": "telesurtv.net",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "theantimedia.org",
-        "id": "theantimedia.org",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "theblaze.com",
-        "id": "theblaze.com",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "thecollegefix.com",
-        "id": "thecollegefix.com",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "thefederalist.com",
-        "id": "thefederalist.com",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "thefreethoughtproject.com",
         "id": "thefreethoughtproject.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "thefreethoughtproject.com",
+        "id": "thefreethoughtproject.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "thegatewaypundit.com",
         "id": "thegatewaypundit.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "thegatewaypundit.com",
+        "id": "thegatewaypundit.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "theguardian.com",
         "id": "theguardian.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "theguardian.com",
+        "id": "theguardian.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "thehill.com",
         "id": "thehill.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "thehill.com",
+        "id": "thehill.com",
+        "parent": null,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "theintercept.com",
         "id": "theintercept.com",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "thelastamericanvagabond.com",
-        "id": "thelastamericanvagabond.com",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "thelibertarianrepublic.com",
-        "id": "thelibertarianrepublic.com",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "thenation.com",
-        "id": "thenation.com",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "thenewcivilrightsmovement.com",
-        "id": "thenewcivilrightsmovement.com",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "thinkprogress.org",
         "id": "thinkprogress.org",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "towleroad.com",
-        "id": "towleroad.com",
+        "label": "thinkprogress.org",
+        "id": "thinkprogress.org",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "truth-out.org",
-        "id": "truth-out.org",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "truthdig.com",
-        "id": "truthdig.com",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "usuncut.com",
         "id": "usuncut.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "vesselnews.io",
-        "id": "vesselnews.io",
+        "label": "usuncut.com",
+        "id": "usuncut.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "vox.com",
         "id": "vox.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "washingtonexaminer.com",
         "id": "washingtonexaminer.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "washingtonpost.com",
         "id": "washingtonpost.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
-        "label": "washingtonsblog.com",
-        "id": "washingtonsblog.com",
+        "label": "washingtonpost.com",
+        "id": "washingtonpost.com",
         "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "washingtontimes.com",
-        "id": "washingtontimes.com",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "wikileaks.org",
-        "id": "wikileaks.org",
-        "parent": null,
-        "isActive": true,
-        "count": 1
-    },
-    {
-        "label": "yournewswire.com",
-        "id": "yournewswire.com",
-        "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
     },
     {
         "label": "zerohedge.com",
         "id": "zerohedge.com",
         "parent": null,
-        "isActive": true,
+        "isActive": false,
         "count": 1
-    }
-],
+    },
+    {
+        "label": "zerohedge.com",
+        "id": "zerohedge.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    }],
     "edges" : [
     {
         "target": "alternet.org",

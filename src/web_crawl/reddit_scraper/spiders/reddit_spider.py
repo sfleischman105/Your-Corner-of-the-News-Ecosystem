@@ -36,7 +36,12 @@ banned_domains = [
         'pbs.twimg.com',
         'i.imgflip.com',
         '25.media.tumblr.com',
-        'pic.al'
+        'pic.al',
+        'en.wikipedia.org',
+        'facebook.com',
+        'twitter.com',
+        'theonion.com',
+        'mobile.twitter.com',
 
     ]
 
