@@ -269,7 +269,7 @@ function GlobalGraph (graph) {
 
         // Function to change the color of each node.
         function tick() {
-            self.node.style("fill", function(d) {
+            self.node.transition(200).style("fill", function(d) {
                 return color(d.distance);
             });
         }
@@ -315,7 +315,7 @@ function GlobalGraph (graph) {
         var timer = d3.timer(function(elapsed) {
             var t = elapsed - last;
             last = elapsed;
-            if(elapsed > 500) {
+            if(elapsed > 200) {
                 if(!done) stepi();
                 else  timer.stop();
             }
