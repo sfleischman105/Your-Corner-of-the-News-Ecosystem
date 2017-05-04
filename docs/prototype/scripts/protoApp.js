@@ -1,6 +1,6 @@
 // async ajax call baked into d3 to grab data
 // proto_ck_1a	gdelt_weblinks  gdelt_50_52
-d3.json("reddit_data_test.json", function (error, graph) {
+d3.json("./scripts/reddit_data_test.json", function (error, graph) {
  	if (error) throw error;
  	window.protoApp.globalGraphData = $.extend(true, {}, graph);
  	window.globalGraph = new GlobalGraph(graph);
@@ -24,7 +24,7 @@ function GlobalGraph (graph) {
 
 	this.doSelectNode = true;
 	this.doShowSteps = true;
-	this.stepCount = 5;
+	this.stepCount = 30;
 
 	this.width = $('#graphContainer').innerWidth();
 	this.height = this.width * .5;
@@ -145,6 +145,12 @@ function GlobalGraph (graph) {
 			.merge(self.node);
 	};
 
+	// Handler for node clicks; d = node datum; this = svg element
+	this.onNodeClick = function (d) {
+		// dijkstra!
+		if (self.doShowSteps) self.dijkstra(d);
+		// self.toggleNodeIsActive(d, this);
+	};
 
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
@@ -186,15 +192,6 @@ function GlobalGraph (graph) {
 			.text(d.id);
 	
 	}
-
-
-
-	// Handler for node clicks; d = node datum; this = svg element
-	this.onNodeClick = function (d) {
-		// dijkstra!
-		if (self.doShowSteps) self.dijkstra(d);
-		self.toggleNodeIsActive(d, this);
-	};
 
 	// Selecting and Deselecting Nodes
 	this.toggleNodeIsActive = function (d, ele) {
@@ -457,6 +454,7 @@ function ProtoApp () {
 		for (var i = 0; i < 30; i++) {
 			self.stepsController.select('select')
 				.append('option')
+				.attr('selected', i == 30 ? 'true' : 'false')
 				.attr('value', i + 1)
 				.text(i + 1);
 		}

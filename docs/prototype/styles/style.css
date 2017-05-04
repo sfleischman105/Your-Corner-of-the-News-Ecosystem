@@ -60,7 +60,7 @@ ol { margin: 1em; }
 }
 
 #graphContainer {
-  border-right: 1px solid grey;
+  position: relative;
 }
 
 .toolTipDiv {
@@ -112,7 +112,6 @@ ol { margin: 1em; }
 
 
 .stepsControlSelect {
-  clear:both;
-  display: block;
+  margin: 10px 20px;
 }
 
