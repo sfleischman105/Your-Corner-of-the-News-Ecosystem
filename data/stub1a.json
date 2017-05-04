@@ -1,24 +1,20 @@
 {
-	"proflie"	: {
-		"age"	: 	30,
-		"gender": 	"male"
-	},
-	"history"	: [
+	"nodes": [
 		{
-			"id"	: 	"nbcnews.com",
-			"count"	: 	15
+			"count": 1,
+			"id": "time.com"
 		},
 		{
-			"id"	:	"today.com",
-			"count"	: 	5 
+			"count": 1,
+			"id": "nytimes.com"
 		},
 		{
-			"id" 	: 	"cnn.com",
-			"count"	:	8
+			"count": 1,
+			"id": "theguardian.com"
 		},
 		{
-			"id"	: 	"bbc.co.uk",
-			"count"	: 	12
+			"count": 1,
+			"id": "washingtonpost.com"
 		}
 	]
 }
