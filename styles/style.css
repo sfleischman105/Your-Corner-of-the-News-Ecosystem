@@ -115,4 +115,8 @@ line {
 }
 
 
+.stepsControlSelect {
+  clear:both;
+  display: block;
+}
 
