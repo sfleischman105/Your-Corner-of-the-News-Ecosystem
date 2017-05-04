@@ -2,44 +2,69 @@
 <html xml:lang="en" lang="en">
 <head>
   <title>CSE442 | Your Corner of the News Ecosystem</title>
-  <link href="https://cse442-17s.github.io/style.css" media="all" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" media="all" rel="stylesheet">
+  <link href="./styles/normalize.css" media="all" rel="stylesheet" />
+  <link href="./styles/skeleton.css" media="all" rel="stylesheet" />
+  <link href="./styles/style.css" media="all" rel="stylesheet" />
 </head>
 
 <body>
-<div class="content">
+  <main class="container content">
 
-  <section class="title">
-    <a href="/">Your Corner of the News Ecosystem</a>
-  </section>
+    <section class="title">
+      <a href="/">Your Corner of the News Ecosystem</a>
+    </section>
 
-  <section>
-    <p>
-      <strong>Team Members</strong>: Conor Kelly, Brendan King, Stephen Fleischman, Jingwei Zhang
-    </p>
-  </section>
+    <section>
+      <p>
+        <strong>Team Members</strong>: Conor Kelly, Brendan King, Stephen Fleischman, Jingwei Zhang
+      </p>
+    </section>
 
-  <section>
-    <em>[Add: Interactive visualization goes here!]</em>
-  </section>
+    <section id="graphContainer" class="twelve columns alpha">
+      <svg></svg>
+    </section>
 
-  <section>
-    <h2>Design Rationale</h2>
-    <p>
-      [Add: A rationale for your design decisions. How did you choose your particular visual encodings and interaction techniques? What alternatives did you consider and how did you arrive at your ultimate choices?]
-    </p>
-  </section>
+    <section id="graphControl" class="six columns">
+      <button id="refreshGraph">Refresh Graph</button>  <!--  -->
+    
+      <!-- Select Stub Data to bring in; value should be filename of json w/o extension -->
+      <select id="stubDataSelect">
+        <option value="stub1a">User Data 1a</option>
+        <option value="stub2">User Data 2</option>
+      <option value="stub_gdelt_ua">Some Russian and Ukrainian Domains</option>
+      </select>
+      <button id="addStubData">Add Stub Data</button>
+      <button id="toggleNode">Toggle Point</button>
+    </section>
 
-  <section>
-    <h2>Development Process</h2>
-    <p>
-      [Add: An overview of your development process. Describe how the work was split among the team members. Include a commentary on the development process, including answers to the following questions: Roughly how much time did you spend developing your application (in people-hours)? What aspects took the most time?]
-    </p>
-  </section>
+    <hr>
 
-  <div class="footer">
-    <a href="https://cse442-17s.github.io/">CSE 442 Data Visualization</a> -
-    <a href="http://www.washington.edu">University of Washington</a>
-  </div>
-</div>
+    <section class='twelve columns alpha'>
+      <h2 class='twelve columns alpha'>Design Rationale</h2>
+      <p>
+        [Add: A rationale for your design decisions. How did you choose your particular visual encodings and interaction techniques? What alternatives did you consider and how did you arrive at your ultimate choices?]
+      </p>
+    </section>
+
+    <section>
+      <h2>Development Process</h2>
+      <p>
+        [Add: An overview of your development process. Describe how the work was split among the team members. Include a commentary on the development process, including answers to the following questions: Roughly how much time did you spend developing your application (in people-hours)? What aspects took the most time?]
+      </p>
+    </section>
+
+    <div class="footer">
+      <a href="https://cse442-17s.github.io/">CSE 442 Data Visualization</a> -
+      <a href="http://www.washington.edu">University of Washington</a>
+    </div>
+
+
+  </main>
+  <script type="text/javascript" src="./scripts/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
+  <script type="text/javascript" src="./scripts/protoApp.js"></script>
 </body>
 </html>
