@@ -1,6 +1,6 @@
 // async ajax call baked into d3 to grab data
 // proto_ck_1a	gdelt_weblinks  gdelt_50_52
-d3.json("/data/gdelt_50_52.json", function (error, graph) {
+d3.json("/data/reddit/reddit_data_test.json", function (error, graph) {
  	if (error) throw error;
  	window.protoApp.globalGraphData = $.extend(true, {}, graph);
  	window.globalGraph = new GlobalGraph(graph);
@@ -39,7 +39,7 @@ function GlobalGraph (graph) {
     self._counts = function () {
         var counts = [];
         for (var i = 0; i < self.graph.edges.length; i++) {
-            counts[i] = (parseInt(self.graph.edges[i].attributes.Count));
+            counts[i] = (parseInt(self.graph.edges[i].count));
         }
         return counts;
     };
@@ -57,13 +57,15 @@ function GlobalGraph (graph) {
 	// simulation actually renders the graph and handles force animations
 	this.simulation = d3.forceSimulation()
 		.force("link", d3.forceLink().distance(function (d) {
-            var shift = (parseInt(d.attributes.Count) - self.link_mean) / (0.05 * self.link_stdev);
-            return Math.max(Math.min(20 - shift, 5), 40);
-        }).strength(1).id(function(d) { return d.id; }))
-	    .force("charge", d3.forceManyBody().strength([-200])) // default strength -30
-	    .force("center", d3.forceCenter(this.width / 2, this.height / 2))
-		.force("x", d3.forceX(this.width / 2).strength([0.1]))
-    	.force("y", d3.forceY(this.height / 2).strength([0.1]));
+            var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
+            return Math.max(Math.min(50 - shift, 5), 100);
+        }).strength(0.1).id(function(d) { return d.id; }))
+	    .force("charge", d3.forceManyBody().strength([-300])) // default strength -30
+	    //.force("center", d3.forceCenter(this.width / 2, this.height / 2))
+        //.force("x", d3.forceX(0).strength([0.4]))
+        .force("x", d3.forceX(this.width / 2).strength([0.05]))
+        //.force("y", d3.forceY(0).strength([0.4]))
+		.force("y", d3.forceY(this.height / 2).strength([0.1]));
 
 	// this is a list of sub-graphs and their simulations
 	this.sub_graphs = [];
