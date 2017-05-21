@@ -19,7 +19,7 @@ function GlobalGraph (graph) {
 	this.graph = graph; // the data used by the simulation
 	this.toggleNode = null; // for test purposes, this is a variable to contain removed node
 	this.toggleNodeEdges = []; // for test purposes, this is an array to conatin removed edges
-	this.radius = 5; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
+	this.radius = 3; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
 
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
@@ -70,20 +70,51 @@ function GlobalGraph (graph) {
 		//.on("mouseout", tip.hide);
 
 	//svg.call(tip);
-	
+	this.gravityWells = {
+		".com" : { x: .75, y: .5},
+
+		".org" : { x: .15, y: .15},
+		".co.uk" : { x: .05, y: .3 },
+		".co.ru" : { x: .15, y: .85 }
+	};
+
 
 	// simulation actually renders the graph and handles force animations
 	this.simulation = d3.forceSimulation()
 		.force("link", d3.forceLink().distance(function (d) {
             var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
             return Math.max(Math.min(50 - shift, 5), 100);
-        }).strength(0.1).id(function(d) { return d.id; }))
-	    .force("charge", d3.forceManyBody().strength([-250])) // default strength -30
-	    .force("center", d3.forceCenter(this.width / 2, this.height / 2))
+        }).strength(.05).id(function(d) { return d.id; }))
+	    .force("charge", d3.forceManyBody().strength([-350])) // default strength -30
+	    // .force("center", d3.forceCenter(this.width / 2, this.height / 2))
+
         //.force("x", d3.forceX(0).strength([0.4]))
-        .force("x", d3.forceX(this.width / 2).strength([0.1]))
+        .force("x", d3.forceX(function (d) {
+        	if (d.well) return self.width * self.gravityWells[d.well].x;
+        	for (var well in self.gravityWells) {
+        		if (typeof d.id === "string" && 
+        			d.id.indexOf(well) !== -1) {
+        			d.well = well;
+        			return self.width * self.gravityWells[d.well].x;
+        		}
+        	}
+        	return self.width * .15;
+        }).strength([.5]))
+
         //.force("y", d3.forceY(0).strength([0.4]))
-		.force("y", d3.forceY(this.height / 2).strength([0.2]));
+		.force("y", d3.forceY(function (d) {
+			console.log(d.well);
+			if (d.well) return self.height * self.gravityWells[d.well].y;
+			for (var well in self.gravityWells) {
+        		if (typeof d.id === "string" && 
+        			d.id.indexOf(well) !== -1) {
+        			d.well = well;
+        			return self.height * self.gravityWells[d.well].y;
+        		}
+        	}
+        	return self.height * .85;
+
+		}).strength([.5]));
 
 
 	// this is a list of sub-graphs and their simulations
