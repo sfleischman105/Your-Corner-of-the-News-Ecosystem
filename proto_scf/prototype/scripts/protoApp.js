@@ -67,7 +67,7 @@ function GlobalGraph (graph) {
 	this.renderGravityWells = function () {
 		var gravity = self.svg.selectAll("circle.gravWell")
 							.data(self.doGravity ? self.convertGravityData() : []);
-							
+
 		gravity.enter().append("circle").attr("class", "gravWell")
 			.style("fill", "red")
 			.attr("r", 10)
@@ -77,7 +77,7 @@ function GlobalGraph (graph) {
 
 		gravity.exit().remove();
 	}
-	
+
 	this.renderGravityWells(); // move into initializer
 
 	// Handler function for turning on and off gravity wells
@@ -137,12 +137,12 @@ function GlobalGraph (graph) {
 	// Handler for applying / updating simulation forces
 	// Todo - this can be broken down even further for fine-tune control over the simulation
 	this.applyGravityForces = function () {
-		
+
 		// d3.forceX || null
 		self.simulation.force("x", self.doGravity ? d3.forceX(function (d) {
         	if (d.well) return self.width * self.gravityWells[d.well].x;
         	for (var well in self.gravityWells) {
-        		if (typeof d.id === "string" && 
+        		if (typeof d.id === "string" &&
         			d.id.indexOf(well) !== -1) {
         			d.well = well;
         			return self.width * self.gravityWells[d.well].x;
@@ -157,7 +157,7 @@ function GlobalGraph (graph) {
 		.force("y", self.doGravity ? d3.forceY(function (d) {
 			if (d.well) return self.height * self.gravityWells[d.well].y;
 			for (var well in self.gravityWells) {
-        		if (typeof d.id === "string" && 
+        		if (typeof d.id === "string" &&
         			d.id.indexOf(well) !== -1) {
         			d.well = well;
         			return self.height * self.gravityWells[d.well].y;
@@ -233,6 +233,25 @@ function GlobalGraph (graph) {
 			// handle click
 			.on("click", self.onNodeClick)
 			.merge(self.node);
+
+		self.label = svg.append("g")
+            .attr("class", "labels")
+            .selectAll("text")
+            .data(self.graph.nodes)
+            .enter().append("text")
+            .attr("class", "label")
+            .text(function(d) { return d.id; })
+
+			//handle dragging by text
+			.call(d3.drag()
+                .on("start", self.dragStarted)
+                .on("drag", self.dragged)
+                .on("end", self.dragEnded))
+
+			// handle click
+            .on("click", self.onNodeClick)
+            .merge(self.node);
+
 	};
 
 	// Handler for node clicks; d = node datum; this = svg element
@@ -325,6 +344,11 @@ function GlobalGraph (graph) {
         self.node
         	.attr("cx", function(d) { return d.x = Math.max(self.radius, Math.min(self.width - self.radius, d.x)); })
             .attr("cy", function(d) { return d.y = Math.max(self.radius, Math.min(self.height - self.radius, d.y)); });
+
+        self.label
+            .attr("x", function(d) { return d.x; })
+            .attr("y", function (d) { return d.y; })
+            .style("font-size", "10px").style("fill", "#645cc3");
 	};
 
 	// Re-apply updated node and link to simulation
@@ -452,6 +476,15 @@ function GlobalGraph (graph) {
         });
     };
 
+	// show and hide labels
+    this.showNodeLabels = function() {
+       self.label.attr("display", "inline")
+    };
+
+    this.hideNodeLabels = function() {
+        self.label.attr("display", "none")
+    };
+
 	this.highlightSubGraph = function (node_ids) {
 		var subgraph_nodes = {};
 		subgraph_nodes.nodes = [];
@@ -503,7 +536,7 @@ function GlobalGraph (graph) {
 }
 
 
-// ProtoApp is the frontend app controllng the front-end and integrating D3 and user interactions
+// ProtoApp is the frontend app controlling the front-end and integrating D3 and user interactions
 function ProtoApp () {
 
 	var self = this;
@@ -526,7 +559,7 @@ function ProtoApp () {
 
 	this.onToggleGravity = function (e) {
 		window.globalGraph.onToggleGravity();
-	}
+	},
 
 	this.buildStepsControl = function () {
 		self.stepsController = d3.select('#stepsControlContainer');
@@ -564,7 +597,7 @@ function ProtoApp () {
 				window.globalGraph.stepCount = Number($('.stepsControlSelect option:selected').attr('value'));
 				if (window.globalGraph.firstStep) window.globalGraph.dijkstra();
 			});
-	}
+	},
 
 	// Handling Refresh Graph Button
 	this.onRefreshGraph = function (e) {
@@ -618,9 +651,18 @@ function ProtoApp () {
 
 		// Rerun the simulation
 		window.globalGraph.resetSimulation();
-	}
+	},
 
-	// Callback function for what to do when we graph data from external source
+	this.displayNodeLabels = function(checkbox) {
+		if (checkbox.checked) {
+			window.globalGraph.showNodeLabels();
+		} else {
+            window.globalGraph.hideNodeLabels();
+        }
+	},
+
+
+    // Callback function for what to do when we graph data from external source
 	this.handleStubData = function (data) {
 		self.userData = data;
 		// do things with stub data
