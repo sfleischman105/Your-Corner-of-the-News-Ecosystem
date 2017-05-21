@@ -50,7 +50,7 @@ ol { margin: 1em; }
 
 .link {
   stroke-width: 1;
-  stroke: grey;
+  stroke: rgba(0,0,0,.1);
 }
 
 .node {
