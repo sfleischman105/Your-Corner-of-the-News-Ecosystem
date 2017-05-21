@@ -1,0 +1,410 @@
+﻿[
+    {
+        "id": "breitbart.com",
+        "label": "breitbart.com",
+        "page_rank": 3832579,
+        "modularity_class": 44
+    },
+    {
+        "id": "businessinsider.com",
+        "label": "businessinsider.com",
+        "page_rank": 4245498,
+        "modularity_class": 18
+    },
+    {
+        "id": "cnbc.com",
+        "label": "cnbc.com",
+        "page_rank": 3965125,
+        "modularity_class": 20
+    },
+    {
+        "id": "cnn.com",
+        "label": "cnn.com",
+        "page_rank": 11843340,
+        "modularity_class": 44
+    },
+    {
+        "id": "dailycaller.com",
+        "label": "dailycaller.com",
+        "page_rank": 4965176,
+        "modularity_class": 44
+    },
+    {
+        "id": "dailymail.co.uk",
+        "label": "dailymail.co.uk",
+        "page_rank": 17070963,
+        "modularity_class": 15
+    },
+    {
+        "id": "forbes.com",
+        "label": "forbes.com",
+        "page_rank": 4472655,
+        "modularity_class": 20
+    },
+    {
+        "id": "forbes.com",
+        "label": "forbes.com",
+        "page_rank": 7156248,
+        "modularity_class": 20
+    },
+    {
+        "id": "foxnews.com",
+        "label": "foxnews.com",
+        "page_rank": 6488665,
+        "modularity_class": 44
+    },
+    {
+        "id": "foxnews.com",
+        "label": "foxnews.com",
+        "page_rank": 10381864,
+        "modularity_class": 44
+    },
+    {
+        "id": "huffingtonpost.com",
+        "label": "huffingtonpost.com",
+        "page_rank": 17180991,
+        "modularity_class": 44
+    },
+    {
+        "id": "independent.co.uk",
+        "label": "independent.co.uk",
+        "page_rank": 7654891,
+        "modularity_class": 53
+    },
+    {
+        "id": "inquisitr.com",
+        "label": "inquisitr.com",
+        "page_rank": 22239066,
+        "modularity_class": 15
+    },
+    {
+        "id": "latimes.com",
+        "label": "latimes.com",
+        "page_rank": 9995276,
+        "modularity_class": 44
+    },
+    {
+        "id": "motherjones.com",
+        "label": "motherjones.com",
+        "page_rank": 4420614,
+        "modularity_class": 44
+    },
+    {
+        "id": "msn.com",
+        "label": "msn.com",
+        "page_rank": 11387486,
+        "modularity_class": 8
+    },
+    {
+        "id": "nasdaq.com",
+        "label": "nasdaq.com",
+        "page_rank": 13553828,
+        "modularity_class": 12
+    },
+    {
+        "id": "nationalreview.com",
+        "label": "nationalreview.com",
+        "page_rank": 4028216,
+        "modularity_class": 44
+    },
+    {
+        "id": "npr.org",
+        "label": "npr.org",
+        "page_rank": 41640070,
+        "modularity_class": 59
+    },
+    {
+        "id": "nymag.com",
+        "label": "nymag.com",
+        "page_rank": 5491146,
+        "modularity_class": 44
+    },
+    {
+        "id": "nypost.com",
+        "label": "nypost.com",
+        "page_rank": 10099299,
+        "modularity_class": 15
+    },
+    {
+        "id": "nytimes.com",
+        "label": "nytimes.com",
+        "page_rank": 103451556,
+        "modularity_class": 44
+    },
+    {
+        "id": "patheos.com",
+        "label": "patheos.com",
+        "page_rank": 5169942,
+        "modularity_class": 36
+    },
+    {
+        "id": "politico.com",
+        "label": "politico.com",
+        "page_rank": 16660881,
+        "modularity_class": 44
+    },
+    {
+        "id": "politicususa.com",
+        "label": "politicususa.com",
+        "page_rank": 3720878,
+        "modularity_class": 44
+    },
+    {
+        "id": "politifact.com",
+        "label": "politifact.com",
+        "page_rank": 5731659,
+        "modularity_class": 44
+    },
+    {
+        "id": "rawstory.com",
+        "label": "rawstory.com",
+        "page_rank": 6616963,
+        "modularity_class": 44
+    },
+    {
+        "id": "realclearpolitics.com",
+        "label": "realclearpolitics.com",
+        "page_rank": 5378560,
+        "modularity_class": 44
+    },
+    {
+        "id": "reason.com",
+        "label": "reason.com",
+        "page_rank": 4444158,
+        "modularity_class": 44
+    },
+    {
+        "id": "reuters.com",
+        "label": "reuters.com",
+        "page_rank": 83698799,
+        "modularity_class": 60
+    },
+    {
+        "id": "rt.com",
+        "label": "rt.com",
+        "page_rank": 18643560,
+        "modularity_class": 8
+    },
+    {
+        "id": "salon.com",
+        "label": "salon.com",
+        "page_rank": 9694731,
+        "modularity_class": 44
+    },
+    {
+        "id": "seekingalpha.com",
+        "label": "seekingalpha.com",
+        "page_rank": 18556554,
+        "modularity_class": 20
+    },
+    {
+        "id": "slate.com",
+        "label": "slate.com",
+        "page_rank": 11259939,
+        "modularity_class": 44
+    },
+    {
+        "id": "sputniknews.com",
+        "label": "sputniknews.com",
+        "page_rank": 11278487,
+        "modularity_class": 8
+    },
+    {
+        "id": "telegraph.co.uk",
+        "label": "telegraph.co.uk",
+        "page_rank": 12420608,
+        "modularity_class": 53
+    },
+    {
+        "id": "tenthamendmentcenter.com",
+        "label": "tenthamendmentcenter.com",
+        "page_rank": 42473240,
+        "modularity_class": 44
+    },
+    {
+        "id": "theage.com.au",
+        "label": "theage.com.au",
+        "page_rank": 45823883,
+        "modularity_class": 14
+    },
+    {
+        "id": "theatlantic.com",
+        "label": "theatlantic.com",
+        "page_rank": 12782419,
+        "modularity_class": 44
+    },
+    {
+        "id": "theblaze.com",
+        "label": "theblaze.com",
+        "page_rank": 5404069,
+        "modularity_class": 44
+    },
+    {
+        "id": "theconversation.com",
+        "label": "theconversation.com",
+        "page_rank": 28657063,
+        "modularity_class": 53
+    },
+    {
+        "id": "thecourier.com.au",
+        "label": "thecourier.com.au",
+        "page_rank": 12755192,
+        "modularity_class": 14
+    },
+    {
+        "id": "thefederalist.com",
+        "label": "thefederalist.com",
+        "page_rank": 4091075,
+        "modularity_class": 44
+    },
+    {
+        "id": "theguardian.com",
+        "label": "theguardian.com",
+        "page_rank": 129946134,
+        "modularity_class": 53
+    },
+    {
+        "id": "theherald.com.au",
+        "label": "theherald.com.au",
+        "page_rank": 25095283,
+        "modularity_class": 14
+    },
+    {
+        "id": "thehill.com",
+        "label": "thehill.com",
+        "page_rank": 16896317,
+        "modularity_class": 44
+    },
+    {
+        "id": "theintercept.com",
+        "label": "theintercept.com",
+        "page_rank": 5802822,
+        "modularity_class": 44
+    },
+    {
+        "id": "thenation.com",
+        "label": "thenation.com",
+        "page_rank": 7230251,
+        "modularity_class": 44
+    },
+    {
+        "id": "theverge.com",
+        "label": "theverge.com",
+        "page_rank": 11567717,
+        "modularity_class": 20
+    },
+    {
+        "id": "theweek.co.uk",
+        "label": "theweek.co.uk",
+        "page_rank": 49084720,
+        "modularity_class": 53
+    },
+    {
+        "id": "theweek.com",
+        "label": "theweek.com",
+        "page_rank": 37672610,
+        "modularity_class": 44
+    },
+    {
+        "id": "thewrap.com",
+        "label": "thewrap.com",
+        "page_rank": 13684949,
+        "modularity_class": 18
+    },
+    {
+        "id": "thinkprogress.org",
+        "label": "thinkprogress.org",
+        "page_rank": 12886745,
+        "modularity_class": 44
+    },
+    {
+        "id": "time.com",
+        "label": "time.com",
+        "page_rank": 26359973,
+        "modularity_class": 20
+    },
+    {
+        "id": "timesofisrael.com",
+        "label": "timesofisrael.com",
+        "page_rank": 9808326,
+        "modularity_class": 38
+    },
+    {
+        "id": "truth-out.org",
+        "label": "truth-out.org",
+        "page_rank": 11311066,
+        "modularity_class": 44
+    },
+    {
+        "id": "truthdig.com",
+        "label": "truthdig.com",
+        "page_rank": 5635605,
+        "modularity_class": 44
+    },
+    {
+        "id": "variety.com",
+        "label": "variety.com",
+        "page_rank": 18697873,
+        "modularity_class": 20
+    },
+    {
+        "id": "vice.com",
+        "label": "vice.com",
+        "page_rank": 25607286,
+        "modularity_class": 53
+    },
+    {
+        "id": "vox.com",
+        "label": "vox.com",
+        "page_rank": 13653565,
+        "modularity_class": 44
+    },
+    {
+        "id": "washingtonexaminer.com",
+        "label": "washingtonexaminer.com",
+        "page_rank": 9987577,
+        "modularity_class": 44
+    },
+    {
+        "id": "washingtonpost.com",
+        "label": "washingtonpost.com",
+        "page_rank": 319284353,
+        "modularity_class": 44
+    },
+    {
+        "id": "washingtontimes.com",
+        "label": "washingtontimes.com",
+        "page_rank": 14283218,
+        "modularity_class": 44
+    },
+    {
+        "id": "whitehouse.gov",
+        "label": "whitehouse.gov",
+        "page_rank": 20372886,
+        "modularity_class": 44
+    },
+    {
+        "id": "wired.com",
+        "label": "wired.com",
+        "page_rank": 9596180,
+        "modularity_class": 20
+    },
+    {
+        "id": "wkbw.com",
+        "label": "wkbw.com",
+        "page_rank": 11869996,
+        "modularity_class": 44
+    },
+    {
+        "id": "worldbank.org",
+        "label": "worldbank.org",
+        "page_rank": 36476505,
+        "modularity_class": 53
+    },
+    {
+        "id": "wsj.com",
+        "label": "wsj.com",
+        "page_rank": 199211154,
+        "modularity_class": 20
+    }
+]

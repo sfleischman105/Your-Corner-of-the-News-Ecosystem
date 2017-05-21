@@ -1,6 +1,6 @@
 // async ajax call baked into d3 to grab data
 // proto_ck_1a	gdelt_weblinks  gdelt_50_52
-d3.json("./scripts/gdelt_weblinks.json", function (error, graph) {
+d3.json("./scripts/gdelt_filtered.json", function (error, graph) {
  	if (error) throw error;
  	window.protoApp.globalGraphData = $.extend(true, {}, graph);
  	window.globalGraph = new GlobalGraph(graph);
@@ -75,7 +75,7 @@ function GlobalGraph (graph) {
 	// simulation actually renders the graph and handles force animations
 	this.simulation = d3.forceSimulation()
 		.force("link", d3.forceLink().distance(function (d) {
-            var shift = (parseInt(d.attributes) - self.link_mean) / (0.01 * self.link_stdev);
+            var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
             return Math.max(Math.min(50 - shift, 5), 100);
         }).strength(0.1).id(function(d) { return d.id; }))
 	    .force("charge", d3.forceManyBody().strength([-250])) // default strength -30
