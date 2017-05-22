@@ -601,10 +601,12 @@ function ProtoApp () {
 
 	// Handling Refresh Graph Button
 	this.onRefreshGraph = function (e) {
+	    window.globalGraph.hideNodeLabels();
 		window.globalGraph.graph = $.extend(true, {}, self.globalGraphData);
 		window.globalGraph.toggleNode = null;
 		window.globalGraph.toggleNodeEdges.length = 0;
 		window.globalGraph.resetSimulation();
+		this.displayNodeLabels(document.getElementById("nodeLabelCheckBox"));
 	},
 
 	// Handles button click and fetches stub data file based on selected option
