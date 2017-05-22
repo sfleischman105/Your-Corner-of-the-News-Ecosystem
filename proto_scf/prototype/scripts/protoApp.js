@@ -613,11 +613,6 @@ function ProtoApp () {
 		
 	};
 
-	this.onControlSliderChange = function (e) { // this : input html; self : protoApp
-		var handlerStr = this.id + 'Update';
-		if (!!self[handlerStr]) self[handlerStr](this.value, true);
-	}
-
 	this.onToggleGravity = function (e) {
 		window.globalGraph.onToggleGravity();
 	},
@@ -636,6 +631,11 @@ function ProtoApp () {
         this.collisionForceSliderUpdate(DEFAULT_COLLISION_FORCE_RADIUS, false);
         this.gravityForceSliderUpdate(DEFAULT_GRAVITY_FORCE_STRENGTH, false);
     },
+
+    this.onControlSliderChange = function (e) { // this : input html; self : protoApp
+		var handlerStr = this.id + 'Update';
+		if (!!self[handlerStr]) self[handlerStr](this.value, true);
+	}
 
 	this.buildStepsControl = function () {
 		self.stepsController = d3.select('#stepsControlContainer');
