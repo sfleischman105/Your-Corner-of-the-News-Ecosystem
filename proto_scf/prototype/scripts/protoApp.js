@@ -19,7 +19,7 @@ function GlobalGraph (graph) {
 	this.graph = graph; // the data used by the simulation
 	this.toggleNode = null; // for test purposes, this is a variable to contain removed node
 	this.toggleNodeEdges = []; // for test purposes, this is an array to conatin removed edges
-	this.radius = 3; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
+	this.radius = 8; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
 
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges

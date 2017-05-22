@@ -42,21 +42,9 @@
         "modularity_class": 20
     },
     {
-        "id": "forbes.com",
-        "label": "forbes.com",
-        "page_rank": 7156248,
-        "modularity_class": 20
-    },
-    {
         "id": "foxnews.com",
         "label": "foxnews.com",
         "page_rank": 6488665,
-        "modularity_class": 44
-    },
-    {
-        "id": "foxnews.com",
-        "label": "foxnews.com",
-        "page_rank": 10381864,
         "modularity_class": 44
     },
     {
