@@ -38,7 +38,7 @@ function GlobalGraph (graph) {
 	this.stepCount = 30;
 
 	this.width = $('#graphContainer').innerWidth();
-	this.height = this.width * .5;
+	this.height = this.width * .8;
 
 	this.svg = svg = d3.select("svg")
     	.attr("viewBox", "0 0 " + this.width  + " " + this.height)
