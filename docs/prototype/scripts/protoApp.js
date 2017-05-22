@@ -17,7 +17,7 @@ function GlobalGraph (graph) {
 	this.graph = graph; // the data used by the simulation
 	this.toggleNode = null; // for test purposes, this is a variable to contain removed node
 	this.toggleNodeEdges = []; // for test purposes, this is an array to conatin removed edges
-	this.radius = 5; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
+	this.nodeBorderPadding = 5; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
 
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
@@ -233,8 +233,8 @@ function GlobalGraph (graph) {
         // Math.max and radius calculation allow us to bound the position of the nodes within a box
         // todo - convert this to using linear scales to keep nodes within box?
         self.node
-        	.attr("cx", function(d) { return d.x = Math.max(self.radius, Math.min(self.width - self.radius, d.x)); })
-            .attr("cy", function(d) { return d.y = Math.max(self.radius, Math.min(self.height - self.radius, d.y)); });
+        	.attr("cx", function(d) { return d.x = Math.max(self.nodeBorderPadding, Math.min(self.width - self.nodeBorderPadding, d.x)); })
+            .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
 	};
 
 	// Re-apply updated node and link to simulation
