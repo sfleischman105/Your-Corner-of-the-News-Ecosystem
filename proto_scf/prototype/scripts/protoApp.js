@@ -41,7 +41,7 @@ function GlobalGraph (graph) {
         d.visited = false;
     });
 
-
+    this.doGravity = false;
     this.gravityWells = {
 		".com" : { x: .75, y: .5},
 		".org" : { x: .15, y: .15},
@@ -49,23 +49,41 @@ function GlobalGraph (graph) {
 		".co.ru" : { x: .15, y: .85 }
 	};
 
-	this.gravityEnter = this.svg.selectAll("circle.gravWell")
-		.data(function () {
-			var data = [];
-			for (var prop in self.gravityWells) {
-				data.push({
-					"id" : prop, "x": self.gravityWells[prop].x, "y": self.gravityWells[prop].y
-				})
-			}
-			return data;
-		})
-		.enter();
+	this.convertGravityData = function () {
+		var data = [];
+		for (var prop in self.gravityWells) {
+			data.push({
+				"id" : prop, "x": self.gravityWells[prop].x, "y": self.gravityWells[prop].y
+			})
+		}
+		return data;
+	};
 
-	this.gravityEnter.append("circle").attr("class", "gravWell")
-		.style("fill", "red")
-		.attr("r", 10)
-		.attr("cx", function (d) { return self.width * d.x; })
-		.attr("cy", function (d) { return self.height * d.y });
+
+
+	this.renderGravityWells = function () {
+
+		var gravity = self.svg.selectAll("circle.gravWell")
+							.data(self.doGravity ? self.convertGravityData() : []);
+							
+		
+		gravity.enter().append("circle").attr("class", "gravWell")
+			.style("fill", "red")
+			.attr("r", 10)
+			.attr("cx", function (d) { return self.width * d.x; })
+			.attr("cy", function (d) { return self.height * d.y })
+			.merge(gravity);
+
+		gravity.exit().remove();
+	}
+	
+	this.renderGravityWells();
+	this.onToggleGravity = function () {
+		self.doGravity = !self.doGravity;
+		self.renderGravityWells();
+		self.applyGravityForces();
+		self.restartAllSimulations(0.2);
+	}
 
 
 	// d3 selection containing all edge lines
@@ -110,10 +128,13 @@ function GlobalGraph (graph) {
 
 	    .force("charge", d3.forceManyBody()
 	    .strength([-30])) // default strength -30
-	    // .force("center", d3.forceCenter(this.width / 2, this.height / 2))
+	    
 
         //.force("x", d3.forceX(0).strength([0.4]))
-        .force("x", d3.forceX(function (d) {
+        ;
+
+	this.applyGravityForces = function () {
+		self.simulation.force("x", self.doGravity ? d3.forceX(function (d) {
         	if (d.well) return self.width * self.gravityWells[d.well].x;
         	for (var well in self.gravityWells) {
         		if (typeof d.id === "string" && 
@@ -124,11 +145,11 @@ function GlobalGraph (graph) {
         	}
         	return self.width * .15;
         })
-        .strength([.05]))
+        .strength([.05]) : null)
 
 
         //.force("y", d3.forceY(0).strength([0.4]))
-		.force("y", d3.forceY(function (d) {
+		.force("y", self.doGravity ? d3.forceY(function (d) {
 			if (d.well) return self.height * self.gravityWells[d.well].y;
 			for (var well in self.gravityWells) {
         		if (typeof d.id === "string" && 
@@ -139,8 +160,11 @@ function GlobalGraph (graph) {
         	}
         	return self.height * .85;
 		})
-		.strength([.05]));
+		.strength([.05]) : null)
 
+		.force("center", !self.doGravity ? d3.forceCenter(this.width / 2, this.height / 2) : null);
+	}
+	this.applyGravityForces();
 
 	// this is a list of sub-graphs and their simulations
 	this.sub_graphs = [];
@@ -305,10 +329,7 @@ function GlobalGraph (graph) {
 	// Drag Start Event Handler
 	this.dragStarted = function (d) {
 		if (!d3.event.active) {
-			self.simulation.alphaTarget(0.3).restart();
-			for (i = 0; i < self.sub_simulations.length; i++) {
-				self.sub_simulations[i].alphaTarget(0.3).restart();
-			}
+			self.restartAllSimulations(0.3);
         }
 		d.fx = d.x;
 		d.fy = d.y;
@@ -323,15 +344,19 @@ function GlobalGraph (graph) {
 	// Drag End Event Handler
 	this.dragEnded = function (d) {
 		if (!d3.event.active) {
-			self.simulation.alphaTarget(0);
-            for (i = 0; i < self.sub_simulations.length; i++) {
-                self.sub_simulations[i].alphaTarget(0);
-            }
+			self.restartAllSimulations(0.3);
         }
 		d.fx = null;
 		d.fy = null;
 	};
 
+	this.restartAllSimulations = function (alpha) {
+		if (typeof alpha === "undefined") alpha = 0;
+		self.simulation.alphaTarget(alpha).restart();
+		for (i = 0; i < self.sub_simulations.length; i++) {
+			self.sub_simulations[i].alphaTarget(alpha).restart();
+		}
+	}
 
 
     // Color scale for the Dijkstra's
@@ -487,7 +512,12 @@ function ProtoApp () {
 		$('#refreshGraph').on('click', this.onRefreshGraph);
 		$('#addStubData').on('click', this.onAddStubData);
 		$('#toggleNode').on('click', this.onToggleNode);
-	},
+		$('#toggleGravity').on('click', this.onToggleGravity);
+	};
+
+	this.onToggleGravity = function (e) {
+		window.globalGraph.onToggleGravity();
+	}
 
 	this.buildStepsControl = function () {
 		self.stepsController = d3.select('#stepsControlContainer');
