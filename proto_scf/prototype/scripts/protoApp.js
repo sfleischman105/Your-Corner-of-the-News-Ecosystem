@@ -41,7 +41,9 @@ function GlobalGraph (graph) {
         d.visited = false;
     });
 
-    this.doGravity = false;
+    this.doGravity = false; // control boolean for gravity forces. Todo - integrate this to State object
+
+    // todo - convert this to a key of arrays for different sets of gravity wells
     this.gravityWells = {
 		".com" : { x: .75, y: .5},
 		".org" : { x: .15, y: .15},
@@ -49,6 +51,7 @@ function GlobalGraph (graph) {
 		".co.ru" : { x: .15, y: .85 }
 	};
 
+	// todo - this is just a handler for now, we'll bake in some of these node state data into the datasets that get loaded
 	this.convertGravityData = function () {
 		var data = [];
 		for (var prop in self.gravityWells) {
@@ -60,13 +63,11 @@ function GlobalGraph (graph) {
 	};
 
 
-
+	// todo - add d3 colors for different sets of gravity wells
 	this.renderGravityWells = function () {
-
 		var gravity = self.svg.selectAll("circle.gravWell")
 							.data(self.doGravity ? self.convertGravityData() : []);
 							
-		
 		gravity.enter().append("circle").attr("class", "gravWell")
 			.style("fill", "red")
 			.attr("r", 10)
@@ -77,7 +78,9 @@ function GlobalGraph (graph) {
 		gravity.exit().remove();
 	}
 	
-	this.renderGravityWells();
+	this.renderGravityWells(); // move into initializer
+
+	// Handler function for turning on and off gravity wells
 	this.onToggleGravity = function () {
 		self.doGravity = !self.doGravity;
 		self.renderGravityWells();
@@ -119,21 +122,23 @@ function GlobalGraph (graph) {
 
 	// simulation actually renders the graph and handles force animations
 	this.simulation = d3.forceSimulation()
+
+		// Edge force / strength
 		.force("link", d3.forceLink().distance(function (d) {
             var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
             return Math.max(Math.min(50 - shift, 5), 100);
         })
         .strength(.005).id(function(d) { return d.id; }))
 
-
+		// MainBody Force and strength
 	    .force("charge", d3.forceManyBody()
-	    .strength([-30])) // default strength -30
-	    
+	    .strength([-30])); // default strength -30
 
-        //.force("x", d3.forceX(0).strength([0.4]))
-        ;
-
+	// Handler for applying / updating simulation forces
+	// Todo - this can be broken down even further for fine-tune control over the simulation
 	this.applyGravityForces = function () {
+		
+		// d3.forceX || null
 		self.simulation.force("x", self.doGravity ? d3.forceX(function (d) {
         	if (d.well) return self.width * self.gravityWells[d.well].x;
         	for (var well in self.gravityWells) {
@@ -148,7 +153,7 @@ function GlobalGraph (graph) {
         .strength([.05]) : null)
 
 
-        //.force("y", d3.forceY(0).strength([0.4]))
+        // d3.forceY || null
 		.force("y", self.doGravity ? d3.forceY(function (d) {
 			if (d.well) return self.height * self.gravityWells[d.well].y;
 			for (var well in self.gravityWells) {
@@ -162,9 +167,12 @@ function GlobalGraph (graph) {
 		})
 		.strength([.05]) : null)
 
+
+		// d3.forceCenter || null
 		.force("center", !self.doGravity ? d3.forceCenter(this.width / 2, this.height / 2) : null);
 	}
-	this.applyGravityForces();
+	this.applyGravityForces(); // todo - move this to initializer
+
 
 	// this is a list of sub-graphs and their simulations
 	this.sub_graphs = [];
@@ -350,6 +358,7 @@ function GlobalGraph (graph) {
 		d.fy = null;
 	};
 
+	// helper function to restart simulation and sub_simulations
 	this.restartAllSimulations = function (alpha) {
 		if (typeof alpha === "undefined") alpha = 0;
 		self.simulation.alphaTarget(alpha).restart();
