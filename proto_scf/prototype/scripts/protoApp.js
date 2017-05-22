@@ -6,6 +6,15 @@ d3.json("./scripts/gdelt_filtered.json", function (error, graph) {
  	window.globalGraph = new GlobalGraph(graph);
 });
 
+/* ====== Constants ========= */
+
+const DEFAULT_LINK_FORCE_STRENGTH = 0.01;
+const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
+const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
+const DEFAULT_COLLISION_FORCE_RADIUS = 3;
+
+/* ========================== */
+
 // {"nodes": [{"label": "lexpress.fr", "attributes": {"Modularity Class": "39", "PageRank": "6.239664438254604E-4"}, "id": "lexpress.fr"}, {} etc
 
 // GlobalGraph object to initialize and render the global news network graph
@@ -120,57 +129,75 @@ function GlobalGraph (graph) {
 	//svg.call(tip);
 
 
-	// simulation actually renders the graph and handles force animations
-	this.simulation = d3.forceSimulation()
+    // Saving a reference to each force applied to the graph as a variable to allow live adjustments:
 
-		// Edge force / strength
-		.force("link", d3.forceLink().distance(function (d) {
-            var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
-            return Math.max(Math.min(50 - shift, 5), 100);
-        })
-        .strength(.005).id(function(d) { return d.id; }))
+    // force for links. Saving reference for slider adjustment
+    this.linkForce = d3.forceLink().distance(function (d) {
+        var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
+        return Math.max(Math.min(50 - shift, 5), 100);
+    }).strength(DEFAULT_LINK_FORCE_STRENGTH).id(function(d) { return d.id; });
 
-		// MainBody Force and strength
-	    .force("charge", d3.forceManyBody()
-	    .strength([-30])); // default strength -30
+    //charge force
+    this.chargeForce = d3.forceManyBody().strength([DEFAULT_CHARGE_FORCE_STRENGTH]);
+
+    //centering force: on by default and switched off when gravity is used.
+    this.centerForce = d3.forceCenter(this.width / 2, this.height / 2);
+
+    // collision force to prevent overlap
+    this.collisionForce = d3.forceCollide(DEFAULT_COLLISION_FORCE_RADIUS);
+
+    // simulation actually renders the graph and handles force animations
+    this.simulation = d3.forceSimulation()
+        .force("link", this.linkForce)
+        .force("charge", this.chargeForce)
+        .force("collision", this.collisionForce);
+
+    //set a force strength for gravity. Storing this supports slider updates while gravity not in use, prevents inconsistent state
+    this.gravityValue = DEFAULT_GRAVITY_FORCE_STRENGTH;
+
 
 	// Handler for applying / updating simulation forces
 	// Todo - this can be broken down even further for fine-tune control over the simulation
 	this.applyGravityForces = function () {
 
-		// d3.forceX || null
-		self.simulation.force("x", self.doGravity ? d3.forceX(function (d) {
-        	if (d.well) return self.width * self.gravityWells[d.well].x;
-        	for (var well in self.gravityWells) {
-        		if (typeof d.id === "string" &&
-        			d.id.indexOf(well) !== -1) {
-        			d.well = well;
-        			return self.width * self.gravityWells[d.well].x;
-        		}
-        	}
-        	return self.width * .15;
-        })
-        .strength([.05]) : null)
+        if (self.doGravity) {
+            // d3.forceX || null
+            this.gravityForceX = d3.forceX(function (d) {
+                if (d.well) return self.width * self.gravityWells[d.well].x;
+                for (var well in self.gravityWells) {
+                    if (typeof d.id === "string" &&
+                        d.id.indexOf(well) !== -1) {
+                        d.well = well;
+                        return self.width * self.gravityWells[d.well].x;
+                    }
+                }
+                return self.width * .15;
+            }).strength([DEFAULT_GRAVITY_FORCE_STRENGTH]);
 
+            this.gravityForceY = d3.forceY(function (d) {
+                if (d.well) return self.height * self.gravityWells[d.well].y;
+                for (var well in self.gravityWells) {
+                    if (typeof d.id === "string" &&
+                        d.id.indexOf(well) !== -1) {
+                        d.well = well;
+                        return self.height * self.gravityWells[d.well].y;
+                    }
+                }
+                return self.height * .85;
+            }).strength([this.gravityValue]);
 
-        // d3.forceY || null
-		.force("y", self.doGravity ? d3.forceY(function (d) {
-			if (d.well) return self.height * self.gravityWells[d.well].y;
-			for (var well in self.gravityWells) {
-        		if (typeof d.id === "string" &&
-        			d.id.indexOf(well) !== -1) {
-        			d.well = well;
-        			return self.height * self.gravityWells[d.well].y;
-        		}
-        	}
-        	return self.height * .85;
-		})
-		.strength([.05]) : null)
+            //now apply gravitational forces
+            this.simulation.force("center", null);
+            this.simulation.force("gravityForceX", this.gravityForceX);
+            this.simulation.force("gravityForceY", this.gravityForceY);
+        } else {
+            // or centering forces
+            this.simulation.force("center", this.centerForce);
+            this.simulation.force("gravityForceX", null);
+            this.simulation.force("gravityForceY", null);
+        }
+	};
 
-
-		// d3.forceCenter || null
-		.force("center", !self.doGravity ? d3.forceCenter(this.width / 2, this.height / 2) : null);
-	}
 	this.applyGravityForces(); // todo - move this to initializer
 
 
@@ -518,6 +545,29 @@ function GlobalGraph (graph) {
 				.on("tick", self.ticked));
     };
 
+	// adding methods for changing force parameters
+    this.linkForceUpdate = function(value) {
+        this.linkForce.strength(value);
+        self.simulation.alphaTarget(0.3).restart(); // reset simulation
+    };
+    this.chargeForceUpdate = function(value) {
+        this.chargeForce.strength([value]);
+        self.simulation.alphaTarget(0.3).restart(); // reset simulation
+    };
+    this.collisionForceUpdate = function(value) {
+        this.collisionForce.strength(value);
+        self.simulation.alphaTarget(0.3).restart(); // reset simulation
+    };
+    this.gravityForceUpdate = function(value) {
+        if (self.doGravity) {
+            this.gravityForceX.strength(value);
+            this.gravityForceY.strength(value);
+            this.gravityValue = value;
+            self.simulation.alphaTarget(0.3).restart(); // reset simulation
+        }
+
+    };
+
 	// helper function for building an index of SVG elements by UUID
     function _index(objects) {
         var index = {};
@@ -560,6 +610,18 @@ function ProtoApp () {
 	this.onToggleGravity = function (e) {
 		window.globalGraph.onToggleGravity();
 	},
+    this.setSliderDefaults = function () {
+        // set the slider values for these constants
+        document.getElementById("linkForceSlider").setAttribute("value",  DEFAULT_LINK_FORCE_STRENGTH);
+        document.getElementById("chargeForceSlider").setAttribute("value", DEFAULT_CHARGE_FORCE_STRENGTH);
+        document.getElementById("gravityForceSlider").setAttribute("value", window.globalGraph.gravityValue);
+        document.getElementById("collisionForceSlider").setAttribute("value", DEFAULT_COLLISION_FORCE_RADIUS);
+
+        this.linkForceSliderUpdate(DEFAULT_LINK_FORCE_STRENGTH);
+        this.chargeForceSliderUpdate(DEFAULT_CHARGE_FORCE_STRENGTH);
+        this.collisionForceSliderUpdate(DEFAULT_COLLISION_FORCE_RADIUS);
+        this.gravityForceSliderUpdate(window.globalGraph.gravityValue);
+    },
 
 	this.buildStepsControl = function () {
 		self.stepsController = d3.select('#stepsControlContainer');
@@ -662,6 +724,24 @@ function ProtoApp () {
             window.globalGraph.hideNodeLabels();
         }
 	},
+        
+    // handling force parameter sliders
+    this.linkForceSliderUpdate = function(value) {
+        document.getElementById("linkForceSliderSpan").innerHTML = value;
+        window.globalGraph.linkForceUpdate(value);
+    },
+    this.chargeForceSliderUpdate = function(value) {
+        document.getElementById("chargeForceSliderSpan").innerHTML = value;
+        window.globalGraph.chargeForceUpdate(value);
+    },
+    this.collisionForceSliderUpdate = function(value) {
+        document.getElementById("collisionForceSliderSpan").innerHTML = value;
+        window.globalGraph.collisionForceUpdate(value);
+    },
+    this.gravityForceSliderUpdate = function(value) {
+        document.getElementById("gravityForceSliderSpan").innerHTML = value;
+        window.globalGraph.gravityForceUpdate(value);
+    },
 
 
     // Callback function for what to do when we graph data from external source
