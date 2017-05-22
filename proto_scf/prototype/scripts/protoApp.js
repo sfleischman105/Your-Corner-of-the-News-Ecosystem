@@ -8,7 +8,7 @@ d3.json("./scripts/gdelt_filtered.json", function (error, graph) {
 
 /* ====== Constants ========= */
 
-const DEFAULT_LINK_FORCE_STRENGTH = 0.01;
+const DEFAULT_LINK_FORCE_STRENGTH = 0.005;
 const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
 const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
 const DEFAULT_COLLISION_FORCE_RADIUS = 3;
@@ -597,6 +597,7 @@ function ProtoApp () {
 	this.initialize = function () {
 		this.addEventListeners();
 		this.buildStepsControl();
+		this.setSliderDefaults();
 	},
 
 	// Subscribe to button clicks
@@ -610,17 +611,19 @@ function ProtoApp () {
 	this.onToggleGravity = function (e) {
 		window.globalGraph.onToggleGravity();
 	},
+
     this.setSliderDefaults = function () {
         // set the slider values for these constants
         document.getElementById("linkForceSlider").setAttribute("value",  DEFAULT_LINK_FORCE_STRENGTH);
         document.getElementById("chargeForceSlider").setAttribute("value", DEFAULT_CHARGE_FORCE_STRENGTH);
-        document.getElementById("gravityForceSlider").setAttribute("value", window.globalGraph.gravityValue);
+        document.getElementById("gravityForceSlider").setAttribute("value", DEFAULT_GRAVITY_FORCE_STRENGTH);
         document.getElementById("collisionForceSlider").setAttribute("value", DEFAULT_COLLISION_FORCE_RADIUS);
 
-        this.linkForceSliderUpdate(DEFAULT_LINK_FORCE_STRENGTH);
-        this.chargeForceSliderUpdate(DEFAULT_CHARGE_FORCE_STRENGTH);
-        this.collisionForceSliderUpdate(DEFAULT_COLLISION_FORCE_RADIUS);
-        this.gravityForceSliderUpdate(window.globalGraph.gravityValue);
+        // We supply false to prevent updating a simulation that might not exist yet. Will have consistent state if constructed correctly using these constants in GlobalGraph
+        this.linkForceSliderUpdate(DEFAULT_LINK_FORCE_STRENGTH, false);
+        this.chargeForceSliderUpdate(DEFAULT_CHARGE_FORCE_STRENGTH, false);
+        this.collisionForceSliderUpdate(DEFAULT_COLLISION_FORCE_RADIUS, false);
+        this.gravityForceSliderUpdate(DEFAULT_GRAVITY_FORCE_STRENGTH, false);
     },
 
 	this.buildStepsControl = function () {
@@ -726,21 +729,29 @@ function ProtoApp () {
 	},
         
     // handling force parameter sliders
-    this.linkForceSliderUpdate = function(value) {
+    this.linkForceSliderUpdate = function(value, update_simulation) {
         document.getElementById("linkForceSliderSpan").innerHTML = value;
-        window.globalGraph.linkForceUpdate(value);
+        if (update_simulation) {
+            window.globalGraph.linkForceUpdate(value);
+        }
     },
-    this.chargeForceSliderUpdate = function(value) {
+    this.chargeForceSliderUpdate = function(value, update_simulation) {
         document.getElementById("chargeForceSliderSpan").innerHTML = value;
-        window.globalGraph.chargeForceUpdate(value);
+        if (update_simulation) {
+            window.globalGraph.chargeForceUpdate(value);
+        }
     },
-    this.collisionForceSliderUpdate = function(value) {
+    this.collisionForceSliderUpdate = function(value, update_simulation) {
         document.getElementById("collisionForceSliderSpan").innerHTML = value;
-        window.globalGraph.collisionForceUpdate(value);
+        if (update_simulation) {
+            window.globalGraph.collisionForceUpdate(value);
+        }
     },
-    this.gravityForceSliderUpdate = function(value) {
+    this.gravityForceSliderUpdate = function(value, update_simulation) {
         document.getElementById("gravityForceSliderSpan").innerHTML = value;
-        window.globalGraph.gravityForceUpdate(value);
+        if (update_simulation) {
+            window.globalGraph.gravityForceUpdate(value);
+        }
     },
 
 
@@ -760,5 +771,6 @@ function uuid(a) {
 }
 
 window.protoApp = new ProtoApp(); // new it up!
+
 
 
