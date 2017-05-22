@@ -630,6 +630,17 @@ function ProtoApp () {
         document.getElementById("gravityForceSlider").setAttribute("value", DEFAULT_GRAVITY_FORCE_STRENGTH);
         document.getElementById("collisionForceSlider").setAttribute("value", DEFAULT_COLLISION_FORCE_RADIUS);
 
+        $('#simulationControls input[type=range]').each(function(i) { // For each slider
+        	var rangeEl = this;
+
+        	$('span[id^=' + this.id + ']').each(function(ii) { // For each span starting with current slider ID
+        		var attrStr = this.id.replace(rangeEl.id, '').toLowerCase(); // get the attribute name from span ID
+
+        		if (!!$(rangeEl).attr(attrStr)) $(this).text($(rangeEl).attr(attrStr)); // if current slider has an attribute, update the span text to match it
+        	});
+        });
+
+
         // We supply false to prevent updating a simulation that might not exist yet. Will have consistent state if constructed correctly using these constants in GlobalGraph
         this.linkForceSliderUpdate(DEFAULT_LINK_FORCE_STRENGTH, false);
         this.chargeForceSliderUpdate(DEFAULT_CHARGE_FORCE_STRENGTH, false);
