@@ -292,7 +292,7 @@ function GlobalGraph (graph) {
 
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
-		self.handleToolTipEvent(d);
+		// self.handleToolTipEvent(d);
 	}
 
 	this.onNodeMouseOut = function (d) {
