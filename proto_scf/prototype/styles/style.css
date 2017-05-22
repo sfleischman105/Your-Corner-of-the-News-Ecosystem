@@ -45,6 +45,13 @@ ol { margin: 1em; }
 }
 
 
+/* Graph Controls */
+button.checked { 
+  background-color: #eee;
+  color: rgba(0,155,0,1);
+  border-color: rgba(0,155,0,1);
+}
+
 
 /* PROTOTYPE SPECIFIC STYLING */
 

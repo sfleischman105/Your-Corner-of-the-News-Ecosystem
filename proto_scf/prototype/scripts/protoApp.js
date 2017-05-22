@@ -90,8 +90,10 @@ function GlobalGraph (graph) {
 	this.renderGravityWells(); // move into initializer
 
 	// Handler function for turning on and off gravity wells
-	this.onToggleGravity = function () {
+	this.onToggleGravity = function (buttonEl) {
 		self.doGravity = !self.doGravity;
+		$(buttonEl).toggleClass('checked');
+		$('span', buttonEl).text(self.doGravity ? 'ON' : 'OFF');
 		self.renderGravityWells();
 		self.applyGravityForces();
 		self.restartAllSimulations(0.2);
@@ -503,14 +505,16 @@ function GlobalGraph (graph) {
         });
     };
 
-	// show and hide labels
-    this.showNodeLabels = function() {
-       self.label.attr("display", "inline")
-    };
+    // show and hide labels
+    this.doShowNodeLabels = true;
+    this.onToggleNodeLabels = function (buttonEl) {
+    	self.doShowNodeLabels = !self.doShowNodeLabels;
+    	self.label.attr("display", self.doShowNodeLabels ? "inline" : "none");
+    	$(buttonEl).toggleClass('checked');
+    	$('span', buttonEl).text(self.doShowNodeLabels ? "ON" : "OFF");
+    }
 
-    this.hideNodeLabels = function() {
-        self.label.attr("display", "none")
-    };
+	
 
 	this.highlightSubGraph = function (node_ids) {
 		var subgraph_nodes = {};
@@ -605,7 +609,7 @@ function ProtoApp () {
 		$('#refreshGraph').on('click', this.onRefreshGraph);
 		$('#addStubData').on('click', this.onAddStubData);
 		$('#toggleNode').on('click', this.onToggleNode);
-		$('#toggleGravity').on('click', this.onToggleGravity);
+		$('#ToggleGravity, #ToggleNodeLabels').on('click', this.onToggle);
 
 		// Parameter Sliders
 		$('#linkForceSlider, #chargeForceSlider, #collisionForceSlider, #gravityForceSlider')
@@ -613,8 +617,9 @@ function ProtoApp () {
 		
 	};
 
-	this.onToggleGravity = function (e) {
-		window.globalGraph.onToggleGravity();
+	this.onToggle = function (e) {
+		var handlerStr = 'on' + this.id;
+		if (!!window.globalGraph[handlerStr]) window.globalGraph[handlerStr](this);
 	},
 
     this.setSliderDefaults = function () {
