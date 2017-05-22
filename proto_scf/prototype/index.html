@@ -35,18 +35,23 @@
     <section id="graphControl" class="six columns alpha">
       <button id="refreshGraph">Refresh Graph</button>
       <button id="toggleGravity">Toggle Gravity</button>
+        
         <input type="checkbox" id="nodeLabelCheckBox" name="nodeLabels" value="mycheckbox" onchange="window.protoApp.displayNodeLabels(this)" checked>Show Node Labels<br>
+
         <span> Link Force Strength</span>
-        <input id="linkForceSlider" type="range"  min="0" max="0.5" step="0.001" onchange="protoApp.linkForceSliderUpdate(this.value, true)"/>
+        <input id="linkForceSlider" type="range"  min="0" max="0.5" step="0.001" "/>
         <span id="linkForceSliderSpan">0</span>
+
         <span> Charge Force Strength</span>
-        <input id="chargeForceSlider" type="range"  min="-50" max="0" step="0.1" onchange="protoApp.chargeForceSliderUpdate(this.value, true)"/>
+        <input id="chargeForceSlider" type="range"  min="-50" max="0" step="0.1" />
         <span id="chargeForceSliderSpan">0</span>
+
         <span> Collision Force Radius</span>
-        <input id="collisionForceSlider"type="range"  min="-5" max="5" step="0.01" onchange="protoApp.collisionForceSliderUpdate(this.value, true)"/>
+        <input id="collisionForceSlider"type="range"  min="-5" max="5" step="0.01"/>
         <span id="collisionForceSliderSpan">0</span>
+
         <span> Gravity Force Strength</span>
-        <input id="gravityForceSlider" type="range"  min="0" max="1" step="0.001" onchange="protoApp.gravityForceSliderUpdate(this.value, true)"/>
+        <input id="gravityForceSlider" type="range"  min="0" max="1" step="0.001" />
         <span id="gravityForceSliderSpan">0</span>
     </section>
 

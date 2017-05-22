@@ -606,7 +606,17 @@ function ProtoApp () {
 		$('#addStubData').on('click', this.onAddStubData);
 		$('#toggleNode').on('click', this.onToggleNode);
 		$('#toggleGravity').on('click', this.onToggleGravity);
+
+		// Parameter Sliders
+		$('#linkForceSlider, #chargeForceSlider, #collisionForceSlider, #gravityForceSlider')
+			.on('change', this.onControlSliderChange);
+		
 	};
+
+	this.onControlSliderChange = function (e) { // this : input html; self : protoApp
+		var handlerStr = this.id + 'Update';
+		if (!!self[handlerStr]) self[handlerStr](this.value, true);
+	}
 
 	this.onToggleGravity = function (e) {
 		window.globalGraph.onToggleGravity();
@@ -614,6 +624,7 @@ function ProtoApp () {
 
     this.setSliderDefaults = function () {
         // set the slider values for these constants
+        // $('#linkForceSlider').attr('value', DEFAULT_LINK_FORCE_STRENGTH); // <~~~ This does the same as the vanila js! :)
         document.getElementById("linkForceSlider").setAttribute("value",  DEFAULT_LINK_FORCE_STRENGTH);
         document.getElementById("chargeForceSlider").setAttribute("value", DEFAULT_CHARGE_FORCE_STRENGTH);
         document.getElementById("gravityForceSlider").setAttribute("value", DEFAULT_GRAVITY_FORCE_STRENGTH);
