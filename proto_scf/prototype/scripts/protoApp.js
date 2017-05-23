@@ -685,7 +685,7 @@ function ProtoApp () {
         this.chargeForceSliderUpdate(DEFAULT_CHARGE_FORCE_STRENGTH, false);
         this.collisionForceSliderUpdate(DEFAULT_COLLISION_FORCE_RADIUS, false);
         this.gravityForceSliderUpdate(DEFAULT_GRAVITY_FORCE_STRENGTH, false);
-        this.edgeConnectionsSliderUpdate(DEFAULT_EDGE_CONNECTIONS, false);
+        this.edgeConnectivitySliderUpdate(DEFAULT_EDGE_CONNECTIONS, false);
     },
 
     this.onControlSliderChange = function (e) { // this : input html; self : protoApp
@@ -821,7 +821,7 @@ function ProtoApp () {
         }
     },
 
-	this.edgeConnectionsSliderUpdate = function(value, update_simulation) {
+	this.edgeConnectivitySliderUpdate = function(value, update_simulation) {
         document.getElementById("edgeConnectivitySliderSpan").innerHTML = value;
         if (update_simulation) {
             window.globalGraph.edgeConnectionsUpdate(value);
