@@ -12,6 +12,7 @@ const DEFAULT_LINK_FORCE_STRENGTH = 0.005;
 const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
 const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
 const DEFAULT_COLLISION_FORCE_RADIUS = 3;
+const DEFAULT_EDGE_CONNECTIONS = 0;
 
 /* ========================== */
 
@@ -572,6 +573,11 @@ function GlobalGraph (graph) {
 
     };
 
+    this.edgeConnectionsUpdate = function(value) {
+        // this.collisionForce.strength(value);
+        // self.simulation.alphaTarget(0.3).restart(); // reset simulation
+    };
+
 	// helper function for building an index of SVG elements by UUID
     function _index(objects) {
         var index = {};
@@ -612,7 +618,7 @@ function ProtoApp () {
 		$('#ToggleGravity, #ToggleNodeLabels').on('click', this.onToggle);
 
 		// Parameter Sliders
-		$('#linkForceSlider, #chargeForceSlider, #collisionForceSlider, #gravityForceSlider')
+		$('#linkForceSlider, #chargeForceSlider, #collisionForceSlider, #gravityForceSlider, #edgeConnectivitySlider')
 			.on('change', this.onControlSliderChange);
 		
 	};
@@ -629,6 +635,7 @@ function ProtoApp () {
         document.getElementById("chargeForceSlider").setAttribute("value", DEFAULT_CHARGE_FORCE_STRENGTH);
         document.getElementById("gravityForceSlider").setAttribute("value", DEFAULT_GRAVITY_FORCE_STRENGTH);
         document.getElementById("collisionForceSlider").setAttribute("value", DEFAULT_COLLISION_FORCE_RADIUS);
+        document.getElementById("edgeConnectivitySlider").setAttribute("value", DEFAULT_EDGE_CONNECTIONS);
 
         $('#simulationControls input[type=range]').each(function(i) { // For each slider
         	var rangeEl = this;
@@ -646,6 +653,7 @@ function ProtoApp () {
         this.chargeForceSliderUpdate(DEFAULT_CHARGE_FORCE_STRENGTH, false);
         this.collisionForceSliderUpdate(DEFAULT_COLLISION_FORCE_RADIUS, false);
         this.gravityForceSliderUpdate(DEFAULT_GRAVITY_FORCE_STRENGTH, false);
+        this.edgeConnectionsSliderUpdate(DEFAULT_EDGE_CONNECTIONS, false);
     },
 
     this.onControlSliderChange = function (e) { // this : input html; self : protoApp
@@ -781,6 +789,12 @@ function ProtoApp () {
         }
     },
 
+	this.edgeConnectionsSliderUpdate = function(value, update_simulation) {
+        document.getElementById("edgeConnectivitySliderSpan").innerHTML = value;
+        if (update_simulation) {
+            window.globalGraph.edgeConnectionsUpdate(value);
+        }
+    },
 
     // Callback function for what to do when we graph data from external source
 	this.handleStubData = function (data) {
