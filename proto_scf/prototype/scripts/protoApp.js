@@ -1,10 +1,21 @@
 // async ajax call baked into d3 to grab data
 // proto_ck_1a	gdelt_weblinks  gdelt_50_52
-d3.json("./scripts/reddit_data_test.json", function (error, graph) {
+d3.json("./scripts/gdelt_filtered.json", function (error, graph) {
  	if (error) throw error;
  	window.protoApp.globalGraphData = $.extend(true, {}, graph);
  	window.globalGraph = new GlobalGraph(graph);
 });
+
+/* ====== Constants ========= */
+
+const DEFAULT_LINK_FORCE_STRENGTH = 0.005;
+const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
+const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
+const DEFAULT_COLLISION_FORCE_RADIUS = 3;
+
+/* ========================== */
+
+// {"nodes": [{"label": "lexpress.fr", "attributes": {"Modularity Class": "39", "PageRank": "6.239664438254604E-4"}, "id": "lexpress.fr"}, {} etc
 
 // GlobalGraph object to initialize and render the global news network graph
 // graph {} : json formatted data retrieved by d3.json()
@@ -17,7 +28,7 @@ function GlobalGraph (graph) {
 	this.graph = graph; // the data used by the simulation
 	this.toggleNode = null; // for test purposes, this is a variable to contain removed node
 	this.toggleNodeEdges = []; // for test purposes, this is an array to conatin removed edges
-	this.nodeBorderPadding = 5; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
+	this.nodeBorderPadding = 8; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
 
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
@@ -27,7 +38,7 @@ function GlobalGraph (graph) {
 	this.stepCount = 30;
 
 	this.width = $('#graphContainer').innerWidth();
-	this.height = this.width * .5;
+	this.height = this.width * .8;
 
 	this.svg = svg = d3.select("svg")
     	.attr("viewBox", "0 0 " + this.width  + " " + this.height)
@@ -38,6 +49,56 @@ function GlobalGraph (graph) {
         d.distance = 0;
         d.visited = false;
     });
+
+    this.doGravity = false; // control boolean for gravity forces. Todo - integrate this to State object
+
+    // todo - convert this to a key of arrays for different sets of gravity wells
+    this.gravityWells = {
+		".com" : { x: .75, y: .5},
+		".org" : { x: .15, y: .15},
+		".co.uk" : { x: .05, y: .3 },
+		".co.ru" : { x: .15, y: .85 }
+	};
+
+	// todo - this is just a handler for now, we'll bake in some of these node state data into the datasets that get loaded
+	this.convertGravityData = function () {
+		var data = [];
+		for (var prop in self.gravityWells) {
+			data.push({
+				"id" : prop, "x": self.gravityWells[prop].x, "y": self.gravityWells[prop].y
+			})
+		}
+		return data;
+	};
+
+
+	// todo - add d3 colors for different sets of gravity wells
+	this.renderGravityWells = function () {
+		var gravity = self.svg.selectAll("circle.gravWell")
+							.data(self.doGravity ? self.convertGravityData() : []);
+
+		gravity.enter().append("circle").attr("class", "gravWell")
+			.style("fill", "red")
+			.attr("r", 10)
+			.attr("cx", function (d) { return self.width * d.x; })
+			.attr("cy", function (d) { return self.height * d.y })
+			.merge(gravity);
+
+		gravity.exit().remove();
+	}
+
+	this.renderGravityWells(); // move into initializer
+
+	// Handler function for turning on and off gravity wells
+	this.onToggleGravity = function (buttonEl) {
+		self.doGravity = !self.doGravity;
+		$(buttonEl).toggleClass('checked');
+		$('span', buttonEl).text(self.doGravity ? 'ON' : 'OFF');
+		self.renderGravityWells();
+		self.applyGravityForces();
+		self.restartAllSimulations(0.2);
+	}
+
 
 	// d3 selection containing all edge lines
 	this.link = svg.append("g")
@@ -68,20 +129,78 @@ function GlobalGraph (graph) {
 		//.on("mouseout", tip.hide);
 
 	//svg.call(tip);
-	
 
-	// simulation actually renders the graph and handles force animations
-	this.simulation = d3.forceSimulation()
-		.force("link", d3.forceLink().distance(function (d) {
-            var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
-            return Math.max(Math.min(50 - shift, 5), 100);
-        }).strength(0.1).id(function(d) { return d.id; }))
-	    .force("charge", d3.forceManyBody().strength([-250])) // default strength -30
-	    .force("center", d3.centerForce(this.width / 2, this.height / 2))
-        //.force("x", d3.forceX(0).strength([0.4]))
-        .force("x", d3.forceX(this.width / 2).strength([0.1]))
-        //.force("y", d3.forceY(0).strength([0.4]))
-		.force("y", d3.forceY(this.height / 2).strength([0.2]));
+
+    // Saving a reference to each force applied to the graph as a variable to allow live adjustments:
+
+    // force for links. Saving reference for slider adjustment
+    this.linkForce = d3.forceLink().distance(function (d) {
+        var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
+        return Math.max(Math.min(50 - shift, 5), 100);
+    }).strength(DEFAULT_LINK_FORCE_STRENGTH).id(function(d) { return d.id; });
+
+    //charge force
+    this.chargeForce = d3.forceManyBody().strength([DEFAULT_CHARGE_FORCE_STRENGTH]);
+
+    //centering force: on by default and switched off when gravity is used.
+    this.centerForce = d3.forceCenter(this.width / 2, this.height / 2);
+
+    // collision force to prevent overlap
+    this.collisionForce = d3.forceCollide(DEFAULT_COLLISION_FORCE_RADIUS);
+
+    // simulation actually renders the graph and handles force animations
+    this.simulation = d3.forceSimulation()
+        .force("link", this.linkForce)
+        .force("charge", this.chargeForce)
+        .force("collision", this.collisionForce);
+
+    //set a force strength for gravity. Storing this supports slider updates while gravity not in use, prevents inconsistent state
+    this.gravityValue = DEFAULT_GRAVITY_FORCE_STRENGTH;
+
+
+	// Handler for applying / updating simulation forces
+	// Todo - this can be broken down even further for fine-tune control over the simulation
+	this.applyGravityForces = function () {
+
+        if (self.doGravity) {
+            // d3.forceX || null
+            this.gravityForceX = d3.forceX(function (d) {
+                if (d.well) return self.width * self.gravityWells[d.well].x;
+                for (var well in self.gravityWells) {
+                    if (typeof d.id === "string" &&
+                        d.id.indexOf(well) !== -1) {
+                        d.well = well;
+                        return self.width * self.gravityWells[d.well].x;
+                    }
+                }
+                return self.width * .15;
+            }).strength([DEFAULT_GRAVITY_FORCE_STRENGTH]);
+
+            this.gravityForceY = d3.forceY(function (d) {
+                if (d.well) return self.height * self.gravityWells[d.well].y;
+                for (var well in self.gravityWells) {
+                    if (typeof d.id === "string" &&
+                        d.id.indexOf(well) !== -1) {
+                        d.well = well;
+                        return self.height * self.gravityWells[d.well].y;
+                    }
+                }
+                return self.height * .85;
+            }).strength([this.gravityValue]);
+
+            //now apply gravitational forces
+            this.simulation.force("center", null);
+            this.simulation.force("gravityForceX", this.gravityForceX);
+            this.simulation.force("gravityForceY", this.gravityForceY);
+        } else {
+            // or centering forces
+            this.simulation.force("center", this.centerForce);
+            this.simulation.force("gravityForceX", null);
+            this.simulation.force("gravityForceY", null);
+        }
+	};
+
+	this.applyGravityForces(); // todo - move this to initializer
 
 
 	// this is a list of sub-graphs and their simulations
@@ -143,6 +262,25 @@ function GlobalGraph (graph) {
 			// handle click
 			.on("click", self.onNodeClick)
 			.merge(self.node);
+
+		self.label = svg.append("g")
+            .attr("class", "labels")
+            .selectAll("text")
+            .data(self.graph.nodes)
+            .enter().append("text")
+            .attr("class", "label")
+            .text(function(d) { return d.id; })
+
+			//handle dragging by text
+			.call(d3.drag()
+                .on("start", self.dragStarted)
+                .on("drag", self.dragged)
+                .on("end", self.dragEnded))
+
+			// handle click
+            .on("click", self.onNodeClick)
+            .merge(self.node);
+
 	};
 
 	// Handler for node clicks; d = node datum; this = svg element
@@ -235,6 +373,11 @@ function GlobalGraph (graph) {
         self.node
         	.attr("cx", function(d) { return d.x = Math.max(self.nodeBorderPadding, Math.min(self.width - self.nodeBorderPadding, d.x)); })
             .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
+
+        self.label
+            .attr("x", function(d) { return d.x; })
+            .attr("y", function (d) { return d.y; })
+            .style("font-size", "10px").style("fill", "#645cc3");
 	};
 
 	// Re-apply updated node and link to simulation
@@ -247,10 +390,7 @@ function GlobalGraph (graph) {
 	// Drag Start Event Handler
 	this.dragStarted = function (d) {
 		if (!d3.event.active) {
-			self.simulation.alphaTarget(0.3).restart();
-			for (i = 0; i < self.sub_simulations.length; i++) {
-				self.sub_simulations[i].alphaTarget(0.3).restart();
-			}
+			self.restartAllSimulations(0.3);
         }
 		d.fx = d.x;
 		d.fy = d.y;
@@ -265,15 +405,20 @@ function GlobalGraph (graph) {
 	// Drag End Event Handler
 	this.dragEnded = function (d) {
 		if (!d3.event.active) {
-			self.simulation.alphaTarget(0);
-            for (i = 0; i < self.sub_simulations.length; i++) {
-                self.sub_simulations[i].alphaTarget(0);
-            }
+			self.restartAllSimulations(0.3);
         }
 		d.fx = null;
 		d.fy = null;
 	};
 
+	// helper function to restart simulation and sub_simulations
+	this.restartAllSimulations = function (alpha) {
+		if (typeof alpha === "undefined") alpha = 0;
+		self.simulation.alphaTarget(alpha).restart();
+		for (i = 0; i < self.sub_simulations.length; i++) {
+			self.sub_simulations[i].alphaTarget(alpha).restart();
+		}
+	}
 
 
     // Color scale for the Dijkstra's
@@ -360,6 +505,17 @@ function GlobalGraph (graph) {
         });
     };
 
+    // show and hide labels
+    this.doShowNodeLabels = true;
+    this.onToggleNodeLabels = function (buttonEl) {
+    	self.doShowNodeLabels = !self.doShowNodeLabels;
+    	self.label.attr("display", self.doShowNodeLabels ? "inline" : "none");
+    	$(buttonEl).toggleClass('checked');
+    	$('span', buttonEl).text(self.doShowNodeLabels ? "ON" : "OFF");
+    }
+
+	
+
 	this.highlightSubGraph = function (node_ids) {
 		var subgraph_nodes = {};
 		subgraph_nodes.nodes = [];
@@ -393,6 +549,29 @@ function GlobalGraph (graph) {
 				.on("tick", self.ticked));
     };
 
+	// adding methods for changing force parameters
+    this.linkForceUpdate = function(value) {
+        this.linkForce.strength(value);
+        self.simulation.alphaTarget(0.3).restart(); // reset simulation
+    };
+    this.chargeForceUpdate = function(value) {
+        this.chargeForce.strength([value]);
+        self.simulation.alphaTarget(0.3).restart(); // reset simulation
+    };
+    this.collisionForceUpdate = function(value) {
+        this.collisionForce.strength(value);
+        self.simulation.alphaTarget(0.3).restart(); // reset simulation
+    };
+    this.gravityForceUpdate = function(value) {
+        if (self.doGravity) {
+            this.gravityForceX.strength(value);
+            this.gravityForceY.strength(value);
+            this.gravityValue = value;
+            self.simulation.alphaTarget(0.3).restart(); // reset simulation
+        }
+
+    };
+
 	// helper function for building an index of SVG elements by UUID
     function _index(objects) {
         var index = {};
@@ -411,7 +590,7 @@ function GlobalGraph (graph) {
 }
 
 
-// ProtoApp is the frontend app controllng the front-end and integrating D3 and user interactions
+// ProtoApp is the frontend app controlling the front-end and integrating D3 and user interactions
 function ProtoApp () {
 
 	var self = this;
@@ -422,6 +601,7 @@ function ProtoApp () {
 	this.initialize = function () {
 		this.addEventListeners();
 		this.buildStepsControl();
+		this.setSliderDefaults();
 	},
 
 	// Subscribe to button clicks
@@ -429,7 +609,49 @@ function ProtoApp () {
 		$('#refreshGraph').on('click', this.onRefreshGraph);
 		$('#addStubData').on('click', this.onAddStubData);
 		$('#toggleNode').on('click', this.onToggleNode);
+		$('#ToggleGravity, #ToggleNodeLabels').on('click', this.onToggle);
+
+		// Parameter Sliders
+		$('#linkForceSlider, #chargeForceSlider, #collisionForceSlider, #gravityForceSlider')
+			.on('change', this.onControlSliderChange);
+		
+	};
+
+	this.onToggle = function (e) {
+		var handlerStr = 'on' + this.id;
+		if (!!window.globalGraph[handlerStr]) window.globalGraph[handlerStr](this);
 	},
+
+    this.setSliderDefaults = function () {
+        // set the slider values for these constants
+        // $('#linkForceSlider').attr('value', DEFAULT_LINK_FORCE_STRENGTH); // <~~~ This does the same as the vanila js! :)
+        document.getElementById("linkForceSlider").setAttribute("value",  DEFAULT_LINK_FORCE_STRENGTH);
+        document.getElementById("chargeForceSlider").setAttribute("value", DEFAULT_CHARGE_FORCE_STRENGTH);
+        document.getElementById("gravityForceSlider").setAttribute("value", DEFAULT_GRAVITY_FORCE_STRENGTH);
+        document.getElementById("collisionForceSlider").setAttribute("value", DEFAULT_COLLISION_FORCE_RADIUS);
+
+        $('#simulationControls input[type=range]').each(function(i) { // For each slider
+        	var rangeEl = this;
+
+        	$('span[id^=' + this.id + ']').each(function(ii) { // For each span starting with current slider ID
+        		var attrStr = this.id.replace(rangeEl.id, '').toLowerCase(); // get the attribute name from span ID
+
+        		if (!!$(rangeEl).attr(attrStr)) $(this).text($(rangeEl).attr(attrStr)); // if current slider has an attribute, update the span text to match it
+        	});
+        });
+
+
+        // We supply false to prevent updating a simulation that might not exist yet. Will have consistent state if constructed correctly using these constants in GlobalGraph
+        this.linkForceSliderUpdate(DEFAULT_LINK_FORCE_STRENGTH, false);
+        this.chargeForceSliderUpdate(DEFAULT_CHARGE_FORCE_STRENGTH, false);
+        this.collisionForceSliderUpdate(DEFAULT_COLLISION_FORCE_RADIUS, false);
+        this.gravityForceSliderUpdate(DEFAULT_GRAVITY_FORCE_STRENGTH, false);
+    },
+
+    this.onControlSliderChange = function (e) { // this : input html; self : protoApp
+		var handlerStr = this.id + 'Update';
+		if (!!self[handlerStr]) self[handlerStr](this.value, true);
+	}
 
 	this.buildStepsControl = function () {
 		self.stepsController = d3.select('#stepsControlContainer');
@@ -467,14 +689,16 @@ function ProtoApp () {
 				window.globalGraph.stepCount = Number($('.stepsControlSelect option:selected').attr('value'));
 				if (window.globalGraph.firstStep) window.globalGraph.dijkstra();
 			});
-	}
+	},
 
 	// Handling Refresh Graph Button
 	this.onRefreshGraph = function (e) {
+	    window.globalGraph.hideNodeLabels();
 		window.globalGraph.graph = $.extend(true, {}, self.globalGraphData);
 		window.globalGraph.toggleNode = null;
 		window.globalGraph.toggleNodeEdges.length = 0;
 		window.globalGraph.resetSimulation();
+		this.displayNodeLabels(document.getElementById("nodeLabelCheckBox"));
 	},
 
 	// Handles button click and fetches stub data file based on selected option
@@ -521,9 +745,44 @@ function ProtoApp () {
 
 		// Rerun the simulation
 		window.globalGraph.resetSimulation();
-	}
+	},
 
-	// Callback function for what to do when we graph data from external source
+	this.displayNodeLabels = function(checkbox) {
+		if (checkbox.checked) {
+			window.globalGraph.showNodeLabels();
+		} else {
+            window.globalGraph.hideNodeLabels();
+        }
+	},
+        
+    // handling force parameter sliders
+    this.linkForceSliderUpdate = function(value, update_simulation) {
+        document.getElementById("linkForceSliderSpan").innerHTML = value;
+        if (update_simulation) {
+            window.globalGraph.linkForceUpdate(value);
+        }
+    },
+    this.chargeForceSliderUpdate = function(value, update_simulation) {
+        document.getElementById("chargeForceSliderSpan").innerHTML = value;
+        if (update_simulation) {
+            window.globalGraph.chargeForceUpdate(value);
+        }
+    },
+    this.collisionForceSliderUpdate = function(value, update_simulation) {
+        document.getElementById("collisionForceSliderSpan").innerHTML = value;
+        if (update_simulation) {
+            window.globalGraph.collisionForceUpdate(value);
+        }
+    },
+    this.gravityForceSliderUpdate = function(value, update_simulation) {
+        document.getElementById("gravityForceSliderSpan").innerHTML = value;
+        if (update_simulation) {
+            window.globalGraph.gravityForceUpdate(value);
+        }
+    },
+
+
+    // Callback function for what to do when we graph data from external source
 	this.handleStubData = function (data) {
 		self.userData = data;
 		// do things with stub data
@@ -539,5 +798,6 @@ function uuid(a) {
 }
 
 window.protoApp = new ProtoApp(); // new it up!
+
 
 

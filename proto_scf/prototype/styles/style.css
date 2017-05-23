@@ -1,0 +1,162 @@
+* { padding: 0; margin: 0; }
+
+body {
+  background-color: #33333f;
+  font-family: "Avenir", "Avenir Next", Helvetica Neue, Arial;
+}
+
+circle {
+  cursor: pointer;
+}
+
+
+a, a:visited { text-decoration: none; color: #7533f4; }
+a:hover { text-decoration: underline; color: #f4b014; }
+img { max-width: 100%; }
+img, a.img, a:hover.img { border: none; }
+
+h1, h2, h3, h4, h5 {
+  color: #492a7c;
+  background-color: inherit;
+  font-weight: normal;
+  padding: 0 0 5px 0;
+  margin: 15px 0 0 0;
+  border: none;
+  clear: right;
+}
+h1 { font-size: 18pt; margin:  5px 0 10px 0; line-height: 28px; }
+h2 { font-size: 14pt; margin: 30px 0 15px 0; letter-spacing: 0.01em; border-bottom: 1px solid #ccc;  line-height: 20px;}
+h3 { font-size: 13pt; }
+h4 { font-size: 12pt; }
+h5 { font-size: 11pt; }
+p { margin: 0 0 10px 0; }
+hr { border: 0px; border-top: 1px solid #ccc; height: 0px; }
+ol { margin: 1em; }
+
+.content {
+
+  padding: 15px 20px;
+  background-color: #ffffff;
+}
+
+  
+@media (min-width: 550px) {
+  .alpha.columns, .alpha.column { margin-left: 0; }
+}
+
+
+/* Graph Controls */
+button.checked { 
+  background-color: #eee;
+  color: rgba(0,155,0,1);
+  border-color: rgba(0,155,0,1);
+}
+#simulationControls {
+  position: relative;
+}
+
+#simulationControls h3 {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+#simulationControls h6 {
+  margin: 24px 0 6px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+#simulationControls input[type=range] {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+}
+
+#simulationControls span {
+  display: block;
+  font-size: 12px;
+}
+
+#simulationControls span.left { float: left; }
+#simulationControls span.right { float: right; }
+#simulationControls span.center { 
+  text-align: center;
+  font-size: 16px;
+
+  position: absolute;
+  left: 0; right: 0;
+  margin-top: -4px;
+}
+
+
+/* PROTOTYPE SPECIFIC STYLING */
+
+.link {
+  stroke-width: 1;
+  stroke: rgba(0,0,0,.1);
+}
+
+.node {
+  stroke-width: 2;
+  fill: #454545;
+  r: 5;
+}
+
+#graphContainer {
+  position: relative;
+}
+
+.toolTipDiv {
+  display: block;
+  opacity: 0;
+  top: 0; left: 0; 
+  margin-left: 24px; margin-top: 18px;
+  padding: 0 12px;
+  transition: opactiy .2s;
+  position: absolute;
+  background-color: white;
+  border: 1px solid #aaa;
+  font-weight: bold;
+}
+
+.toolTipDiv .close {
+
+  font-size: 18px;
+  line-height: 24px;
+  text-align: center;
+  color: #666;
+  cursor: pointer;
+
+  display: block;
+  position: absolute;
+  right: -12px;
+  top: -12px;
+  height: 24px;
+  width: 24px;
+
+  transition: color .2s;
+}
+
+.toolTipDiv .close:hover {
+  color: black;
+}
+
+.toolTipDiv h3 {
+  font-weight: bold;
+  margin-top: 7px;
+  color: black;
+}
+
+.toolTipDiv h3 a,
+.toolTipDiv h3 a:hover {
+  color: black;
+  cursor: pointer;
+}
+
+
+.stepsControlSelect {
+  margin: 10px 20px;
+}
+
+.footer { clear: both; }

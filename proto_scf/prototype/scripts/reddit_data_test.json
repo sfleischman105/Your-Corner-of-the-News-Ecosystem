@@ -1,0 +1,1387 @@
+{
+    "nodes" : [ 
+        {
+        "label": "alternet.org",
+        "id": "alternet.org",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "alternet.org",
+        "id": "alternet.org",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "bbc.co.uk",
+        "id": "bbc.co.uk",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "bbc.co.uk",
+        "id": "bbc.co.uk",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "bbc.com",
+        "id": "bbc.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "bbc.com",
+        "id": "bbc.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "breitbart.com",
+        "id": "breitbart.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "breitbart.com",
+        "id": "breitbart.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "businessinsider.com",
+        "id": "businessinsider.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "cbc.ca",
+        "id": "cbc.ca",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "cbc.ca",
+        "id": "cbc.ca",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "cnn.com",
+        "id": "cnn.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "cnn.com",
+        "id": "cnn.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "dailycaller.com",
+        "id": "dailycaller.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "dailycaller.com",
+        "id": "dailycaller.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "dailymail.co.uk",
+        "id": "dailymail.co.uk",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "dailymail.co.uk",
+        "id": "dailymail.co.uk",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "democracynow.org",
+        "id": "democracynow.org",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "foxnews.com",
+        "id": "foxnews.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "foxnews.com",
+        "id": "foxnews.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "huffingtonpost.com",
+        "id": "huffingtonpost.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "huffingtonpost.com",
+        "id": "huffingtonpost.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "independent.co.uk",
+        "id": "independent.co.uk",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "independent.co.uk",
+        "id": "independent.co.uk",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "motherjones.com",
+        "id": "motherjones.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "motherjones.com",
+        "id": "motherjones.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "nationalreview.com",
+        "id": "nationalreview.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "nationalreview.com",
+        "id": "nationalreview.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "nypost.com",
+        "id": "nypost.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "nytimes.com",
+        "id": "nytimes.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "nytimes.com",
+        "id": "nytimes.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "pinknews.co.uk",
+        "id": "pinknews.co.uk",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "politico.com",
+        "id": "politico.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "politico.com",
+        "id": "politico.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "politicususa.com",
+        "id": "politicususa.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "politicususa.com",
+        "id": "politicususa.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "politifact.com",
+        "id": "politifact.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "rawstory.com",
+        "id": "rawstory.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "rawstory.com",
+        "id": "rawstory.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "realclearpolitics.com",
+        "id": "realclearpolitics.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "reason.com",
+        "id": "reason.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "reuters.com",
+        "id": "reuters.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "reuters.com",
+        "id": "reuters.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "rt.com",
+        "id": "rt.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "rt.com",
+        "id": "rt.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "salon.com",
+        "id": "salon.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "salon.com",
+        "id": "salon.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "thefreethoughtproject.com",
+        "id": "thefreethoughtproject.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "thefreethoughtproject.com",
+        "id": "thefreethoughtproject.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "thegatewaypundit.com",
+        "id": "thegatewaypundit.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "thegatewaypundit.com",
+        "id": "thegatewaypundit.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "theguardian.com",
+        "id": "theguardian.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "theguardian.com",
+        "id": "theguardian.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "thehill.com",
+        "id": "thehill.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "thehill.com",
+        "id": "thehill.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "theintercept.com",
+        "id": "theintercept.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "thinkprogress.org",
+        "id": "thinkprogress.org",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "thinkprogress.org",
+        "id": "thinkprogress.org",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "usuncut.com",
+        "id": "usuncut.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "usuncut.com",
+        "id": "usuncut.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "vox.com",
+        "id": "vox.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "washingtonexaminer.com",
+        "id": "washingtonexaminer.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "washingtonpost.com",
+        "id": "washingtonpost.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "washingtonpost.com",
+        "id": "washingtonpost.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "zerohedge.com",
+        "id": "zerohedge.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    },
+    {
+        "label": "zerohedge.com",
+        "id": "zerohedge.com",
+        "parent": null,
+        "isActive": false,
+        "count": 1
+    }],
+    "edges" : [
+    {
+        "target": "alternet.org",
+        "source": "huffingtonpost.com",
+        "count": 3
+    },
+    {
+        "target": "alternet.org",
+        "source": "rawstory.com",
+        "count": 3
+    },
+    {
+        "target": "alternet.org",
+        "source": "washingtonpost.com",
+        "count": 3
+    },
+    {
+        "target": "alternet.org",
+        "source": "motherjones.com",
+        "count": 2
+    },
+    {
+        "target": "alternet.org",
+        "source": "nytimes.com",
+        "count": 2
+    },
+    {
+        "target": "alternet.org",
+        "source": "politicususa.com",
+        "count": 2
+    },
+    {
+        "target": "bbc.co.uk",
+        "source": "nytimes.com",
+        "count": 3
+    },
+    {
+        "target": "bbc.co.uk",
+        "source": "bbc.com",
+        "count": 2
+    },
+    {
+        "target": "bbc.co.uk",
+        "source": "independent.co.uk",
+        "count": 2
+    },
+    {
+        "target": "bbc.co.uk",
+        "source": "reuters.com",
+        "count": 2
+    },
+    {
+        "target": "bbc.co.uk",
+        "source": "theguardian.com",
+        "count": 2
+    },
+    {
+        "target": "bbc.co.uk",
+        "source": "washingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "bbc.com",
+        "source": "independent.co.uk",
+        "count": 4
+    },
+    {
+        "target": "bbc.com",
+        "source": "theguardian.com",
+        "count": 4
+    },
+    {
+        "target": "bbc.com",
+        "source": "washingtonpost.com",
+        "count": 4
+    },
+    {
+        "target": "bbc.com",
+        "source": "dailymail.co.uk",
+        "count": 3
+    },
+    {
+        "target": "bbc.com",
+        "source": "nytimes.com",
+        "count": 3
+    },
+    {
+        "target": "bbc.com",
+        "source": "bbc.co.uk",
+        "count": 2
+    },
+    {
+        "target": "breitbart.com",
+        "source": "dailycaller.com",
+        "count": 4
+    },
+    {
+        "target": "breitbart.com",
+        "source": "washingtonpost.com",
+        "count": 4
+    },
+    {
+        "target": "breitbart.com",
+        "source": "cnn.com",
+        "count": 3
+    },
+    {
+        "target": "breitbart.com",
+        "source": "dailymail.co.uk",
+        "count": 3
+    },
+    {
+        "target": "breitbart.com",
+        "source": "foxnews.com",
+        "count": 3
+    },
+    {
+        "target": "breitbart.com",
+        "source": "politico.com",
+        "count": 3
+    },
+    {
+        "target": "businessinsider.com",
+        "source": "independent.co.uk",
+        "count": 2
+    },
+    {
+        "target": "businessinsider.com",
+        "source": "nytimes.com",
+        "count": 2
+    },
+    {
+        "target": "businessinsider.com",
+        "source": "theguardian.com",
+        "count": 2
+    },
+    {
+        "target": "businessinsider.com",
+        "source": "washingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "cbc.ca",
+        "source": "bbc.com",
+        "count": 2
+    },
+    {
+        "target": "cbc.ca",
+        "source": "dailymail.co.uk",
+        "count": 2
+    },
+    {
+        "target": "cbc.ca",
+        "source": "independent.co.uk",
+        "count": 2
+    },
+    {
+        "target": "cbc.ca",
+        "source": "theguardian.com",
+        "count": 2
+    },
+    {
+        "target": "cbc.ca",
+        "source": "washingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "cnn.com",
+        "source": "washingtonpost.com",
+        "count": 7
+    },
+    {
+        "target": "cnn.com",
+        "source": "nytimes.com",
+        "count": 4
+    },
+    {
+        "target": "cnn.com",
+        "source": "politico.com",
+        "count": 4
+    },
+    {
+        "target": "cnn.com",
+        "source": "theguardian.com",
+        "count": 4
+    },
+    {
+        "target": "cnn.com",
+        "source": "thehill.com",
+        "count": 4
+    },
+    {
+        "target": "cnn.com",
+        "source": "breitbart.com",
+        "count": 3
+    },
+    {
+        "target": "dailycaller.com",
+        "source": "breitbart.com",
+        "count": 4
+    },
+    {
+        "target": "dailycaller.com",
+        "source": "foxnews.com",
+        "count": 3
+    },
+    {
+        "target": "dailycaller.com",
+        "source": "politico.com",
+        "count": 3
+    },
+    {
+        "target": "dailycaller.com",
+        "source": "washingtonpost.com",
+        "count": 3
+    },
+    {
+        "target": "dailycaller.com",
+        "source": "cnn.com",
+        "count": 2
+    },
+    {
+        "target": "dailycaller.com",
+        "source": "dailymail.co.uk",
+        "count": 2
+    },
+    {
+        "target": "dailymail.co.uk",
+        "source": "washingtonpost.com",
+        "count": 4
+    },
+    {
+        "target": "dailymail.co.uk",
+        "source": "bbc.com",
+        "count": 3
+    },
+    {
+        "target": "dailymail.co.uk",
+        "source": "breitbart.com",
+        "count": 3
+    },
+    {
+        "target": "dailymail.co.uk",
+        "source": "independent.co.uk",
+        "count": 3
+    },
+    {
+        "target": "dailymail.co.uk",
+        "source": "theguardian.com",
+        "count": 3
+    },
+    {
+        "target": "dailymail.co.uk",
+        "source": "cbc.ca",
+        "count": 2
+    },
+    {
+        "target": "democracynow.org",
+        "source": "theguardian.com",
+        "count": 2
+    },
+    {
+        "target": "democracynow.org",
+        "source": "washingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "foxnews.com",
+        "source": "breitbart.com",
+        "count": 3
+    },
+    {
+        "target": "foxnews.com",
+        "source": "dailycaller.com",
+        "count": 3
+    },
+    {
+        "target": "foxnews.com",
+        "source": "dailymail.co.uk",
+        "count": 2
+    },
+    {
+        "target": "foxnews.com",
+        "source": "nationalreview.com",
+        "count": 2
+    },
+    {
+        "target": "foxnews.com",
+        "source": "politico.com",
+        "count": 2
+    },
+    {
+        "target": "foxnews.com",
+        "source": "thegatewaypundit.com",
+        "count": 2
+    },
+    {
+        "target": "huffingtonpost.com",
+        "source": "washingtonpost.com",
+        "count": 7
+    },
+    {
+        "target": "huffingtonpost.com",
+        "source": "nytimes.com",
+        "count": 6
+    },
+    {
+        "target": "huffingtonpost.com",
+        "source": "rawstory.com",
+        "count": 5
+    },
+    {
+        "target": "huffingtonpost.com",
+        "source": "salon.com",
+        "count": 5
+    },
+    {
+        "target": "huffingtonpost.com",
+        "source": "theguardian.com",
+        "count": 5
+    },
+    {
+        "target": "huffingtonpost.com",
+        "source": "independent.co.uk",
+        "count": 4
+    },
+    {
+        "target": "independent.co.uk",
+        "source": "theguardian.com",
+        "count": 7
+    },
+    {
+        "target": "independent.co.uk",
+        "source": "washingtonpost.com",
+        "count": 7
+    },
+    {
+        "target": "independent.co.uk",
+        "source": "bbc.com",
+        "count": 4
+    },
+    {
+        "target": "independent.co.uk",
+        "source": "huffingtonpost.com",
+        "count": 4
+    },
+    {
+        "target": "independent.co.uk",
+        "source": "nytimes.com",
+        "count": 4
+    },
+    {
+        "target": "independent.co.uk",
+        "source": "rawstory.com",
+        "count": 4
+    },
+    {
+        "target": "motherjones.com",
+        "source": "alternet.org",
+        "count": 2
+    },
+    {
+        "target": "motherjones.com",
+        "source": "huffingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "motherjones.com",
+        "source": "nytimes.com",
+        "count": 2
+    },
+    {
+        "target": "motherjones.com",
+        "source": "politicususa.com",
+        "count": 2
+    },
+    {
+        "target": "motherjones.com",
+        "source": "rawstory.com",
+        "count": 2
+    },
+    {
+        "target": "motherjones.com",
+        "source": "salon.com",
+        "count": 2
+    },
+    {
+        "target": "nationalreview.com",
+        "source": "breitbart.com",
+        "count": 2
+    },
+    {
+        "target": "nationalreview.com",
+        "source": "dailycaller.com",
+        "count": 2
+    },
+    {
+        "target": "nationalreview.com",
+        "source": "foxnews.com",
+        "count": 2
+    },
+    {
+        "target": "nationalreview.com",
+        "source": "washingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "nypost.com",
+        "source": "breitbart.com",
+        "count": 2
+    },
+    {
+        "target": "nytimes.com",
+        "source": "washingtonpost.com",
+        "count": 8
+    },
+    {
+        "target": "nytimes.com",
+        "source": "huffingtonpost.com",
+        "count": 6
+    },
+    {
+        "target": "nytimes.com",
+        "source": "theguardian.com",
+        "count": 5
+    },
+    {
+        "target": "nytimes.com",
+        "source": "cnn.com",
+        "count": 4
+    },
+    {
+        "target": "nytimes.com",
+        "source": "independent.co.uk",
+        "count": 4
+    },
+    {
+        "target": "nytimes.com",
+        "source": "politico.com",
+        "count": 4
+    },
+    {
+        "target": "pinknews.co.uk",
+        "source": "huffingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "pinknews.co.uk",
+        "source": "salon.com",
+        "count": 2
+    },
+    {
+        "target": "politico.com",
+        "source": "thehill.com",
+        "count": 5
+    },
+    {
+        "target": "politico.com",
+        "source": "washingtonpost.com",
+        "count": 5
+    },
+    {
+        "target": "politico.com",
+        "source": "cnn.com",
+        "count": 4
+    },
+    {
+        "target": "politico.com",
+        "source": "nytimes.com",
+        "count": 4
+    },
+    {
+        "target": "politico.com",
+        "source": "breitbart.com",
+        "count": 3
+    },
+    {
+        "target": "politico.com",
+        "source": "dailycaller.com",
+        "count": 3
+    },
+    {
+        "target": "politicususa.com",
+        "source": "huffingtonpost.com",
+        "count": 4
+    },
+    {
+        "target": "politicususa.com",
+        "source": "washingtonpost.com",
+        "count": 4
+    },
+    {
+        "target": "politicususa.com",
+        "source": "nytimes.com",
+        "count": 3
+    },
+    {
+        "target": "politicususa.com",
+        "source": "rawstory.com",
+        "count": 3
+    },
+    {
+        "target": "politicususa.com",
+        "source": "salon.com",
+        "count": 3
+    },
+    {
+        "target": "politicususa.com",
+        "source": "alternet.org",
+        "count": 2
+    },
+    {
+        "target": "politifact.com",
+        "source": "huffingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "politifact.com",
+        "source": "nytimes.com",
+        "count": 2
+    },
+    {
+        "target": "politifact.com",
+        "source": "politicususa.com",
+        "count": 2
+    },
+    {
+        "target": "politifact.com",
+        "source": "washingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "rawstory.com",
+        "source": "washingtonpost.com",
+        "count": 6
+    },
+    {
+        "target": "rawstory.com",
+        "source": "huffingtonpost.com",
+        "count": 5
+    },
+    {
+        "target": "rawstory.com",
+        "source": "theguardian.com",
+        "count": 5
+    },
+    {
+        "target": "rawstory.com",
+        "source": "independent.co.uk",
+        "count": 4
+    },
+    {
+        "target": "rawstory.com",
+        "source": "nytimes.com",
+        "count": 4
+    },
+    {
+        "target": "rawstory.com",
+        "source": "alternet.org",
+        "count": 3
+    },
+    {
+        "target": "realclearpolitics.com",
+        "source": "politico.com",
+        "count": 2
+    },
+    {
+        "target": "reason.com",
+        "source": "breitbart.com",
+        "count": 2
+    },
+    {
+        "target": "reason.com",
+        "source": "cnn.com",
+        "count": 2
+    },
+    {
+        "target": "reason.com",
+        "source": "washingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "reuters.com",
+        "source": "independent.co.uk",
+        "count": 3
+    },
+    {
+        "target": "reuters.com",
+        "source": "theguardian.com",
+        "count": 3
+    },
+    {
+        "target": "reuters.com",
+        "source": "washingtonpost.com",
+        "count": 3
+    },
+    {
+        "target": "reuters.com",
+        "source": "bbc.co.uk",
+        "count": 2
+    },
+    {
+        "target": "reuters.com",
+        "source": "bbc.com",
+        "count": 2
+    },
+    {
+        "target": "reuters.com",
+        "source": "nytimes.com",
+        "count": 2
+    },
+    {
+        "target": "rt.com",
+        "source": "theguardian.com",
+        "count": 3
+    },
+    {
+        "target": "rt.com",
+        "source": "independent.co.uk",
+        "count": 2
+    },
+    {
+        "target": "rt.com",
+        "source": "reuters.com",
+        "count": 2
+    },
+    {
+        "target": "rt.com",
+        "source": "usuncut.com",
+        "count": 2
+    },
+    {
+        "target": "rt.com",
+        "source": "washingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "salon.com",
+        "source": "huffingtonpost.com",
+        "count": 5
+    },
+    {
+        "target": "salon.com",
+        "source": "washingtonpost.com",
+        "count": 5
+    },
+    {
+        "target": "salon.com",
+        "source": "nytimes.com",
+        "count": 4
+    },
+    {
+        "target": "salon.com",
+        "source": "theguardian.com",
+        "count": 4
+    },
+    {
+        "target": "salon.com",
+        "source": "politicususa.com",
+        "count": 3
+    },
+    {
+        "target": "salon.com",
+        "source": "rawstory.com",
+        "count": 3
+    },
+    {
+        "target": "thefreethoughtproject.com",
+        "source": "breitbart.com",
+        "count": 2
+    },
+    {
+        "target": "thefreethoughtproject.com",
+        "source": "zerohedge.com",
+        "count": 2
+    },
+    {
+        "target": "thegatewaypundit.com",
+        "source": "breitbart.com",
+        "count": 2
+    },
+    {
+        "target": "thegatewaypundit.com",
+        "source": "dailycaller.com",
+        "count": 2
+    },
+    {
+        "target": "thegatewaypundit.com",
+        "source": "dailymail.co.uk",
+        "count": 2
+    },
+    {
+        "target": "thegatewaypundit.com",
+        "source": "foxnews.com",
+        "count": 2
+    },
+    {
+        "target": "theguardian.com",
+        "source": "washingtonpost.com",
+        "count": 9
+    },
+    {
+        "target": "theguardian.com",
+        "source": "independent.co.uk",
+        "count": 7
+    },
+    {
+        "target": "theguardian.com",
+        "source": "huffingtonpost.com",
+        "count": 5
+    },
+    {
+        "target": "theguardian.com",
+        "source": "nytimes.com",
+        "count": 5
+    },
+    {
+        "target": "theguardian.com",
+        "source": "rawstory.com",
+        "count": 5
+    },
+    {
+        "target": "theguardian.com",
+        "source": "bbc.com",
+        "count": 4
+    },
+    {
+        "target": "thehill.com",
+        "source": "politico.com",
+        "count": 5
+    },
+    {
+        "target": "thehill.com",
+        "source": "washingtonpost.com",
+        "count": 5
+    },
+    {
+        "target": "thehill.com",
+        "source": "cnn.com",
+        "count": 4
+    },
+    {
+        "target": "thehill.com",
+        "source": "nytimes.com",
+        "count": 4
+    },
+    {
+        "target": "thehill.com",
+        "source": "huffingtonpost.com",
+        "count": 3
+    },
+    {
+        "target": "thehill.com",
+        "source": "breitbart.com",
+        "count": 2
+    },
+    {
+        "target": "theintercept.com",
+        "source": "independent.co.uk",
+        "count": 2
+    },
+    {
+        "target": "theintercept.com",
+        "source": "rawstory.com",
+        "count": 2
+    },
+    {
+        "target": "theintercept.com",
+        "source": "reuters.com",
+        "count": 2
+    },
+    {
+        "target": "theintercept.com",
+        "source": "theguardian.com",
+        "count": 2
+    },
+    {
+        "target": "theintercept.com",
+        "source": "washingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "thinkprogress.org",
+        "source": "huffingtonpost.com",
+        "count": 4
+    },
+    {
+        "target": "thinkprogress.org",
+        "source": "nytimes.com",
+        "count": 4
+    },
+    {
+        "target": "thinkprogress.org",
+        "source": "washingtonpost.com",
+        "count": 4
+    },
+    {
+        "target": "thinkprogress.org",
+        "source": "rawstory.com",
+        "count": 3
+    },
+    {
+        "target": "thinkprogress.org",
+        "source": "salon.com",
+        "count": 3
+    },
+    {
+        "target": "thinkprogress.org",
+        "source": "theguardian.com",
+        "count": 3
+    },
+    {
+        "target": "usuncut.com",
+        "source": "huffingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "usuncut.com",
+        "source": "rt.com",
+        "count": 2
+    },
+    {
+        "target": "usuncut.com",
+        "source": "theguardian.com",
+        "count": 2
+    },
+    {
+        "target": "usuncut.com",
+        "source": "washingtonpost.com",
+        "count": 2
+    },
+    {
+        "target": "vox.com",
+        "source": "huffingtonpost.com",
+        "count": 3
+    },
+    {
+        "target": "vox.com",
+        "source": "nytimes.com",
+        "count": 3
+    },
+    {
+        "target": "vox.com",
+        "source": "thinkprogress.org",
+        "count": 3
+    },
+    {
+        "target": "vox.com",
+        "source": "washingtonpost.com",
+        "count": 3
+    },
+    {
+        "target": "vox.com",
+        "source": "cnn.com",
+        "count": 2
+    },
+    {
+        "target": "vox.com",
+        "source": "independent.co.uk",
+        "count": 2
+    },
+    {
+        "target": "washingtonexaminer.com",
+        "source": "breitbart.com",
+        "count": 2
+    },
+    {
+        "target": "washingtonexaminer.com",
+        "source": "dailycaller.com",
+        "count": 2
+    },
+    {
+        "target": "washingtonexaminer.com",
+        "source": "foxnews.com",
+        "count": 2
+    },
+    {
+        "target": "washingtonexaminer.com",
+        "source": "politico.com",
+        "count": 2
+    },
+    {
+        "target": "washingtonpost.com",
+        "source": "theguardian.com",
+        "count": 9
+    },
+    {
+        "target": "washingtonpost.com",
+        "source": "nytimes.com",
+        "count": 8
+    },
+    {
+        "target": "washingtonpost.com",
+        "source": "cnn.com",
+        "count": 7
+    },
+    {
+        "target": "washingtonpost.com",
+        "source": "huffingtonpost.com",
+        "count": 7
+    },
+    {
+        "target": "washingtonpost.com",
+        "source": "independent.co.uk",
+        "count": 7
+    },
+    {
+        "target": "washingtonpost.com",
+        "source": "rawstory.com",
+        "count": 6
+    },
+    {
+        "target": "zerohedge.com",
+        "source": "breitbart.com",
+        "count": 2
+    },
+    {
+        "target": "zerohedge.com",
+        "source": "thefreethoughtproject.com",
+        "count": 2
+    }
+]
+}
