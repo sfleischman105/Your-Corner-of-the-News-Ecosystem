@@ -49,6 +49,7 @@ function GlobalGraph (graph) {
         d.links = [];
         d.distance = 0;
         d.visited = false;
+        d.removed_link = []; // For deleting links
     });
 
     this.doGravity = false; // control boolean for gravity forces. Todo - integrate this to State object
@@ -114,6 +115,24 @@ function GlobalGraph (graph) {
             counts[i] = (parseInt(self.graph.edges[i].count));
         }
         return counts;
+    };
+
+     self._min = function () {
+        var min = self.graph.edges[0].count;
+        for (var i = 1; i < self.graph.edges.length; i++) {
+            var curr_length = (parseInt(self.graph.edges[i].count));
+            if (curr_length < min) {min = curr_length}
+        }
+        return min;
+    };
+
+     self._max = function () {
+        var max = self.graph.edges[0].count;
+        for (var i = 1; i < self.graph.edges.length; i++) {
+            var curr_length = (parseInt(self.graph.edges[i].count));
+            if (curr_length > max) {max = curr_length}
+        }
+        return min;
     };
 
 	//getting link means, stdevs
@@ -573,7 +592,14 @@ function GlobalGraph (graph) {
 
     };
 
+    var edge_scale = d3.scaleLinear()
+		.domain([0, 100])
+    	.range([self._min, self._max]);
+
+
+
     this.edgeConnectionsUpdate = function(value) {
+
         // this.collisionForce.strength(value);
         // self.simulation.alphaTarget(0.3).restart(); // reset simulation
     };
