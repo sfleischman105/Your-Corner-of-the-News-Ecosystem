@@ -12,7 +12,7 @@ const DEFAULT_LINK_FORCE_STRENGTH = 0.005;
 const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
 const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
 const DEFAULT_COLLISION_FORCE_RADIUS = 3;
-const DEFAULT_EDGE_CONNECTIONS = 0;
+const DEFAULT_EDGE_CONNECTIONS = 2;
 
 /* ========================== */
 
@@ -599,9 +599,15 @@ function GlobalGraph (graph) {
 
 
     this.edgeConnectionsUpdate = function(value) {
+		var links = self.graph.links;
+		for (var i = 0; i < links.length; i++) {
+			if (links[i].count < value) {
+                    links.splice(i, 1);
+                    break;
+			}
+		}
+		self.simulation.alphaTarget(0.3).restart();
 
-        // this.collisionForce.strength(value);
-        // self.simulation.alphaTarget(0.3).restart(); // reset simulation
     };
 
 	// helper function for building an index of SVG elements by UUID
@@ -820,7 +826,7 @@ function ProtoApp () {
         if (update_simulation) {
             window.globalGraph.edgeConnectionsUpdate(value);
         }
-    },
+    };
 
     // Callback function for what to do when we graph data from external source
 	this.handleStubData = function (data) {
