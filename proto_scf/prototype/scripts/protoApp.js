@@ -25,10 +25,28 @@ const DEFAULT_EDGE_CONNECTIONS = 0;
 function GlobalGraph (graph) {
 	var self = this;
 
-	this.user = {}; // future user data
+
 	this.graph = graph; // the data used by the simulation
-	this.toggleNode = null; // for test purposes, this is a variable to contain removed node
-	this.toggleNodeEdges = []; // for test purposes, this is an array to conatin removed edges
+
+	this.gravityState = {
+
+		doGravity : false,
+		activeGravityField : 'TLD',
+		gravityFields : {
+			'TLD' : {
+				isActive : true,
+				gravityWells : {
+					".com" : { x: .75, y: .5},
+					".org" : { x: .15, y: .15},
+					".co.uk" : { x: .05, y: .3 },
+					".co.ru" : { x: .15, y: .85 }
+				}
+			}
+		}
+	};
+
+	// var currentFeild = this.gravityState.gravityFields[this.activeGravityField];
+
 	this.nodeBorderPadding = 8; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
 
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
@@ -51,24 +69,16 @@ function GlobalGraph (graph) {
         d.visited = false;
     });
 
-    this.doGravity = false; // control boolean for gravity forces. Todo - integrate this to State object
-
-    // todo - convert this to a key of arrays for different sets of gravity wells
-    this.gravityWells = {
-		".com" : { x: .75, y: .5},
-		".org" : { x: .15, y: .15},
-		".co.uk" : { x: .05, y: .3 },
-		".co.ru" : { x: .15, y: .85 }
-	};
 
     this.original_edges = this.graph.edges.slice();
 
 	// todo - this is just a handler for now, we'll bake in some of these node state data into the datasets that get loaded
 	this.convertGravityData = function () {
 		var data = [];
-		for (var prop in self.gravityWells) {
+		var activeGravityField = self.gravityState.gravityFields[self.gravityState.activeGravityField].gravityWells;
+		for (var prop in activeGravityField) {
 			data.push({
-				"id" : prop, "x": self.gravityWells[prop].x, "y": self.gravityWells[prop].y
+				"id" : prop, "x": activeGravityField[prop].x, "y": activeGravityField[prop].y
 			})
 		}
 		return data;
@@ -78,7 +88,7 @@ function GlobalGraph (graph) {
 	// todo - add d3 colors for different sets of gravity wells
 	this.renderGravityWells = function () {
 		var gravity = self.svg.selectAll("circle.gravWell")
-							.data(self.doGravity ? self.convertGravityData() : []);
+							.data(self.gravityState.doGravity ? self.convertGravityData() : []);
 
 		gravity.enter().append("circle").attr("class", "gravWell")
 			.style("fill", "red")
@@ -90,15 +100,14 @@ function GlobalGraph (graph) {
 		gravity.exit().remove();
 	}
 
-	this.renderGravityWells(); // move into initializer
-
 	// Handler function for turning on and off gravity wells
 	this.onToggleGravity = function (buttonEl) {
-		self.doGravity = !self.doGravity;
+		self.gravityState.doGravity = !self.gravityState.doGravity;
 		$(buttonEl).toggleClass('checked');
-		$('span', buttonEl).text(self.doGravity ? 'ON' : 'OFF');
+		$('span', buttonEl).text(self.gravityState.doGravity ? 'ON' : 'OFF');
 		self.renderGravityWells();
-		self.applyGravityForces();
+		self.updateGravityForces();
+		self.updateCenterForce();
 		self.restartAllSimulations(0.2);
 	}
 
@@ -160,59 +169,55 @@ function GlobalGraph (graph) {
     // collision force to prevent overlap
     this.collisionForce = d3.forceCollide(DEFAULT_COLLISION_FORCE_RADIUS);
 
-    // simulation actually renders the graph and handles force animations
-    this.simulation = d3.forceSimulation()
-        .force("link", this.linkForce)
-        .force("charge", this.chargeForce)
-        .force("collision", this.collisionForce);
+    // forceX for active gravity field / wells
+    this.gravityForceX = d3.forceX(function (d) {
+        var activeGravityField = self.gravityState.gravityFields[self.gravityState.activeGravityField].gravityWells; // create temporary reference to the "active" gravity field
+        if (d.well) return self.width * activeGravityField[d.well].x; // this forces single grav well limitation
+
+        for (var well in activeGravityField) { // check all the wells
+            if (typeof d.id === "string" && // conditional to check node parameters against well value; todo - bake this into the data
+                d.id.indexOf(well) !== -1) { 
+                d.well = well; // give node a well
+                return self.width * activeGravityField[d.well].x; // dynamically return x position of gravity well
+            }
+        }
+        return self.width * .15; // default gravity well if node doesn't match any well in the gravity field (or should they just float?)
+    }).strength([DEFAULT_GRAVITY_FORCE_STRENGTH]);
+
+
+    this.gravityForceY = d3.forceY(function (d) {
+        var activeGravityField = self.gravityState.gravityFields[self.gravityState.activeGravityField].gravityWells;
+        if (d.well) return self.height * activeGravityField[d.well].y;
+
+        for (var well in activeGravityField) {
+            if (typeof d.id === "string" &&
+                d.id.indexOf(well) !== -1) {
+                d.well = well;
+                return self.height * activeGravityField[d.well].y;
+            }
+        }
+        return self.height * .5;
+    }).strength([DEFAULT_GRAVITY_FORCE_STRENGTH]);
+
+
 
     //set a force strength for gravity. Storing this supports slider updates while gravity not in use, prevents inconsistent state
     this.gravityValue = DEFAULT_GRAVITY_FORCE_STRENGTH;
 
 
-	// Handler for applying / updating simulation forces
-	// Todo - this can be broken down even further for fine-tune control over the simulation
-	this.applyGravityForces = function () {
-
-        if (self.doGravity) {
-            // d3.forceX || null
-            this.gravityForceX = d3.forceX(function (d) {
-                if (d.well) return self.width * self.gravityWells[d.well].x;
-                for (var well in self.gravityWells) {
-                    if (typeof d.id === "string" &&
-                        d.id.indexOf(well) !== -1) {
-                        d.well = well;
-                        return self.width * self.gravityWells[d.well].x;
-                    }
-                }
-                return self.width * .15;
-            }).strength([DEFAULT_GRAVITY_FORCE_STRENGTH]);
-
-            this.gravityForceY = d3.forceY(function (d) {
-                if (d.well) return self.height * self.gravityWells[d.well].y;
-                for (var well in self.gravityWells) {
-                    if (typeof d.id === "string" &&
-                        d.id.indexOf(well) !== -1) {
-                        d.well = well;
-                        return self.height * self.gravityWells[d.well].y;
-                    }
-                }
-                return self.height * .85;
-            }).strength([this.gravityValue]);
-
-            //now apply gravitational forces
-            this.simulation.force("center", null);
-            this.simulation.force("gravityForceX", this.gravityForceX);
-            this.simulation.force("gravityForceY", this.gravityForceY);
-        } else {
-            // or centering forces
-            this.simulation.force("center", this.centerForce);
-            this.simulation.force("gravityForceX", null);
-            this.simulation.force("gravityForceY", null);
-        }
+	// updating gravity forces
+	this.updateGravityForces = function () {
+        this.simulation.force("gravityForceX", this.gravityState.doGravity ? this.gravityForceX : null);
+        this.simulation.force("gravityForceY", this.gravityState.doGravity ? this.gravityForceY : null);
 	};
 
-	this.applyGravityForces(); // todo - move this to initializer
+	// updating center force
+	this.updateCenterForce = function () {
+		this.simulation.force("center", this.gravityState.doGravity ? null : this.centerForce);
+	}
+
+
+
 
 
 	// this is a list of sub-graphs and their simulations
@@ -576,7 +581,7 @@ function GlobalGraph (graph) {
         self.simulation.alphaTarget(0.3).restart(); // reset simulation
     };
     this.gravityForceUpdate = function(value) {
-        if (self.doGravity) {
+        if (self.gravityState.doGravity) {
             this.gravityForceX.strength(value);
             this.gravityForceY.strength(value);
             this.gravityValue = value;
@@ -636,7 +641,16 @@ function GlobalGraph (graph) {
         return index;
     }
 
+    // Start the simulation
+    this.simulation = d3.forceSimulation()
+        .force("link", this.linkForce)
+        .force("charge", this.chargeForce)
+        .force("center", this.centerForce)
+        .force("collision", this.collisionForce);
+
 	// Actually render the graph once everything is defined
+	this.renderGravityWells(); 
+	this.updateGravityForces(); 
 	this.renderNodes();
 	this.renderLinks();
 	this.runSimulation();
@@ -649,7 +663,6 @@ function ProtoApp () {
 	var self = this;
 	this.userData = {};
 	this.globalGraphData = null;
-
 
 	this.initialize = function () {
 		this.addEventListeners();
