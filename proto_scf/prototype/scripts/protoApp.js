@@ -12,7 +12,7 @@ const DEFAULT_LINK_FORCE_STRENGTH = 0.005;
 const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
 const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
 const DEFAULT_COLLISION_FORCE_RADIUS = 3;
-const DEFAULT_EDGE_CONNECTIONS = 2;
+const DEFAULT_EDGE_CONNECTIONS = 0;
 
 /* ========================== */
 
@@ -49,7 +49,6 @@ function GlobalGraph (graph) {
         d.links = [];
         d.distance = 0;
         d.visited = false;
-        d.removed_link = []; // For deleting links
     });
 
     this.doGravity = false; // control boolean for gravity forces. Todo - integrate this to State object
@@ -132,8 +131,11 @@ function GlobalGraph (graph) {
             var curr_length = (parseInt(self.graph.edges[i].count));
             if (curr_length > max) {max = curr_length}
         }
-        return min;
+        return max;
     };
+
+     var edge_count_min = self._min();
+     var edge_count_max = self._max();
 
 	//getting link means, stdevs
 	var link_counts = self._counts();
@@ -594,18 +596,36 @@ function GlobalGraph (graph) {
 
     var edge_scale = d3.scaleLinear()
 		.domain([0, 100])
-    	.range([self._min, self._max]);
+    	.range([edge_count_min, edge_count_max]);
 
 
+    this.updateEdges = function(new_edges) {
+		self.link = self.link.data(new_edges, function(d) { return d.source.id + "-" + d.target.id; });
+		self.link.exit().transition()
+		  .attr("stroke-opacity", 0)
+		  .attrTween("x1", function(d) { return function() { return d.source.x; }; })
+		  .attrTween("x2", function(d) { return function() { return d.target.x; }; })
+		  .attrTween("y1", function(d) { return function() { return d.source.y; }; })
+		  .attrTween("y2", function(d) { return function() { return d.target.y; }; })
+		  .remove();
+
+		self.link = self.link.enter().append("line")
+			.call(function(link) { link.transition().attr("stroke-opacity", 1); })
+			.merge(self.link);
+
+		self.simulation.force("link").links(new_edges);
+		self.simulation.alphaTarget(0.3).restart();
+
+	};
 
     this.edgeConnectionsUpdate = function(value) {
-		var links = self.graph.links;
-		for (var i = 0; i < links.length; i++) {
-			if (links[i].count < value) {
-                    links.splice(i, 1);
-                    break;
+		temp_links = self.graph.edges;
+		for (var i = 0; i < temp_links.length; i++) {
+			if (temp_links[i].count < edge_scale(value)) {
+                    temp_links.splice(i, 1);
 			}
 		}
+		self.updateEdges(temp_links);
 		self.simulation.alphaTarget(0.3).restart();
 
     };
