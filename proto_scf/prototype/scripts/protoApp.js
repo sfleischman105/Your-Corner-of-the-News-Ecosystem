@@ -69,23 +69,13 @@ function GlobalGraph (graph) {
     });
 
 
-
-    // this.doGravity = false; // control boolean for gravity forces. Todo - integrate this to State object
-
-    // todo - convert this to a key of arrays for different sets of gravity wells
-    this.gravityWells = {
-		".com" : { x: .75, y: .5},
-		".org" : { x: .15, y: .15},
-		".co.uk" : { x: .05, y: .3 },
-		".co.ru" : { x: .15, y: .85 }
-	};
-
 	// todo - this is just a handler for now, we'll bake in some of these node state data into the datasets that get loaded
 	this.convertGravityData = function () {
 		var data = [];
-		for (var prop in self.gravityWells) {
+		var activeGravityField = self.gravityState.gravityFields[self.gravityState.activeGravityField].gravityWells;
+		for (var prop in activeGravityField) {
 			data.push({
-				"id" : prop, "x": self.gravityWells[prop].x, "y": self.gravityWells[prop].y
+				"id" : prop, "x": activeGravityField[prop].x, "y": activeGravityField[prop].y
 			})
 		}
 		return data;
@@ -106,8 +96,6 @@ function GlobalGraph (graph) {
 
 		gravity.exit().remove();
 	}
-
-	this.renderGravityWells(); // move into initializer
 
 	// Handler function for turning on and off gravity wells
 	this.onToggleGravity = function (buttonEl) {
@@ -171,8 +159,8 @@ function GlobalGraph (graph) {
 
     // forceX for active gravity field / wells
     this.gravityForceX = d3.forceX(function (d) {
-        if (d.well) return self.width * self.gravityWells[d.well].x; // this forces single grav well limitation
         var activeGravityField = self.gravityState.gravityFields[self.gravityState.activeGravityField].gravityWells; // create temporary reference to the "active" gravity field
+        if (d.well) return self.width * activeGravityField[d.well].x; // this forces single grav well limitation
 
         for (var well in activeGravityField) { // check all the wells
             if (typeof d.id === "string" && // conditional to check node parameters against well value; todo - bake this into the data
@@ -186,8 +174,8 @@ function GlobalGraph (graph) {
 
 
     this.gravityForceY = d3.forceY(function (d) {
-        if (d.well) return self.height * self.gravityWells[d.well].y;
         var activeGravityField = self.gravityState.gravityFields[self.gravityState.activeGravityField].gravityWells;
+        if (d.well) return self.height * activeGravityField[d.well].y;
 
         for (var well in activeGravityField) {
             if (typeof d.id === "string" &&
@@ -227,7 +215,6 @@ function GlobalGraph (graph) {
 
 
 
-	this.updateGravityForces(); // todo - move this to initializer
 
 
 	// this is a list of sub-graphs and their simulations
@@ -611,6 +598,8 @@ function GlobalGraph (graph) {
     }
 
 	// Actually render the graph once everything is defined
+	this.renderGravityWells(); 
+	this.updateGravityForces(); 
 	this.renderNodes();
 	this.renderLinks();
 	this.runSimulation();
