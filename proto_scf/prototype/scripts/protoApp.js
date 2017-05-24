@@ -61,6 +61,8 @@ function GlobalGraph (graph) {
 		".co.ru" : { x: .15, y: .85 }
 	};
 
+    this.original_edges = this.graph.edges.slice();
+
 	// todo - this is just a handler for now, we'll bake in some of these node state data into the datasets that get loaded
 	this.convertGravityData = function () {
 		var data = [];
@@ -110,32 +112,11 @@ function GlobalGraph (graph) {
     //helper function for getting counts for each node.
     self._counts = function () {
         var counts = [];
-        for (var i = 0; i < self.graph.edges.length; i++) {
-            counts[i] = (parseInt(self.graph.edges[i].count));
+        for (var i = 0; i < self.original_edges.length; i++) {
+            counts[i] = (parseInt(self.original_edges[i].count));
         }
         return counts;
     };
-
-     self._min = function () {
-        var min = self.graph.edges[0].count;
-        for (var i = 1; i < self.graph.edges.length; i++) {
-            var curr_length = (parseInt(self.graph.edges[i].count));
-            if (curr_length < min) {min = curr_length}
-        }
-        return min;
-    };
-
-     self._max = function () {
-        var max = self.graph.edges[0].count;
-        for (var i = 1; i < self.graph.edges.length; i++) {
-            var curr_length = (parseInt(self.graph.edges[i].count));
-            if (curr_length > max) {max = curr_length}
-        }
-        return max;
-    };
-
-     var edge_count_min = self._min();
-     var edge_count_max = self._max();
 
 	//getting link means, stdevs
 	var link_counts = self._counts();
@@ -596,7 +577,8 @@ function GlobalGraph (graph) {
 
     var edge_scale = d3.scaleLinear()
 		.domain([0, 100])
-    	.range([edge_count_min, edge_count_max]);
+    	.range([d3.min(link_counts), d3.max(link_counts)]);
+
 
 
     this.updateEdges = function(new_edges) {
@@ -613,20 +595,19 @@ function GlobalGraph (graph) {
 			.call(function(link) { link.transition().attr("stroke-opacity", 1); })
 			.merge(self.link);
 
-		self.simulation.force("link").links(new_edges);
+		self.simulation.force("link").links();
 		self.simulation.alphaTarget(0.3).restart();
 
 	};
 
     this.edgeConnectionsUpdate = function(value) {
-		temp_links = self.graph.edges;
+		temp_links = self.original_edges.slice();
 		for (var i = 0; i < temp_links.length; i++) {
 			if (temp_links[i].count < edge_scale(value)) {
                     temp_links.splice(i, 1);
 			}
 		}
 		self.updateEdges(temp_links);
-		self.simulation.alphaTarget(0.3).restart();
 
     };
 
