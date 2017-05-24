@@ -24,8 +24,28 @@ const DEFAULT_COLLISION_FORCE_RADIUS = 3;
 function GlobalGraph (graph) {
 	var self = this;
 
-	this.user = {}; // future user data
+
 	this.graph = graph; // the data used by the simulation
+
+	this.gravityState = {
+
+		doGravity : false,
+		activeGravityField : 'TLD',
+		gravityFields : {
+			'TLD' : {
+				isActive : true,
+				gravityWells : {
+					".com" : { x: .75, y: .5},
+					".org" : { x: .15, y: .15},
+					".co.uk" : { x: .05, y: .3 },
+					".co.ru" : { x: .15, y: .85 }
+				}
+			}
+		}
+	};
+
+	// var currentFeild = this.gravityState.gravityFields[this.activeGravityField];
+
 	this.toggleNode = null; // for test purposes, this is a variable to contain removed node
 	this.toggleNodeEdges = []; // for test purposes, this is an array to conatin removed edges
 	this.nodeBorderPadding = 8; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
@@ -49,6 +69,8 @@ function GlobalGraph (graph) {
         d.distance = 0;
         d.visited = false;
     });
+
+
 
     this.doGravity = false; // control boolean for gravity forces. Todo - integrate this to State object
 
@@ -596,7 +618,6 @@ function ProtoApp () {
 	var self = this;
 	this.userData = {};
 	this.globalGraphData = null;
-
 
 	this.initialize = function () {
 		this.addEventListeners();
