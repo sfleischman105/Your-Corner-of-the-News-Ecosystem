@@ -118,7 +118,8 @@ function GlobalGraph (graph) {
         return counts;
     };
 
-	//getting link means, stdevs
+    // todo - move this to preprocessing!
+	//getting link means, stdevs 
 	var link_counts = self._counts();
 	self.link_mean = d3.mean(link_counts);
 	self.link_stdev = d3.deviation(link_counts);
@@ -575,7 +576,7 @@ function GlobalGraph (graph) {
 
     };
 
-    var edge_scale = d3.scaleLinear()
+    this.edge_scale = d3.scaleLinear()
 		.domain([0, 100])
     	.range([d3.min(link_counts), d3.max(link_counts)]);
 
@@ -595,7 +596,7 @@ function GlobalGraph (graph) {
 			.call(function(link) { link.transition().attr("stroke-opacity", 1); })
 			.merge(self.link);
 
-		self.simulation.force("link").links();
+		self.linkForce.links();
 		self.simulation.alphaTarget(0.3).restart();
 
 	};
@@ -603,7 +604,7 @@ function GlobalGraph (graph) {
     this.edgeConnectionsUpdate = function(value) {
 		temp_links = self.original_edges.slice();
 		for (var i = 0; i < temp_links.length; i++) {
-			if (temp_links[i].count < edge_scale(value)) {
+			if (temp_links[i].count < self.edge_scale(value)) {
                     temp_links.splice(i, 1);
 			}
 		}
