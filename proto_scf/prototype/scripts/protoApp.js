@@ -8,10 +8,11 @@ d3.json("./scripts/gdelt_filtered.json", function (error, graph) {
 
 /* ====== Constants ========= */
 
-const DEFAULT_LINK_FORCE_STRENGTH = 0.005;
+const DEFAULT_LINK_FORCE_STRENGTH = 0.00001;
 const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
 const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
 const DEFAULT_COLLISION_FORCE_RADIUS = 3;
+const DEFAULT_EDGE_CONNECTIONS = 0;
 
 /* ========================== */
 
@@ -69,6 +70,8 @@ function GlobalGraph (graph) {
     });
 
 
+    this.original_edges = this.graph.edges.slice();
+
 	// todo - this is just a handler for now, we'll bake in some of these node state data into the datasets that get loaded
 	this.convertGravityData = function () {
 		var data = [];
@@ -118,13 +121,14 @@ function GlobalGraph (graph) {
     //helper function for getting counts for each node.
     self._counts = function () {
         var counts = [];
-        for (var i = 0; i < self.graph.edges.length; i++) {
-            counts[i] = (parseInt(self.graph.edges[i].count));
+        for (var i = 0; i < self.original_edges.length; i++) {
+            counts[i] = (parseInt(self.original_edges[i].count));
         }
         return counts;
     };
 
-	//getting link means, stdevs
+    // todo - move this to preprocessing!
+	//getting link means, stdevs 
 	var link_counts = self._counts();
 	self.link_mean = d3.mean(link_counts);
 	self.link_stdev = d3.deviation(link_counts);
@@ -141,13 +145,21 @@ function GlobalGraph (graph) {
 
 
     // Saving a reference to each force applied to the graph as a variable to allow live adjustments:
-
+    this.linkForceStrength = 0.00001;
+    this.linkForceStrengthHandler = function (d) { 
+		return d.count * self.linkForceStrength; 
+	}
     // force for links. Saving reference for slider adjustment
-    this.linkForce = d3.forceLink().distance(function (d) {
-        var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
-        return Math.max(Math.min(50 - shift, 5), 100);
-    }).strength(DEFAULT_LINK_FORCE_STRENGTH).id(function(d) { return d.id; });
+    this.linkForce = d3.forceLink()
+    		.distance(function (d) {
+        		var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
+        		return Math.max(Math.min(50 - shift, 5), 100);
+    		})
+    		// .strength(DEFAULT_LINK_FORCE_STRENGTH)
+    		.strength(this.linkForceStrengthHandler)
+    		.id(function(d) { return d.id; });
 
+     // todo - convert this to d3 log scale!
     //charge force
     this.chargeForce = d3.forceManyBody().strength([DEFAULT_CHARGE_FORCE_STRENGTH]);
 
@@ -297,7 +309,7 @@ function GlobalGraph (graph) {
 
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
-		self.handleToolTipEvent(d);
+		// self.handleToolTipEvent(d);
 	}
 
 	this.onNodeMouseOut = function (d) {
@@ -556,7 +568,8 @@ function GlobalGraph (graph) {
 
 	// adding methods for changing force parameters
     this.linkForceUpdate = function(value) {
-        this.linkForce.strength(value);
+    	this.linkForceStrength = value;
+        this.linkForce.strength(self.linkForceStrengthHandler);
         self.simulation.alphaTarget(0.3).restart(); // reset simulation
     };
     this.chargeForceUpdate = function(value) {
@@ -574,6 +587,46 @@ function GlobalGraph (graph) {
             this.gravityValue = value;
             self.simulation.alphaTarget(0.3).restart(); // reset simulation
         }
+
+    };
+
+    this.edge_scale = d3.scaleLinear()
+		.domain([0, 100])
+    	.range([d3.min(link_counts), d3.max(link_counts)]);
+
+    this.log_edge_scale = d3.scaleLog()
+    	.domain([0, 100])
+    	.range([d3.min(link_counts), d3.max(link_counts)]);
+
+    this.updateEdges = function(new_edges) {
+		self.link = self.link.data(new_edges, function(d) { return d.source.id + "-" + d.target.id; });
+		self.link.exit().transition()
+		  .attr("stroke-opacity", 0)
+		  .attrTween("x1", function(d) { return function() { return d.source.x; }; })
+		  .attrTween("x2", function(d) { return function() { return d.target.x; }; })
+		  .attrTween("y1", function(d) { return function() { return d.source.y; }; })
+		  .attrTween("y2", function(d) { return function() { return d.target.y; }; })
+		  .remove();
+
+		self.link = self.link.enter().append("line")
+			.call(function(link) { link.transition().attr("stroke-opacity", 1); })
+			.merge(self.link);
+
+
+
+		self.linkForce.strength(self.linkForceStrengthHandler).links(new_edges);
+		self.simulation.alphaTarget(0.3).restart();
+
+	};
+
+    this.edgeConnectionsUpdate = function(value) {
+		temp_links = self.original_edges.slice();
+		for (var i = 0; i < temp_links.length; i++) {
+			if (temp_links[i].count < self.edge_scale(value)) {
+                    temp_links.splice(i, 1);
+			}
+		}
+		self.updateEdges(temp_links);
 
     };
 
@@ -625,7 +678,7 @@ function ProtoApp () {
 		$('#ToggleGravity, #ToggleNodeLabels').on('click', this.onToggle);
 
 		// Parameter Sliders
-		$('#linkForceSlider, #chargeForceSlider, #collisionForceSlider, #gravityForceSlider')
+		$('#linkForceSlider, #chargeForceSlider, #collisionForceSlider, #gravityForceSlider, #edgeConnectivitySlider')
 			.on('change', this.onControlSliderChange);
 		
 	};
@@ -642,6 +695,7 @@ function ProtoApp () {
         document.getElementById("chargeForceSlider").setAttribute("value", DEFAULT_CHARGE_FORCE_STRENGTH);
         document.getElementById("gravityForceSlider").setAttribute("value", DEFAULT_GRAVITY_FORCE_STRENGTH);
         document.getElementById("collisionForceSlider").setAttribute("value", DEFAULT_COLLISION_FORCE_RADIUS);
+        document.getElementById("edgeConnectivitySlider").setAttribute("value", DEFAULT_EDGE_CONNECTIONS);
 
         $('#simulationControls input[type=range]').each(function(i) { // For each slider
         	var rangeEl = this;
@@ -659,6 +713,7 @@ function ProtoApp () {
         this.chargeForceSliderUpdate(DEFAULT_CHARGE_FORCE_STRENGTH, false);
         this.collisionForceSliderUpdate(DEFAULT_COLLISION_FORCE_RADIUS, false);
         this.gravityForceSliderUpdate(DEFAULT_GRAVITY_FORCE_STRENGTH, false);
+        this.edgeConnectivitySliderUpdate(DEFAULT_EDGE_CONNECTIONS, false);
     },
 
     this.onControlSliderChange = function (e) { // this : input html; self : protoApp
@@ -794,6 +849,12 @@ function ProtoApp () {
         }
     },
 
+	this.edgeConnectivitySliderUpdate = function(value, update_simulation) {
+        document.getElementById("edgeConnectivitySliderSpan").innerHTML = value;
+        if (update_simulation) {
+            window.globalGraph.edgeConnectionsUpdate(value);
+        }
+    };
 
     // Callback function for what to do when we graph data from external source
 	this.handleStubData = function (data) {
