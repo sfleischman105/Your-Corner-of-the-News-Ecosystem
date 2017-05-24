@@ -8,7 +8,7 @@ d3.json("./scripts/gdelt_filtered.json", function (error, graph) {
 
 /* ====== Constants ========= */
 
-const DEFAULT_LINK_FORCE_STRENGTH = 0.005;
+const DEFAULT_LINK_FORCE_STRENGTH = 0.00001;
 const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
 const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
 const DEFAULT_COLLISION_FORCE_RADIUS = 3;
@@ -136,13 +136,21 @@ function GlobalGraph (graph) {
 
 
     // Saving a reference to each force applied to the graph as a variable to allow live adjustments:
-
+    this.linkForceStrength = 0.00001;
+    this.linkForceStrengthHandler = function (d) { 
+		return d.count * self.linkForceStrength; 
+	}
     // force for links. Saving reference for slider adjustment
-    this.linkForce = d3.forceLink().distance(function (d) {
-        var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
-        return Math.max(Math.min(50 - shift, 5), 100);
-    }).strength(DEFAULT_LINK_FORCE_STRENGTH).id(function(d) { return d.id; });
+    this.linkForce = d3.forceLink()
+    		.distance(function (d) {
+        		var shift = (parseInt(d.count) - self.link_mean) / (0.01 * self.link_stdev);
+        		return Math.max(Math.min(50 - shift, 5), 100);
+    		})
+    		// .strength(DEFAULT_LINK_FORCE_STRENGTH)
+    		.strength(this.linkForceStrengthHandler)
+    		.id(function(d) { return d.id; });
 
+     // todo - convert this to d3 log scale!
     //charge force
     this.chargeForce = d3.forceManyBody().strength([DEFAULT_CHARGE_FORCE_STRENGTH]);
 
@@ -555,7 +563,8 @@ function GlobalGraph (graph) {
 
 	// adding methods for changing force parameters
     this.linkForceUpdate = function(value) {
-        this.linkForce.strength(value);
+    	this.linkForceStrength = value;
+        this.linkForce.strength(self.linkForceStrengthHandler);
         self.simulation.alphaTarget(0.3).restart(); // reset simulation
     };
     this.chargeForceUpdate = function(value) {
@@ -580,7 +589,9 @@ function GlobalGraph (graph) {
 		.domain([0, 100])
     	.range([d3.min(link_counts), d3.max(link_counts)]);
 
-
+    this.log_edge_scale = d3.scaleLog()
+    	.domain([0, 100])
+    	.range([d3.min(link_counts), d3.max(link_counts)]);
 
     this.updateEdges = function(new_edges) {
 		self.link = self.link.data(new_edges, function(d) { return d.source.id + "-" + d.target.id; });
@@ -596,7 +607,9 @@ function GlobalGraph (graph) {
 			.call(function(link) { link.transition().attr("stroke-opacity", 1); })
 			.merge(self.link);
 
-		self.linkForce.links();
+
+
+		self.linkForce.strength(self.linkForceStrengthHandler).links(new_edges);
 		self.simulation.alphaTarget(0.3).restart();
 
 	};
