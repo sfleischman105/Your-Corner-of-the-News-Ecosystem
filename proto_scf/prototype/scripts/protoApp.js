@@ -189,15 +189,6 @@ function GlobalGraph (graph) {
 
 
 
-
-
-
-    // simulation actually renders the graph and handles force animations
-    this.simulation = d3.forceSimulation()
-        .force("link", this.linkForce)
-        .force("charge", this.chargeForce)
-        .force("collision", this.collisionForce);
-
     //set a force strength for gravity. Storing this supports slider updates while gravity not in use, prevents inconsistent state
     this.gravityValue = DEFAULT_GRAVITY_FORCE_STRENGTH;
 
@@ -596,6 +587,13 @@ function GlobalGraph (graph) {
         }
         return index;
     }
+
+    // Start the simulation
+    this.simulation = d3.forceSimulation()
+        .force("link", this.linkForce)
+        .force("charge", this.chargeForce)
+        .force("center", this.centerForce)
+        .force("collision", this.collisionForce);
 
 	// Actually render the graph once everything is defined
 	this.renderGravityWells(); 
