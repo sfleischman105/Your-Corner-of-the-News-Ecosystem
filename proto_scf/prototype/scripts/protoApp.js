@@ -4,6 +4,7 @@ d3.json("./scripts/gdelt_filtered.json", function (error, graph) {
  	if (error) throw error;
  	window.protoApp.globalGraphData = $.extend(true, {}, graph);
  	window.globalGraph = new GlobalGraph(graph);
+ 	window.protoApp.initialize();
 });
 
 /* ====== Constants ========= */
@@ -72,17 +73,34 @@ function GlobalGraph (graph) {
 
 
     // Simulation Master Control
-	this.simulationParameters = {
-		// Edge Parameters
-		"linkForceStrength" : DEFAULT_LINK_FORCE_STRENGTH,
-		"minimumEdgeCount"	: DEFAULT_EDGE_CONNECTIONS,
+	this.simulationStateControl = {
+		"parameters" : {
 
-		// Node Parameters
-		"chargeForceStrength" : DEFAULT_CHARGE_FORCE_STRENGTH,
-		"collisionForceRadius": DEFAULT_COLLISION_FORCE_RADIUS,
+			// Edge Parameters
+			"linkForceStrength" : DEFAULT_LINK_FORCE_STRENGTH,
+			"minimumEdgeCount"	: DEFAULT_EDGE_CONNECTIONS,
 
-		// Force Parameters
-		"gravityForceStrength": DEFAULT_GRAVITY_FORCE_STRENGTH
+			// Node Parameters
+			"chargeForceStrength" : DEFAULT_CHARGE_FORCE_STRENGTH,
+			"collisionForceRadius": DEFAULT_COLLISION_FORCE_RADIUS,
+
+			// Force Parameters
+			"gravityForceStrength": DEFAULT_GRAVITY_FORCE_STRENGTH,
+
+		},
+
+
+		// stateToStore - reference to place to stash from : self.simulationState
+		// stateToApply - parameters to be applied to : self.simulationState
+		switchStates : function (stateToStore, stateToApply) {
+			for (param in stateToStore) {
+				stateToStore[param] = self.simulationStateControl.parameters[param];
+			}
+
+			for (param in stateToApply) {
+				self.simulationStateControl.parameters[param] = stateToApply[param];
+			}
+		}
 	}
 
 
@@ -124,7 +142,6 @@ function GlobalGraph (graph) {
 				defaultParams : {
 					"linkForceStrength" : 0.00006,
 					"chargeForceStrength" : -250,
-					"collisionForceRadius": DEFAULT_COLLISION_FORCE_RADIUS,
 					"gravityForceStrength": .3
 				}
 			}
@@ -132,10 +149,11 @@ function GlobalGraph (graph) {
 		previousParams : {
 			"linkForceStrength" : DEFAULT_LINK_FORCE_STRENGTH,
 			"chargeForceStrength" : DEFAULT_CHARGE_FORCE_STRENGTH,
-			"collisionForceRadius": DEFAULT_COLLISION_FORCE_RADIUS,
 			"gravityForceStrength": DEFAULT_GRAVITY_FORCE_STRENGTH
 		}
 	};
+
+	
 
 
 	// Handler function for turning on and off gravity wells
@@ -144,36 +162,21 @@ function GlobalGraph (graph) {
 		var activeGravityFieldParams = self.gravityState.gravityFields[self.gravityState.activeGravityField].defaultParams;
 
 		if ( self.gravityState.doGravity ) {
-			
-			// save current params
-			for (var param in self.gravityState.previousParams) { 
-				self.gravityState.previousParams[param] = self.simulationParameters[param];
-			}
-
-			// apply pramas specified by force state
-			for (var param in activeGravityFieldParams) {
-				self.simulationParameters[param] = activeGravityFieldParams[param];
-			}
+			self.simulationStateControl.switchStates(self.gravityState.previousParams, activeGravityFieldParams);
 
 		} else {
-
-
-			for (var param in activeGravityFieldParams) {
-				activeGravityFieldParams[param] = self.simulationParameters[param];
-			}
-
-			for (var param in self.gravityState.previousParams) {
-				self.simulationParameters[param] = self.gravityState.previousParams[param];
-			}
-
+			self.simulationStateControl.switchStates(activeGravityFieldParams, self.gravityState.previousParams);
 		}
+
+		window.protoApp.updateSliders(self.simulationStateControl.parameters);
+
 
 		$(buttonEl).toggleClass('checked');
 		$('span', buttonEl).text(self.gravityState.doGravity ? 'ON' : 'OFF');
 		self.renderGravityWells();
 		self.updateGravityForces();
 		self.updateCenterForce();
-		self.restartAllSimulations(0.2);
+
 	}
 
 	// todo - add d3 colors for different sets of gravity wells
@@ -424,8 +427,8 @@ function GlobalGraph (graph) {
 	// updating gravity forces
 	this.updateGravityForces = function () {
 		if (this.gravityState.doGravity) {
-        	this.gravityForceX.strength(self.simulationParameters.gravityForceStrength);
-        	this.gravityForceX.strength(self.simulationParameters.gravityForceStrength);
+        	this.gravityForceX.strength(self.simulationStateControl.parameters.gravityForceStrength);
+        	this.gravityForceX.strength(self.simulationStateControl.parameters.gravityForceStrength);
         }
         this.simulation.force("gravityForceX", this.gravityState.doGravity ? this.gravityForceX : null);
         this.simulation.force("gravityForceY", this.gravityState.doGravity ? this.gravityForceY : null);
@@ -713,31 +716,35 @@ function GlobalGraph (graph) {
 
 
     /******  INITIALIZE  ******/
+    // called from window.protoApp.initialize() to resolve any race conditionals
+    this.initialize = function () {
+    	// Define the simulation
+	    self.simulation = d3.forceSimulation()
+	        .force("link", self.linkForce)
+	        .force("charge", self.chargeForce)
+	        .force("center", self.centerForce)
+	        .force("collision", self.collisionForce);
 
-    // Define the simulation
-    this.simulation = d3.forceSimulation()
-        .force("link", this.linkForce)
-        .force("charge", this.chargeForce)
-        .force("center", this.centerForce)
-        .force("collision", this.collisionForce);
-
-	// Actually render the graph once everything is defined
-	this.renderGravityWells(); 
-	this.updateGravityForces(); 
-	this.renderNodes();
-	this.renderLinks();
-	this.runSimulation();
+		// Actually render the graph once everything is defined
+		self.renderGravityWells(); 
+		self.updateGravityForces(); 
+		self.renderNodes();
+		self.renderLinks();
+		self.runSimulation();
+    }
+    
 }
 
 
 // ProtoApp is the frontend app controlling the front-end and integrating D3 and user interactions
 function ProtoApp () {
-
 	var self = this;
-	this.userData = {};
+	this.globalGraph;
 	this.globalGraphData = null;
 
 	this.initialize = function () {
+		this.globalGraph = window.globalGraph;
+		this.globalGraph.initialize();
 		this.addEventListeners();
 		this.setSliderDefaults();
 	},
@@ -757,17 +764,13 @@ function ProtoApp () {
 
 	this.onToggle = function (e) {
 		var handlerStr = 'on' + this.id;
-		if (!!window.globalGraph[handlerStr]) window.globalGraph[handlerStr](this);
+		if (!!self.globalGraph[handlerStr]) self.globalGraph[handlerStr](this);
 	},
 
     this.setSliderDefaults = function () {
         // set the slider values for these constants
         // $('#linkForceSlider').attr('value', DEFAULT_LINK_FORCE_STRENGTH); // <~~~ This does the same as the vanila js! :)
-        document.getElementById("linkForceSlider").setAttribute("value",  DEFAULT_LINK_FORCE_STRENGTH);
-        document.getElementById("chargeForceSlider").setAttribute("value", DEFAULT_CHARGE_FORCE_STRENGTH);
-        document.getElementById("gravityForceSlider").setAttribute("value", DEFAULT_GRAVITY_FORCE_STRENGTH);
-        document.getElementById("collisionForceSlider").setAttribute("value", DEFAULT_COLLISION_FORCE_RADIUS);
-        document.getElementById("edgeConnectivitySlider").setAttribute("value", DEFAULT_EDGE_CONNECTIONS);
+        self.updateSliders(self.globalGraph.simulationStateControl.parameters);
 
         $('#simulationControls input[type=range]').each(function(i) { // For each slider
         	var rangeEl = this;
@@ -799,37 +802,66 @@ function ProtoApp () {
 
 	},
 
+	// Iterate through simulationParameters and update dom elements to match via helpers
+	this.updateSliders = function (simulationParameters) {
+		for (var param in simulationParameters) {
+
+			var paramHandler;
+			switch (param) {
+				case "linkForceStrength":
+					paramHandler = "linkForce";
+				break;
+				case "chargeForceStrength":
+					paramHandler = "chargeForce";
+				break;
+				case "collisionForceRadius":
+					paramHandler = "collisionForce";
+				break;
+				case "gravityForceStrength":
+					paramHandler = "gravityForce";
+				break;
+				case "minimumEdgeCount":
+					paramHandler = "edgeConnectivity";
+				break;
+			}
+			var sliderEl = document.getElementById(paramHandler + "Slider")
+			var sliderValue = sliderEl.value;
+			if (simulationParameters[param] !== sliderValue) 
+				$(sliderEl).val(simulationParameters[param]).change();
+		}
+	}
+
         
     // handling force parameter sliders
     this.linkForceSliderUpdate = function(value, update_simulation) {
         document.getElementById("linkForceSliderSpan").innerHTML = value;
         if (update_simulation) {
-            window.globalGraph.linkForceUpdate(value);
+            self.globalGraph.linkForceUpdate(value);
         }
     },
     this.chargeForceSliderUpdate = function(value, update_simulation) {
         document.getElementById("chargeForceSliderSpan").innerHTML = value;
         if (update_simulation) {
-            window.globalGraph.chargeForceUpdate(value);
+            self.globalGraph.chargeForceUpdate(value);
         }
     },
     this.collisionForceSliderUpdate = function(value, update_simulation) {
         document.getElementById("collisionForceSliderSpan").innerHTML = value;
         if (update_simulation) {
-            window.globalGraph.collisionForceUpdate(value);
+            self.globalGraph.collisionForceUpdate(value);
         }
     },
     this.gravityForceSliderUpdate = function(value, update_simulation) {
         document.getElementById("gravityForceSliderSpan").innerHTML = value;
         if (update_simulation) {
-            window.globalGraph.gravityForceUpdate(value);
+            self.globalGraph.gravityForceUpdate(value);
         }
     },
 
 	this.edgeConnectivitySliderUpdate = function(value, update_simulation) {
         document.getElementById("edgeConnectivitySliderSpan").innerHTML = value;
         if (update_simulation) {
-            window.globalGraph.edgeConnectionsUpdate(value);
+            self.globalGraph.edgeConnectionsUpdate(value);
         }
     };
 
@@ -837,10 +869,9 @@ function ProtoApp () {
 	this.handleStubData = function (data) {
 		self.userData = data;
 		// do things with stub data
-		window.globalGraph.highlightSubGraph(data.nodes.map(function (d) { return d.id }));
+		self.globalGraph.highlightSubGraph(data.nodes.map(function (d) { return d.id }));
 	};
 
-	this.initialize(); // kick it off!
 };
 
 // generates UUID v4 identifiers. Math.random() isn't a perfect RNG, but should be more than fine for our purposes
