@@ -51,13 +51,17 @@ button.checked {
   color: rgba(0,155,0,1);
   border-color: rgba(0,155,0,1);
 }
+hr.clear { clear :both; }
 #simulationControls {
   position: relative;
+  clear: both;
+  display: block;
 }
 
 #simulationControls h3 {
   margin-top: 0;
   font-size: 20px;
+  display: block;
 }
 
 #simulationControls h6 {
@@ -98,9 +102,9 @@ button.checked {
 }
 
 .node {
-  stroke-width: 2;
   fill: #454545;
-  r: 5;
+    stroke: #fff;
+    stroke-width: 2px;
 }
 
 #graphContainer {
