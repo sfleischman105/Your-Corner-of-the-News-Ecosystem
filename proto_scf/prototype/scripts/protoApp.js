@@ -141,9 +141,9 @@ function GlobalGraph (graph) {
 					".co.ru" : { x: .15, y: .85 }
 				},
 				defaultParams : {
-					"linkForceStrength" : 0.00006,
+					"linkForceStrength" : 6,
 					"chargeForceStrength" : -250,
-					"gravityForceStrength": 6
+					"gravityForceStrength": .3
 				}
 			}
 		},
@@ -658,10 +658,6 @@ function GlobalGraph (graph) {
 
     this.edge_scale = d3.scaleLinear()
 		.domain([0, 100])
-    	.range([d3.min(link_counts), d3.max(link_counts)]);
-
-    this.log_edge_scale = d3.scaleLog()
-    	.domain([0, 100])
     	.range([d3.min(link_counts), d3.max(link_counts)]);
 
     this.updateEdges = function(new_edges) {
