@@ -269,11 +269,17 @@ function GlobalGraph (graph) {
 				.on("end", self.dragEnded))
 
 			// handle tooltip
-			.on("mouseover", self.onNodeMouseOver(this))
+			// .on("mouseover", self.onNodeMouseOver)
 
 			// Handle mouse out
-			.on("mouseout", self.onNodeMouseOut(this))
+			// .on("mouseout", self.onNodeMouseOut)
 
+            .on("mouseover", function(d) {
+                d3.select(this).transition(20).attr("r", DEFAULT_RADIUS + 5) }
+            )
+            .on("mouseout", function(d) {
+                d3.select(this).transition(20).attr("r", DEFAULT_RADIUS)
+            })
 			// handle click
 			.on("click", self.onNodeClick)
 			.merge(self.node);
@@ -298,18 +304,18 @@ function GlobalGraph (graph) {
 
 	};
 
-	self.node.on("mouseover", function(d) {
-		console.log("HELLO");
-		d3.select(this)
-			.transition(10)
-        	.attr("r", DEFAULT_RADIUS + 15)
-	});
-
-	self.node.on("mouseout", function(d) {
-		d3.select(this)
-			.transition(10)
-			.attr("r", DEFAULT_RADIUS)
-	});
+	// self.node.on("mouseover", function(d) {
+	// 	console.log("HELLO");
+	// 	d3.select(this)
+	// 		.transition(10)
+     //    	.attr("r", DEFAULT_RADIUS + 15)
+	// });
+    //
+	// self.node.on("mouseout", function(d) {
+	// 	d3.select(this)
+	// 		.transition(10)
+	// 		.attr("r", DEFAULT_RADIUS)
+	// });
 
 	// Handler for node clicks; d = node datum; this = svg element
 	this.onNodeClick = function (d) {
@@ -319,7 +325,7 @@ function GlobalGraph (graph) {
 	};
 
 	// Eventhandler callback function for all node mouseover events
-	this.onNodeMouseOver = function (d, ele) {
+	this.onNodeMouseOver = function (d) {
 		// d3.select(d).attr("r", DEFAULT_RADIUS + 15);
 		// self.handleToolTipEvent(d);
 	}
