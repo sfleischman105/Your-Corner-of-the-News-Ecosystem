@@ -9,7 +9,7 @@ d3.json("./scripts/gdelt_filtered.json", function (error, graph) {
 
 /* ====== Constants ========= */
 
-const DEFAULT_LINK_FORCE_STRENGTH = 0.00001;
+const DEFAULT_LINK_FORCE_STRENGTH = 4;
 const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
 const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
 const DEFAULT_COLLISION_FORCE_RADIUS = 3;
@@ -61,7 +61,7 @@ function GlobalGraph (graph) {
 
     // todo - move this to preprocessing!
 	//getting link means, stdevs 
-	var link_counts = self._counts();
+	window.link_counts = self._counts();
 	self.link_mean = d3.mean(link_counts);
 	self.link_stdev = d3.deviation(link_counts);
 
@@ -143,7 +143,7 @@ function GlobalGraph (graph) {
 				defaultParams : {
 					"linkForceStrength" : 0.00006,
 					"chargeForceStrength" : -250,
-					"gravityForceStrength": .3
+					"gravityForceStrength": 6
 				}
 			}
 		},
@@ -370,6 +370,9 @@ function GlobalGraph (graph) {
 	};
 
 
+	this.log_edge_scale = d3.scaleLog()
+    	.domain([d3.min(link_counts), d3.max(link_counts)])
+    	.range([0, .01]);
 
 
 
@@ -377,7 +380,8 @@ function GlobalGraph (graph) {
 
     // Saving a reference to each force applied to the graph as a variable to allow live adjustments:
     this.linkForceStrengthHandler = function (d) { 
-		return d.count * self.simulationStateControl.parameters.linkForceStrength; 
+
+		return self.log_edge_scale(d.count) * self.simulationStateControl.parameters.linkForceStrength; 
 	}
     // force for links. Saving reference for slider adjustment
     this.linkForce = d3.forceLink()
