@@ -46,11 +46,11 @@
       <div id="simulationControls"> 
         <h3>Simulation Parameters</h3>
 
-        <h6>Link Force Strength</h6>
+        <h6>Link Force Strength Multiplier</h6>
         <span id="linkForceSliderMin" class="left">0</span>
         <span id="linkForceSliderSpan" class="center">0</span>
         <span id="linkForceSliderMax" class="right">0</span>
-        <input id="linkForceSlider" type="range" min="0" max="0.001" step="0.00001" "/>
+        <input id="linkForceSlider" type="range" min="0" max="50" step="1" "/>
         
 
         <h6>Charge Force Strength</h6>
@@ -64,20 +64,20 @@
         <span id="collisionForceSliderMin" class="left">0</span>
         <span id="collisionForceSliderSpan" class="center">0</span>
         <span id="collisionForceSliderMax" class="right">0</span>
-        <input id="collisionForceSlider" type="range" min="-5" max="5" step="0.01"/>
+        <input id="collisionForceSlider" type="range" min="-25" max="25" step="1"/>
         
 
         <h6>Gravity Force Strength</h6>
         <span id="gravityForceSliderMin" class="left">0</span>
         <span id="gravityForceSliderSpan" class="center">0</span>
         <span id="gravityForceSliderMax" class="right">0</span>
-        <input id="gravityForceSlider" type="range"  min="0" max="1" step="0.001" />
+        <input id="gravityForceSlider" type="range"  min="0" max="1" step="0.01" />
 
         <h6>Edge Connectivity</h6>
         <span id="edgeConnectivitySliderMin" class="left">0</span>
         <span id="edgeConnectivitySliderSpan" class="center">0</span>
         <span id="edgeConnectivitySliderMax" class="right">0</span>
-        <input id="edgeConnectivitySlider" type="range"  min="0" max="100" step="1" />
+        <input id="edgeConnectivitySlider" type="range"  min="0.1" max="100" step=".1" />
       </div>
     </section>
 
