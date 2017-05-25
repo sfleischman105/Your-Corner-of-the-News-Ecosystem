@@ -79,6 +79,15 @@ function GlobalGraph (graph) {
 				if (append) {d.src_dst_links.push({count:(k.count), target:(k.source), source:d})}
 			});
 		});
+
+		self.graph.nodes.forEach( function(d) {
+			var arr_counts = [];
+			d.src_dst_links.forEach( function(k) {
+				arr_counts.push(k.count);
+			});
+			d.mean = d3.mean(arr_counts);
+			d.st_dev = d3.deviation(arr_counts);
+        });
 	};
 
     // todo - move this to preprocessing!
@@ -568,18 +577,20 @@ function GlobalGraph (graph) {
 		}
 		self.firstStep = first;
 
+
+
         // Function to change the color of each node.
         function tick() {
         	var dis;
             self.node.filter(function(d){
                 return !d.visited
-            }).transition(10).style("fill", function(d) {
+            }).transition(5).style("fill", function(d) {
             	dis = d.distance;
                 return self.color_scale(d.distance);
             }).text(dis);
              self.node.filter(function(d){
              		return d.distance == 0;
-             	}).transition(50).style("fill", "LawnGreen");
+             	}).transition(10).style("fill", "LawnGreen");
 
         }
         var unvisited = [];
@@ -596,7 +607,7 @@ function GlobalGraph (graph) {
         var done = false;
         var i = 0;
 
-        var timer = d3.interval(stepi, 400);
+        var timer = d3.interval(stepi, 350);
         function stepi() {
         	tick();
             current.visited = true;
@@ -605,8 +616,10 @@ function GlobalGraph (graph) {
                 var tar = link.target;
                 if (!tar.visited) {
                     // USE LINK.COUNT for Weights. Otherwise we use just 1 for degrees of seperation
-                    var dist = current.distance + Math.sqrt(1000 / link.count);
+                    var dist = (current.distance + Math.sqrt(1000 / link.count));
                     // var dist = current.distance + 1;
+                    // var dist = self.st_dev_scale((link.count - tar.mean) / tar.st_dev);
+
                     tar.distance = Math.min(dist, tar.distance);
                     console.log(tar.distance);
                 }
@@ -629,8 +642,13 @@ function GlobalGraph (graph) {
 
     // Color scale for Djikstra's based on distance
     this.color_scale = d3.scaleLinear()
-        .domain([0, 0.63, 1.03, 1.55, 2.3, 3.0, 4.6, 5.1, 5.5])
+        .domain([0, 0.63, 1.00, 1.55, 2.39, 3.0, 4.6, 5.1, 5.5])
         .range(["LawnGreen","GreenYellow","yellow","orange","orangered", "salmon","red", "crimson","FireBrick"])
+		.clamp(true);
+
+    this.st_dev_scale = d3.scaleLinear()
+		.domain([-2,2])
+		.range([0, 6])
 		.clamp(true);
 
 	// this is a list of sub-graphs and their simulations
