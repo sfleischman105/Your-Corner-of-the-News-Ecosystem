@@ -182,17 +182,16 @@ function GlobalGraph (graph) {
 
 	// todo - add d3 colors for different sets of gravity wells
 	this.renderGravityWells = function () {
-		var gravity = self.svg.selectAll("circle.gravWell")
-							.data(self.gravityState.doGravity ? self.convertGravityData() : []);
 
-		gravity.enter().append("circle").attr("class", "gravWell")
+		self.gravity.data(self.gravityState.doGravity ? self.convertGravityData() : [])
+			.enter().append("circle").attr("class", "gravWell")
 			.style("fill", "red")
 			.attr("r", 10)
 			.attr("cx", function (d) { return self.width * d.x; })
 			.attr("cy", function (d) { return self.height * d.y })
-			.merge(gravity);
+			.merge(self.gravity);
 
-		gravity.exit().remove();
+		self.gravity.exit().remove();
 	}
 
 	// todo - this is just a handler for now, we'll bake in some of these node state data into the datasets that get loaded
@@ -217,6 +216,11 @@ function GlobalGraph (graph) {
     	.attr("viewBox", "0 0 " + this.width  + " " + this.height)
     	.attr("preserveAspectRatio", "xMidYMid meet");
 
+    this.gravity = svg.append("g")
+		.attr("class", "gravity")
+		.selectAll('circle')
+		.data([]);
+
 	// d3 selection containing all edge lines
 	this.link = svg.append("g")
         .attr("class", "link")
@@ -232,6 +236,8 @@ function GlobalGraph (graph) {
 		.data(self.graph.nodes);
 		//.on("mouseover", tip.show)
 		//.on("mouseout", tip.hide);
+
+
 
 	//svg.call(tip);
 
