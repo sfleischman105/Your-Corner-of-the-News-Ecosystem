@@ -174,7 +174,7 @@ function GlobalGraph (graph) {
 		$(buttonEl).toggleClass('checked');
 		$('span', buttonEl).text(self.gravityState.doGravity ? 'ON' : 'OFF');
 		self.renderGravityWells();
-		self.updateGravityForces();
+		self.gravityForceUpdate();
 		self.updateCenterForce();
 
 	}
@@ -364,9 +364,8 @@ function GlobalGraph (graph) {
 	/******  FORCES  ******/
 
     // Saving a reference to each force applied to the graph as a variable to allow live adjustments:
-    this.linkForceStrength = DEFAULT_LINK_FORCE_STRENGTH;
     this.linkForceStrengthHandler = function (d) { 
-		return d.count * self.linkForceStrength; 
+		return d.count * self.simulationStateControl.parameters.linkForceStrength; 
 	}
     // force for links. Saving reference for slider adjustment
     this.linkForce = d3.forceLink()
@@ -420,19 +419,6 @@ function GlobalGraph (graph) {
 
 
 
-    //set a force strength for gravity. Storing this supports slider updates while gravity not in use, prevents inconsistent state
-    this.gravityValue = DEFAULT_GRAVITY_FORCE_STRENGTH;
-
-
-	// updating gravity forces
-	this.updateGravityForces = function () {
-		if (this.gravityState.doGravity) {
-        	this.gravityForceX.strength(self.simulationStateControl.parameters.gravityForceStrength);
-        	this.gravityForceX.strength(self.simulationStateControl.parameters.gravityForceStrength);
-        }
-        this.simulation.force("gravityForceX", this.gravityState.doGravity ? this.gravityForceX : null);
-        this.simulation.force("gravityForceY", this.gravityState.doGravity ? this.gravityForceY : null);
-	};
 
 	// updating center force
 	this.updateCenterForce = function () {
@@ -441,26 +427,32 @@ function GlobalGraph (graph) {
 
 	// adding methods for changing force parameters
     this.linkForceUpdate = function(value) {
-    	this.linkForceStrength = value;
+    	if (!!value) self.simulationStateControl.parameters.linkForceStrength = value;
         this.linkForce.strength(self.linkForceStrengthHandler);
         self.simulation.alphaTarget(0.3).restart(); // reset simulation
     };
     this.chargeForceUpdate = function(value) {
+    	if (!!value) self.simulationStateControl.parameters.chargeForceStrength = value;
         this.chargeForce.strength([value]);
         self.simulation.alphaTarget(0.3).restart(); // reset simulation
     };
     this.collisionForceUpdate = function(value) {
+    	if (!!value) self.simulationStateControl.parameters.collisionForceRadius = value;
         this.collisionForce.strength(value);
         self.simulation.alphaTarget(0.3).restart(); // reset simulation
     };
+
     this.gravityForceUpdate = function(value) {
+		if (!!value) self.simulationStateControl.parameters.gravityForceStrength = value;
         if (self.gravityState.doGravity) {
-            this.gravityForceX.strength(value);
-            this.gravityForceY.strength(value);
-            this.gravityValue = value;
-            self.simulation.alphaTarget(0.3).restart(); // reset simulation
+            this.gravityForceX.strength(self.simulationStateControl.parameters.gravityForceStrength);
+            this.gravityForceY.strength(self.simulationStateControl.parameters.gravityForceStrength);
         }
+        this.simulation.force("gravityForceX", this.gravityState.doGravity ? this.gravityForceX : null);
+        this.simulation.force("gravityForceY", this.gravityState.doGravity ? this.gravityForceY : null);
+        self.simulation.alphaTarget(0.3).restart();
     };
+    
 
 
 
@@ -727,7 +719,7 @@ function GlobalGraph (graph) {
 
 		// Actually render the graph once everything is defined
 		self.renderGravityWells(); 
-		self.updateGravityForces(); 
+		self.gravityForceUpdate();
 		self.renderNodes();
 		self.renderLinks();
 		self.runSimulation();
