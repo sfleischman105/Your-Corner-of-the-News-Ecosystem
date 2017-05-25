@@ -34,9 +34,12 @@ function GlobalGraph (graph) {
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
 
-	// Initial data wrangling here
-	this.graph.nodes.forEach( function(d) {
+	/***** INITIAL DATA WRANGLING *****/
+	// Adding fields for later filling!
+    this.graph.nodes.forEach( function(d) {
         d.links = [];
+        d.target_links = [];
+        d.src_dst_links = [];
         d.distance = 0;
         d.visited = false;
     });
@@ -52,10 +55,38 @@ function GlobalGraph (graph) {
 
     // Appends the list of links to each node to include links that have that node as the source
     // Called during initialization & during Reset
+	// Also adds a combined list of src/dst nodes for djikstra's
 	this.addSources = function() {
+		// target_links
         self.graph.edges.forEach( function(d) {
             var src = d.source;
             src.links.push(d);
+            var dst = d.target;
+            dst.target_links.push(d);
+        });
+		self.graph.nodes.forEach( function(d) {
+			d.links.forEach( function(k) {
+				d.src_dst_links.push({count:(k.count), target:(k.target), source:d})
+            });
+			d.target_links.forEach( function(k) {
+				var append = true;
+				d.src_dst_links.forEach( function(m) {
+					if (m.target.id == k.source.id) {
+						append = false;
+						m.count += k.count;
+					}
+				});
+				if (append) {d.src_dst_links.push({count:(k.count), target:(k.source), source:d})}
+			});
+		});
+
+		self.graph.nodes.forEach( function(d) {
+			var arr_counts = [];
+			d.src_dst_links.forEach( function(k) {
+				arr_counts.push(k.count);
+			});
+			d.mean = d3.mean(arr_counts);
+			d.st_dev = d3.deviation(arr_counts);
         });
 	};
 
@@ -125,6 +156,8 @@ function GlobalGraph (graph) {
 
 
 
+		
+
 
 	/******  GRAVITY  ******/
 	this.gravityState = {
@@ -170,7 +203,6 @@ function GlobalGraph (graph) {
 		}
 
 		window.protoApp.updateSliders(self.simulationStateControl.parameters);
-
 
 		$(buttonEl).toggleClass('checked');
 		$('span', buttonEl).text(self.gravityState.doGravity ? 'ON' : 'OFF');
@@ -238,8 +270,8 @@ function GlobalGraph (graph) {
 		//.on("mouseout", tip.hide);
 
 
-
 	//svg.call(tip);
+
 
 	// Modular function for declaring what to do with nodes
 	this.renderNodes = function () {
@@ -263,6 +295,8 @@ function GlobalGraph (graph) {
 			// Handle mouse out
 			// .on("mouseout", self.onNodeMouseOut)
 
+			// NOTE: Replaced the above with below, as I couldn't figure out how to get
+			// resizing working without this.
             .on("mouseover", function(d) {
                 d3.select(this).transition(20).attr("r", DEFAULT_RADIUS + 5) }
             )
@@ -293,6 +327,7 @@ function GlobalGraph (graph) {
 
 	};
 
+
 	// Modular function for declaring what to do with edges
 	this.renderLinks = function () {
 		self.link = self.link.enter()
@@ -301,6 +336,7 @@ function GlobalGraph (graph) {
 			.attr("class", "link")
 			.merge(self.link);
 	};
+
 
 	// Callback function for "tick" event (entropy occuring over time!)
 	this.ticked = function () {
@@ -336,12 +372,10 @@ function GlobalGraph (graph) {
 
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
-		// d3.select(d).attr("r", DEFAULT_RADIUS + 15);
 		// self.handleToolTipEvent(d);
 	}
 
 	this.onNodeMouseOut = function (d) {
-		// d3.select(d).attr("r", DEFAULT_RADIUS );
 		// d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
 	}
 
@@ -432,8 +466,6 @@ function GlobalGraph (graph) {
         }
         return self.height * .5;
     }).strength([DEFAULT_GRAVITY_FORCE_STRENGTH]);
-
-
 
 
 	// updating center force
@@ -545,21 +577,22 @@ function GlobalGraph (graph) {
 		}
 		self.firstStep = first;
 
+
+
         // Function to change the color of each node.
         function tick() {
         	var dis;
             self.node.filter(function(d){
                 return !d.visited
-            }).transition(10).style("fill", function(d) {
+            }).transition(5).style("fill", function(d) {
             	dis = d.distance;
                 return self.color_scale(d.distance);
             }).text(dis);
-
              self.node.filter(function(d){
              		return d.distance == 0;
-             	}).transition(50).style("fill", "LightGreen");
-        }
+             	}).transition(10).style("fill", "LawnGreen");
 
+        }
         var unvisited = [];
         this.graph.nodes.forEach(function (d) {
             if (d != first) {
@@ -579,12 +612,14 @@ function GlobalGraph (graph) {
         	tick();
             current.visited = true;
             // current.total_distance = 0;
-            current.links.forEach(function (link) {
+            current.src_dst_links.forEach(function (link) {
                 var tar = link.target;
                 if (!tar.visited) {
                     // USE LINK.COUNT for Weights. Otherwise we use just 1 for degrees of seperation
-                    var dist = current.distance + Math.sqrt(1000 / link.count);
+                    var dist = (current.distance + Math.sqrt(1000 / link.count));
                     // var dist = current.distance + 1;
+                    // var dist = self.st_dev_scale((link.count - tar.mean) / tar.st_dev);
+
                     tar.distance = Math.min(dist, tar.distance);
                     console.log(tar.distance);
                 }
@@ -605,14 +640,16 @@ function GlobalGraph (graph) {
 
     };
 
-    // show and hide labels
-    this.doShowNodeLabels = true;
-    this.onToggleNodeLabels = function (buttonEl) {
-    	self.doShowNodeLabels = !self.doShowNodeLabels;
-    	self.label.attr("display", self.doShowNodeLabels ? "inline" : "none");
-    	$(buttonEl).toggleClass('checked');
-    	$('span', buttonEl).text(self.doShowNodeLabels ? "ON" : "OFF");
-    }
+    // Color scale for Djikstra's based on distance
+    this.color_scale = d3.scaleLinear()
+        .domain([0, 0.63, 1.00, 1.55, 2.39, 3.0, 4.6, 5.1, 5.5])
+        .range(["LawnGreen","GreenYellow","yellow","orange","orangered", "salmon","red", "crimson","FireBrick"])
+		.clamp(true);
+
+    this.st_dev_scale = d3.scaleLinear()
+		.domain([-2,2])
+		.range([0, 6])
+		.clamp(true);
 
 	// this is a list of sub-graphs and their simulations
 	this.sub_graphs = [];
@@ -653,6 +690,7 @@ function GlobalGraph (graph) {
     };
 
 	
+
 
 	/******  EDGE CONTROL  ******/
 
@@ -706,15 +744,14 @@ function GlobalGraph (graph) {
         return index;
     }
 
-    // Color scale for the Dijkstra's
-    // TODO: Fiddle around with this to Get it perfect
-    // This is a PATCH color scale, just to show proof of concept
-
-    this.color_scale = d3.scaleLinear()
-        .domain([0, 1.3, 1.6, 1.9, 3.2, 5])
-        .range(["LightGreen","yellow","orange","red", "crimson","darkred"])
-		.clamp(true);
-
+    // show and hide labels
+    this.doShowNodeLabels = true;
+    this.onToggleNodeLabels = function (buttonEl) {
+    	self.doShowNodeLabels = !self.doShowNodeLabels;
+    	self.label.attr("display", self.doShowNodeLabels ? "inline" : "none");
+    	$(buttonEl).toggleClass('checked');
+    	$('span', buttonEl).text(self.doShowNodeLabels ? "ON" : "OFF");
+    }
 
 
 
