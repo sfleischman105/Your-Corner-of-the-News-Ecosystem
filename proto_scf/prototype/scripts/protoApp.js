@@ -64,6 +64,7 @@ function GlobalGraph (graph) {
     	.attr("viewBox", "0 0 " + this.width  + " " + this.height)
     	.attr("preserveAspectRatio", "xMidYMid meet");
 
+	// Adding fields for later filling!
     this.graph.nodes.forEach( function(d) {
         d.links = [];
         d.target_links = [];
@@ -219,10 +220,6 @@ function GlobalGraph (graph) {
 		this.simulation.force("center", this.gravityState.doGravity ? null : this.centerForce);
 	}
 
-
-
-
-
 	// this is a list of sub-graphs and their simulations
 	this.sub_graphs = [];
 	this.sub_simulations = [];
@@ -276,6 +273,8 @@ function GlobalGraph (graph) {
 			// Handle mouse out
 			// .on("mouseout", self.onNodeMouseOut)
 
+			// NOTE: Replaced the above with below, as I couldn't figure out how to get
+			// resizing working without this.
             .on("mouseover", function(d) {
                 d3.select(this).transition(20).attr("r", DEFAULT_RADIUS + 5) }
             )
@@ -328,12 +327,10 @@ function GlobalGraph (graph) {
 
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
-		// d3.select(d).attr("r", DEFAULT_RADIUS + 15);
 		// self.handleToolTipEvent(d);
 	}
 
 	this.onNodeMouseOut = function (d, ele) {
-		// d3.select(d).attr("r", DEFAULT_RADIUS );
 		// d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
 	}
 
@@ -391,6 +388,7 @@ function GlobalGraph (graph) {
 
     // Appends the list of links to each node to include links that have that node as the source
     // Called during initialization & during Reset
+	// Also adds a combined list of src/dst nodes for djikstra's
 	this.addSources = function() {
 		// target_links
         self.graph.edges.forEach( function(d) {
@@ -406,14 +404,12 @@ function GlobalGraph (graph) {
 			d.target_links.forEach( function(k) {
 				var append = true;
 				d.src_dst_links.forEach( function(m) {
-					if (m.target == k.source) {
+					if (m.target.id == k.source.id) {
 						append = false;
 						m.count += k.count;
 					}
 				});
-				if (append) {
-					d.src_dst_links.push({count:(k.count), target:(k.source), source:d})
-				}
+				if (append) {d.src_dst_links.push({count:(k.count), target:(k.source), source:d})}
 			});
 		});
 	};
@@ -479,6 +475,7 @@ function GlobalGraph (graph) {
 	}
 
 
+	// Color scale for Djikstra's based on distance
     this.color_scale = d3.scaleLinear()
         .domain([0, 0.63, 1.03, 1.55, 2.3, 3.0, 4.6, 5.1, 5.5])
         .range(["LawnGreen","GreenYellow","yellow","orange","orangered", "salmon","red", "crimson","FireBrick"])
@@ -505,13 +502,11 @@ function GlobalGraph (graph) {
             	dis = d.distance;
                 return self.color_scale(d.distance);
             }).text(dis);
-
              self.node.filter(function(d){
              		return d.distance == 0;
              	}).transition(50).style("fill", "LawnGreen");
 
         }
-
         var unvisited = [];
         this.graph.nodes.forEach(function (d) {
             if (d != first) {
