@@ -66,6 +66,8 @@ function GlobalGraph (graph) {
 
     this.graph.nodes.forEach( function(d) {
         d.links = [];
+        d.target_links = [];
+        d.src_dst_links = [];
         d.distance = 0;
         d.visited = false;
     });
@@ -390,10 +392,30 @@ function GlobalGraph (graph) {
     // Appends the list of links to each node to include links that have that node as the source
     // Called during initialization & during Reset
 	this.addSources = function() {
+		// target_links
         self.graph.edges.forEach( function(d) {
             var src = d.source;
             src.links.push(d);
+            var dst = d.target;
+            dst.target_links.push(d);
         });
+		self.graph.nodes.forEach( function(d) {
+			d.links.forEach( function(k) {
+				d.src_dst_links.push({count:(k.count), target:(k.target), source:d})
+            });
+			d.target_links.forEach( function(k) {
+				var append = true;
+				d.src_dst_links.forEach( function(m) {
+					if (m.target == k.source) {
+						append = false;
+						m.count += k.count;
+					}
+				});
+				if (append) {
+					d.src_dst_links.push({count:(k.count), target:(k.source), source:d})
+				}
+			});
+		});
 	};
 
 	// Callback function for "tick" event (entropy occuring over time!)
@@ -457,13 +479,9 @@ function GlobalGraph (graph) {
 	}
 
 
-    // Color scale for the Dijkstra's
-    // TODO: Fiddle around with this to Get it perfect
-    // This is a PATCH color scale, just to show proof of concept
-
     this.color_scale = d3.scaleLinear()
-        .domain([0, 1.3, 1.6, 1.9, 3.2, 5])
-        .range(["LightGreen","yellow","orange","red", "crimson","darkred"])
+        .domain([0, 0.63, 1.03, 1.55, 2.3, 3.0, 4.6, 5.1, 5.5])
+        .range(["LawnGreen","GreenYellow","yellow","orange","orangered", "salmon","red", "crimson","FireBrick"])
 		.clamp(true);
 
     this.firstStep = null;
@@ -490,7 +508,8 @@ function GlobalGraph (graph) {
 
              self.node.filter(function(d){
              		return d.distance == 0;
-             	}).transition(50).style("fill", "LightGreen");
+             	}).transition(50).style("fill", "LawnGreen");
+
         }
 
         var unvisited = [];
@@ -507,12 +526,12 @@ function GlobalGraph (graph) {
         var done = false;
         var i = 0;
 
-        var timer = d3.interval(stepi, 350);
+        var timer = d3.interval(stepi, 400);
         function stepi() {
         	tick();
             current.visited = true;
             // current.total_distance = 0;
-            current.links.forEach(function (link) {
+            current.src_dst_links.forEach(function (link) {
                 var tar = link.target;
                 if (!tar.visited) {
                     // USE LINK.COUNT for Weights. Otherwise we use just 1 for degrees of seperation
