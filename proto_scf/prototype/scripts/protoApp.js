@@ -441,6 +441,12 @@ function GlobalGraph (graph) {
     // Color scale for the Dijkstra's
     // TODO: Fiddle around with this to Get it perfect
     // This is a PATCH color scale, just to show proof of concept
+
+    this.color_scale = d3.scaleLinear()
+        .domain([0,1,2])
+        .range(["green","yellow","orange","red"]);
+
+
     function color(x) {
         if(x <= 0)  return "green";
         if(x <= 1)  return "lime";
@@ -466,9 +472,11 @@ function GlobalGraph (graph) {
         // Function to change the color of each node.
         function tick() {
         	var dis;
-            self.node.transition(200).style("fill", function(d) {
+            self.node.filter(function(d){
+                return !d.visited
+            }).transition(50).style("fill", function(d) {
             	dis = d.distance;
-                return color(d.distance);
+                return self.color_scale(d.distance);
             }).text(dis);
         }
 
@@ -486,6 +494,7 @@ function GlobalGraph (graph) {
         var done = false;
         var i = 0;
 
+        var timer = d3.interval(stepi, 100);
         function stepi() {
             current.visited = true;
             // current.total_distance = 0;
@@ -493,33 +502,27 @@ function GlobalGraph (graph) {
                 var tar = link.target;
                 if (!tar.visited) {
                     // USE LINK.COUNT for Weights. Otherwise we use just 1 for degrees of seperation
-                    // var dist = current.distance + link.count;
-                    var dist = current.distance + 1;
+                    var dist = current.distance + (1000 / link.count);
+                    // var dist = current.distance + 1;
                     tar.distance = Math.min(dist, tar.distance);
+                    console.log(tar.distance);
                 }
             });
-            tick();
-            if ( i++ == self.stepCount || unvisited.length == 0 || current.distance == Infinity) {
-                done = true;
+            if (unvisited.length == 0 || current.distance == Infinity) {
+                // done = true;
                 console.log('finally done?', i);
+                timer.stop();
+                return true;
             }
 
             unvisited.sort(function (a, b) {
                 return b.distance - a.distance
             });
             current = unvisited.pop();
+            tick();
+            return false;
         }
 
-        // timer to update the color of the nodes evert x milliseconds
-        var last = 0;
-        var timer = d3.timer(function(elapsed) {
-            var t = elapsed - last;
-            last = elapsed;
-            if(elapsed > 200) {
-                if(!done) stepi();
-                else  timer.stop();
-            }
-        });
     };
 
     // show and hide labels
