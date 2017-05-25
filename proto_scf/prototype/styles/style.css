@@ -104,7 +104,6 @@ hr.clear { clear :both; }
 .node {
   stroke-width: 2;
   fill: #454545;
-  r: 5;
 }
 
 #graphContainer {
