@@ -307,6 +307,7 @@ function GlobalGraph (graph) {
 			.on("click", self.onNodeClick)
 			.merge(self.node);
 
+		var log = null;
 		self.label = svg.append("g")
             .attr("class", "labels")
             .selectAll("text")
@@ -353,8 +354,10 @@ function GlobalGraph (graph) {
             .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
 
         self.label
-            .attr("x", function(d) { return d.x; })
-            .attr("y", function (d) { return d.y; })
+            .attr("x", function(d) { 
+            	return d.x - ($(this).width() / 2); 
+            })
+            .attr("y", function (d) { return d.y + DEFAULT_RADIUS + 10; })
             .style("font-size", "10px").style("fill", "#645cc3");
 	};
 

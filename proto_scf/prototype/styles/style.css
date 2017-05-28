@@ -107,6 +107,13 @@ hr.clear { clear :both; }
     stroke-width: 2px;
 }
 
+.label {
+  cursor: pointer;
+}
+.label:hover {
+  font-weight: bold;
+}
+
 #graphContainer {
   position: relative;
 }
