@@ -402,7 +402,9 @@ function GlobalGraph (graph) {
             .attr("x", function(d) { 
             	return d.x - ($(this).width() / 2); 
             })
-            .attr("y", function (d) { return d.y + DEFAULT_RADIUS + 10; })
+            .attr("y", function (d) { 
+
+            	return d.y + self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 10; })
             .style("font-size", "10px").style("fill", "#645cc3");
 	};
 
