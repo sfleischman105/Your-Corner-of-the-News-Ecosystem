@@ -293,15 +293,25 @@ function GlobalGraph (graph) {
 			// .on("mouseover", self.onNodeMouseOver)
 
 			// Handle mouse out
-			// .on("mouseout", self.onNodeMouseOut)
+			// .on("mouseout", self.onNodeMousseOut)
 
+				//   stroke: rgba(0,0,0,.1);
 			// NOTE: Replaced the above with below, as I couldn't figure out how to get
 			// resizing working without this.
             .on("mouseover", function(d) {
-                d3.select(this).transition(20).attr("r", DEFAULT_RADIUS + 5) }
-            )
+                d3.select(this).transition(20).attr("r", DEFAULT_RADIUS + 5);
+				self.link.filter(function(l) {
+					return l.source == d || l.target == d
+				}).style("stroke-width", 10)
+					.style("stroke", "rgba(0,0,0,.3)");
+            })
             .on("mouseout", function(d) {
-                d3.select(this).transition(20).attr("r", DEFAULT_RADIUS)
+                d3.select(this).transition(20).attr("r", DEFAULT_RADIUS);
+				self.link.filter(function(l) {
+					return l.source == d || l.target == d
+				}).transition(20)
+					.style("stroke-width", 1)
+					.style("stroke", "rgba(0,0,0,.1)");
             })
 			// handle click
 			.on("click", self.onNodeClick)
@@ -320,7 +330,6 @@ function GlobalGraph (graph) {
                 .on("start", self.dragStarted)
                 .on("drag", self.dragged)
                 .on("end", self.dragEnded))
-
 			// handle click
             .on("click", self.onNodeClick)
             .merge(self.node);
@@ -334,6 +343,7 @@ function GlobalGraph (graph) {
 			.append("line")
 			.attr("stroke-width", 2)
 			.attr("class", "link")
+
 			.merge(self.link);
 	};
 
@@ -369,6 +379,8 @@ function GlobalGraph (graph) {
 		if (self.doShowSteps) self.dijkstra(d);
 		// self.toggleNodeIsActive(d, this);
 	};
+
+
 
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
