@@ -360,6 +360,9 @@ function GlobalGraph (graph) {
             .enter().append("text")
             .attr("class", "label")
             .text(function(d) { return d.id; })
+			.each(function(d,i) {
+				d.thisWidth = this.getComputedTextLength();
+			})
 
 			//handle dragging by text
 			.call(d3.drag()
@@ -399,8 +402,9 @@ function GlobalGraph (graph) {
             .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
 
         self.label
-            .attr("x", function(d) { 
-            	return d.x - ($(this).width() / 2); 
+            .attr("x", function(d) {
+            	return d.x - (d.thisWidth / 3);
+            	// return d.x;
             })
             .attr("y", function (d) { 
 
