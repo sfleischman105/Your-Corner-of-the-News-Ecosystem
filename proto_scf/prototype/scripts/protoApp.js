@@ -271,7 +271,7 @@ function GlobalGraph (graph) {
 
 	this.nodeSizeScale = d3.scaleLog()
 		.domain([3720875,319284353])
-		.range([0, 7])
+		.range([0, 8])
 		.clamp(true);
 
 
