@@ -269,9 +269,9 @@ function GlobalGraph (graph) {
 		//.on("mouseover", tip.show)
 		//.on("mouseout", tip.hide);
 
-	this.nodeSizeScale = d3.scaleLinear()
+	this.nodeSizeScale = d3.scaleLog()
 		.domain([3720875,319284353])
-		.range([0, 8])
+		.range([0, 7])
 		.clamp(true);
 
 
