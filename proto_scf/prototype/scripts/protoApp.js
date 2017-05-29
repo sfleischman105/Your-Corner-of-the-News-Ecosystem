@@ -310,11 +310,11 @@ function GlobalGraph (graph) {
 		var log = null;
 		self.label = svg.append("g")
             .attr("class", "labels")
-            .selectAll("rect.label")
+            .selectAll("text")
             .data(self.graph.nodes)
-            .enter().append("rect")
+            .enter().append("text")
             .attr("class", "label")
-            .attr('fill', 'white')
+            .text(function(d) { return d.id; })
 
 			//handle dragging by text
 			.call(d3.drag()
@@ -324,13 +324,7 @@ function GlobalGraph (graph) {
 
 			// handle click
             .on("click", self.onNodeClick)
-
-            .append('text')
-            .text(function(d) { return d.id; })
             .merge(self.node);
-
-        // self.label.enter();
-
 
 	};
 
