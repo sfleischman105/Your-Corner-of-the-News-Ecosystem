@@ -14,7 +14,7 @@ const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
 const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
 const DEFAULT_COLLISION_FORCE_RADIUS = 3;
 const DEFAULT_EDGE_CONNECTIONS = 0;
-const DEFAULT_RADIUS = 10;
+const DEFAULT_RADIUS = 8;
 
 /* ========================== */
 
@@ -269,15 +269,19 @@ function GlobalGraph (graph) {
 		//.on("mouseover", tip.show)
 		//.on("mouseout", tip.hide);
 
-
-	//svg.call(tip);
+	this.nodeSizeScale = d3.scaleLinear()
+		.domain([3720875,319284353])
+		.range([0, 8])
+		.clamp(true);
 
 
 	// Modular function for declaring what to do with nodes
 	this.renderNodes = function () {
 		self.node = self.node.enter()
 			.append("circle")
-			.attr("r", DEFAULT_RADIUS)
+			.attr("r", function(d) {
+				return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS;
+            })
 			.attr("class", "node")
             .attr("id", function (d) {
                 return d.uuid;
@@ -299,14 +303,18 @@ function GlobalGraph (graph) {
 			// NOTE: Replaced the above with below, as I couldn't figure out how to get
 			// resizing working without this.
             .on("mouseover", function(d) {
-                d3.select(this).transition(20).attr("r", DEFAULT_RADIUS + 5);
+                d3.select(this).transition(20).attr("r", function(d) {
+                	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 6;
+                });
 				self.link.filter(function(l) {
 					return l.source == d || l.target == d
-				}).style("stroke-width", 10)
+				}).transition(20).style("stroke-width", 8)
 					.style("stroke", "rgba(0,0,0,.3)");
             })
             .on("mouseout", function(d) {
-                d3.select(this).transition(20).attr("r", DEFAULT_RADIUS);
+                d3.select(this).transition(20).attr("r", function(d) {
+                	return self.nodeSizeScale(d.page_rank) +DEFAULT_RADIUS
+                });
 				self.link.filter(function(l) {
 					return l.source == d || l.target == d
 				}).transition(20)
@@ -619,9 +627,9 @@ function GlobalGraph (graph) {
         var done = false;
         var i = 0;
 
+        tick();
         var timer = d3.interval(stepi, 350);
         function stepi() {
-        	tick();
             current.visited = true;
             // current.total_distance = 0;
             current.src_dst_links.forEach(function (link) {
@@ -633,9 +641,9 @@ function GlobalGraph (graph) {
                     // var dist = self.st_dev_scale((link.count - tar.mean) / tar.st_dev);
 
                     tar.distance = Math.min(dist, tar.distance);
-                    console.log(tar.distance);
                 }
             });
+            tick();
             if (unvisited.length == 0 || current.distance == Infinity) {
                 // done = true;
                 console.log('finally done?', i);
