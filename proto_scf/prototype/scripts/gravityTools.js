@@ -2,26 +2,46 @@
  * Created by bking on 5/30/17.
  */
 
+const DEFAULT_GRAVITY_FIELD_PARAMS =  {
+    "linkForceStrength" : 6,
+    "chargeForceStrength" : -250,
+    "gravityForceStrength": .3
+};
+
 // function for generating gravitational field from data
-function build_gravitational_field(data, key_function, asLinear) {
+function build_gravitational_field(data, keyFunction, asLinear, width, height) {
     var wells = {};
     for (i = 0; i < data.length; i++) {
-        var key = key_function(data[i]);
+        var key = keyFunction(data[i]);
         if (key in wells) {
             wells[key] += 1; //will add x, y when all keys are known
         } else {
             wells[key] = 1;
         }
     }
-    return place_wells(wells, asLinear);
+    return {
+        gravityWells : place_wells(wells, asLinear, width, height),
+        defaultParams: DEFAULT_GRAVITY_FIELD_PARAMS,
+        keyFunction : keyFunction,
+        updateGravityPosition  : function (d) {
+            var well = d.id;
+            this.gravityWells[well].x = d.x;
+            this.gravityWells[well].y = d.y;
+        },
+        getGravityWellPosition : function (d) {
+            var well = this.keyFunction(d);
+            d.well = well; // give node a well
+            return this.gravityWells[well]; // dynamically return x position of gravity well
+        }
+    }
 }
 
-function place_wells(wells, asLinear) {
+function place_wells(wells, asLinear, width, height) {
     var size =  Object.keys(wells).length;
     if (asLinear) {
         var i = 1.0;
         for (var key in wells) {
-            wells[key] = {'x': i / (size + 1), 'y': .5};
+            wells[key] = {'x': width * (i / (size + 1)), 'y': height * .5, 'id': key};
             i++;
         }
     } else {
@@ -39,7 +59,7 @@ function place_wells(wells, asLinear) {
             simulation.tick();
         }
         for (var key in wells) {
-            wells[key] = {'x': Math.max(.1, Math.min(.9, nodes[i].x / 100)), 'y': Math.max(.1, Math.min(.9, nodes[i].y / 100)),};
+            wells[key] = {'x': width * Math.max(.1, Math.min(.9, nodes[i].x / 100)), 'y': height * Math.max(.1, Math.min(.9, nodes[i].y / 100)), 'id': key};
             i++;
         }
     }
