@@ -99,7 +99,8 @@ function GlobalGraph (graph) {
 
 	// Global Properties
 	this.width = $('#graphContainer').innerWidth();
-	this.height = this.width * .8;
+
+	this.height = $('#graphControl').height(); // 30 = top and bottom padding of main.container 
 	this.nodeBorderPadding = 8; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
 
 
