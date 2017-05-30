@@ -783,6 +783,12 @@ function GlobalGraph (graph) {
     	$('span', buttonEl).text(self.doShowNodeLabels ? "ON" : "OFF");
     }
 
+    this.onToggleSteps = function (buttonEl) {
+    	self.doShowSteps = !self.doShowSteps;
+    	$(buttonEl).toggleClass('checked');
+    	$('span', buttonEl).text(self.doShowSteps ? "ON" : "OFF");
+    }
+
 
 
     /******  INITIALIZE  ******/
@@ -824,7 +830,7 @@ function ProtoApp () {
 		$('#refreshGraph').on('click', this.onRefreshGraph);
 		$('#addStubData').on('click', this.onAddStubData);
 		$('#toggleNode').on('click', this.onToggleNode);
-		$('#ToggleGravity, #ToggleNodeLabels').on('click', this.onToggle);
+		$('#ToggleGravity, #ToggleNodeLabels, #ToggleSteps').on('click', this.onToggle);
 
 		// Parameter Sliders
 		$('#linkForceSlider, #chargeForceSlider, #collisionForceSlider, #gravityForceSlider, #edgeConnectivitySlider')
