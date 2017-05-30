@@ -139,7 +139,7 @@ function GlobalGraph (graph) {
 
 	// Final step of initailization
 	this.runSimulation = function () {
-		self.simulation.nodes(self.graph.nodes).on("tick", self.ticked);
+        self.simulation.nodes(self.graph.nodes).on("tick", self.ticked);
 		self.simulation.force("link").links(self.graph.edges);
         self.addSources();
 	};
@@ -156,30 +156,13 @@ function GlobalGraph (graph) {
 	}
 
 
-
-		
-
-
-	/******  GRAVITY  ******/
+    /******  GRAVITY  ******/
 	this.gravityState = {
 
 		doGravity : false,
 		activeGravityField : 'TLD',
 		gravityFields : {
-			'TLD' : {
-				isActive : true,
-				gravityWells : {
-					".com" : { x: .75, y: .5},
-					".org" : { x: .15, y: .15},
-					".co.uk" : { x: .05, y: .3 },
-					".co.ru" : { x: .15, y: .85 }
-				},
-				defaultParams : {
-					"linkForceStrength" : 6,
-					"chargeForceStrength" : -250,
-					"gravityForceStrength": .3
-				}
-			}
+			'TLD': build_gravitational_field(self.graph.nodes, function (node) { return node.id.split(/\.(.+)/)[1] }, false, self.width, self.height)
 		},
 		previousParams : {
 			"linkForceStrength" : DEFAULT_LINK_FORCE_STRENGTH,
@@ -188,15 +171,21 @@ function GlobalGraph (graph) {
 		}
 	};
 
+    this.getActiveGravityField = function () {
+        return this.gravityState.gravityFields[this.gravityState.activeGravityField];
+    };
+
 	
 
 
-	// Handler function for turning on and off gravity wells
-	this.onToggleGravity = function (buttonEl) {
-		self.gravityState.doGravity = !self.gravityState.doGravity;
-		$('body').toggleClass('noGrav');
 
-		var activeGravityFieldParams = self.gravityState.gravityFields[self.gravityState.activeGravityField].defaultParams;
+    this.onToggleGravity = function (buttonEl) {
+
+		self.gravityState.doGravity = !self.gravityState.doGravity;
+
+        self.gravityWellLabels.attr("display", self.gravityState.doGravity ? "inline" : "none");
+        var activeGravityFieldParams = self.getActiveGravityField().defaultParams;
+
 
 		if ( self.gravityState.doGravity ) {
 			self.simulationStateControl.switchStates(self.gravityState.previousParams, activeGravityFieldParams);
@@ -217,28 +206,36 @@ function GlobalGraph (graph) {
 
 	// todo - add d3 colors for different sets of gravity wells
 	this.renderGravityWells = function () {
+		var data = self.gravityState.doGravity ? Object.values(self.getActiveGravityField().gravityWells) : [];
+		self.gravity = svg.select("g").selectAll(".gravWell").data(data); // update selection
+        self.gravity.exit().remove();
+		self.gravity.enter().append("circle").attr("class", "gravWell")
+            .attr("fill", "#3169ff")
+            .attr("fill-opacity", 0.1)
+			.attr("r", 50)
+			.attr("cx", function (d) { return d.x; })
+			.attr("cy", function (d) { return d.y; })
+			.attr("id", function (d) { return d.id;})
+            .call(d3.drag()
+                .on("start", self.gravityDragStarted)
+                .on("drag", self.gravityDragged)
+                .on("end", self.gravityDragEnded))
+            .merge(self.gravity);
 
-		self.gravity.data(self.gravityState.doGravity ? self.convertGravityData() : [])
-			.enter().append("circle").attr("class", "gravWell")
-			.style("fill", "red")
-			.attr("r", 10)
-			.attr("cx", function (d) { return self.width * d.x; })
-			.attr("cy", function (d) { return self.height * d.y })
-			.merge(self.gravity);
+        self.gravityWellLabels = svg.append("g")
+            .attr("class", "gravityLabels")
+            .selectAll("text")
+            .data(data)
+            .enter().append("text")
+            .attr("class", "label")
+            .text(function(d) { return d.id; })
 
-		self.gravity.exit().remove();
-	}
+            //handle dragging by text
+            .call(d3.drag()
+                .on("start", self.dragStarted)
+                .on("drag", self.dragged)
+                .on("end", self.dragEnded));
 
-	// todo - this is just a handler for now, we'll bake in some of these node state data into the datasets that get loaded
-	this.convertGravityData = function () {
-		var data = [];
-		var activeGravityField = self.gravityState.gravityFields[self.gravityState.activeGravityField].gravityWells;
-		for (var prop in activeGravityField) {
-			data.push({
-				"id" : prop, "x": activeGravityField[prop].x, "y": activeGravityField[prop].y
-			})
-		}
-		return data;
 	};
 
 
@@ -252,11 +249,11 @@ function GlobalGraph (graph) {
     	.attr("preserveAspectRatio", "xMidYMid meet");
 
     this.gravity = svg.append("g")
-		.attr("class", "gravity")
-		.selectAll('circle')
+		.attr("class", "gravWell")
+		.selectAll('.gravWell')
 		.data([]);
 
-	// d3 selection containing all edge lines
+    // d3 selection containing all edge lines
 	this.link = svg.append("g")
         .attr("class", "link")
 		.selectAll(".link")
@@ -404,14 +401,27 @@ function GlobalGraph (graph) {
             .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
 
         self.label
-            .attr("x", function(d) {
+             .attr("x", function(d) {
             	return d.x - (d.thisWidth / 3);
             })
             .attr("y", function (d) { 
             	return d.y + self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 13;
             })
             .style("font-size", "12px").style("fill", "#000000");
-	};
+	
+
+		    self.gravity
+            .attr("cx", function(d) { return d.x = Math.max(self.nodeBorderPadding, Math.min(self.width - self.nodeBorderPadding, d.x)); })
+            .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
+
+        self.gravityWellLabels
+            .attr("x", function(d) { return d.x; })
+            .attr("y", function (d) { return d.y; })
+            .attr("font-size", "20px")
+			      .attr("fill", "#6a0dc3")
+	      		.attr("fill-opacity", 0.3);
+    };
+
 
 
 
@@ -439,11 +449,11 @@ function GlobalGraph (graph) {
 	// Drag Start Event Handler
 	this.dragStarted = function (d) {
 		if (!d3.event.active) {
-			self.restartAllSimulations(0.3);
+            self.restartAllSimulations(0.3);
         }
 		d.fx = d.x;
 		d.fy = d.y;
-	};
+    };
 
 	// Drag Event Handler
 	this.dragged = function (d) {
@@ -459,6 +469,32 @@ function GlobalGraph (graph) {
 		d.fx = null;
 		d.fy = null;
 	};
+
+	// Gravity Draggers. Must be different because they are not a part of a simulation's nodes array
+    // Gravity Drag Start Event Handler
+    this.gravityDragStarted = function (d) {
+        if (!d3.event.active) {
+            self.restartAllSimulations(0.3);
+        }
+        d3.select(this).raise().classed("active", true);
+    };
+
+    // Gravity Drag Event Handler
+    this.gravityDragged = function (d) {
+        d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+    };
+
+    // Gravity Drag End Event Handler
+    this.gravityDragEnded = function (d) {
+        self.getActiveGravityField().updateGravityPosition(d);
+        //update gravity positions
+    	self.resetGravityForceX();
+		self.resetGravityForceY();
+    	d3.select(this).classed("active", false);
+        if (!d3.event.active) {
+            self.restartAllSimulations(1);
+        }
+    };
 
 
 	this.log_edge_scale = d3.scaleLog()
@@ -494,34 +530,37 @@ function GlobalGraph (graph) {
     // collision force to prevent overlap
     this.collisionForce = d3.forceCollide(DEFAULT_COLLISION_FORCE_RADIUS);
 
+    // used to set gravity force x positions. Run on gravity toggle ON, gravity drag end, etc.
+    this.resetGravityForceX = function() {
+        this.gravityForceX.x(function (d) {
+            var activeGravityField = self.getActiveGravityField();  // create temporary reference to the "active" gravity field
+            if (d.well) return activeGravityField.gravityWells[d.well].x; // this forces single grav well limitation
+            return activeGravityField.getGravityWellPosition(d).x;
+        });
+    };
+
+    // used to set gravity force y positions. Run on gravity toggle ON, gravity drag end, etc.
+    this.resetGravityForceY = function() {
+        this.gravityForceY.y(function (d) {
+            var activeGravityField = self.getActiveGravityField();
+            if (d.well) return activeGravityField.gravityWells[d.well].y; // this forces single grav well limitation
+            return activeGravityField.getGravityWellPosition(d).y;
+        });
+    };
+
     // forceX for active gravity field / wells
     this.gravityForceX = d3.forceX(function (d) {
-        var activeGravityField = self.gravityState.gravityFields[self.gravityState.activeGravityField].gravityWells; // create temporary reference to the "active" gravity field
-        if (d.well) return self.width * activeGravityField[d.well].x; // this forces single grav well limitation
-
-        for (var well in activeGravityField) { // check all the wells
-            if (typeof d.id === "string" && // conditional to check node parameters against well value; todo - bake this into the data
-                d.id.indexOf(well) !== -1) { 
-                d.well = well; // give node a well
-                return self.width * activeGravityField[d.well].x; // dynamically return x position of gravity well
-            }
-        }
-        return self.width * .15; // default gravity well if node doesn't match any well in the gravity field (or should they just float?)
+        var activeGravityField = self.getActiveGravityField();  // create temporary reference to the "active" gravity field
+        if (d.well) return activeGravityField.gravityWells[d.well].x; // this forces single grav well limitation
+		return activeGravityField.getGravityWellPosition(d).x;
     }).strength([DEFAULT_GRAVITY_FORCE_STRENGTH]);
 
 
+    // forceY for active gravity field / wells
     this.gravityForceY = d3.forceY(function (d) {
-        var activeGravityField = self.gravityState.gravityFields[self.gravityState.activeGravityField].gravityWells;
-        if (d.well) return self.height * activeGravityField[d.well].y;
-
-        for (var well in activeGravityField) {
-            if (typeof d.id === "string" &&
-                d.id.indexOf(well) !== -1) {
-                d.well = well;
-                return self.height * activeGravityField[d.well].y;
-            }
-        }
-        return self.height * .5;
+        var activeGravityField = self.getActiveGravityField();
+        if (d.well) return activeGravityField.gravityWells[d.well].y; // this forces single grav well limitation
+        return activeGravityField.getGravityWellPosition(d).y;
     }).strength([DEFAULT_GRAVITY_FORCE_STRENGTH]);
 
 
@@ -829,8 +868,8 @@ function GlobalGraph (graph) {
 	        .force("collision", self.collisionForce);
 
 		// Actually render the graph once everything is defined
-		self.renderGravityWells(); 
-		self.gravityForceUpdate();
+        self.renderGravityWells();
+        self.gravityForceUpdate();
 		self.renderNodes();
 		self.renderLinks();
 		self.runSimulation();
