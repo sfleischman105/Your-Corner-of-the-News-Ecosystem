@@ -340,7 +340,7 @@ function GlobalGraph (graph) {
 	this.renderLinks = function () {
 		self.link = self.link.enter()
 			.append("line")
-			.attr("stroke-width", 2)
+			.style("stroke-width", self.edgeStrokeCallback)
 			.attr("class", "link")
 
 			.merge(self.link);
@@ -382,7 +382,7 @@ function GlobalGraph (graph) {
 		if (self.doShowSteps) self.dijkstra(d);
 
 		self.link.transition(20)
-			.style("stroke-width", 1)
+			.style("stroke-width", self.edgeStrokeCallback)
 			.style("stroke", "rgba(0,0,0,.1)");
 
 		if (d.isActive) {
@@ -393,8 +393,13 @@ function GlobalGraph (graph) {
 	};
 
 
+	this.log_stroke_scale = d3.scaleLog()
+    	.domain([d3.min(link_counts), d3.max(link_counts)])
+    	.range([0, 15]);
+
 
 	this.onNodeMouseOver = function (d, ele) {
+		// d.isActive = !d.isActive;
 		d3.select(ele).transition(20)
         	.attr("r", function(d) {
         		return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 6;
@@ -405,9 +410,14 @@ function GlobalGraph (graph) {
 				return l.source == d || l.target == d
 			})
 			.transition(20)
-			.style("stroke-width", 2)
-			.style("stroke", "black");
+			// .style("stroke-width", self.edgeStrokeCallback)
+			.style("stroke", "rgba(0,0,0,.8)");
 	}
+
+	this.edgeStrokeCallback = function (d) {
+		// console.log(d);
+		return self.log_stroke_scale(d.count);
+	};
 
 	this.onNodeMouseOut = function (d, ele) {
 		d3.select(ele).transition(20)
@@ -419,8 +429,8 @@ function GlobalGraph (graph) {
 				return l.source == d || l.target == d
 			})
 			.transition(20)
-			.style("stroke-width", 1)
-			.style("stroke", "rgba(0,0,0,.1)");
+			// .style("stroke-width", 1)
+			.style("stroke", "rgba(0,0,0,.3)");
 	}
 
 	// Drag Start Event Handler
@@ -452,6 +462,7 @@ function GlobalGraph (graph) {
     	.domain([d3.min(link_counts), d3.max(link_counts)])
     	.range([0, .01]);
 
+    
 
 
 	/******  FORCES  ******/
