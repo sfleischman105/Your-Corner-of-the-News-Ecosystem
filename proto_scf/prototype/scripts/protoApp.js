@@ -42,6 +42,7 @@ function GlobalGraph (graph) {
         d.src_dst_links = [];
         d.distance = 0;
         d.visited = false;
+        d.isActive = false;
     });
 
     //helper function for getting counts for each node.
@@ -64,6 +65,7 @@ function GlobalGraph (graph) {
             var dst = d.target;
             dst.target_links.push(d);
         });
+
 		self.graph.nodes.forEach( function(d) {
 			d.links.forEach( function(k) {
 				d.src_dst_links.push({count:(k.count), target:(k.target), source:d})
@@ -296,37 +298,20 @@ function GlobalGraph (graph) {
 				.on("drag", self.dragged)
 				.on("end", self.dragEnded))
 
-			// handle tooltip
-			// .on("mouseover", self.onNodeMouseOver)
 
-			// Handle mouse out
-			// .on("mouseout", self.onNodeMousseOut)
 
-				//   stroke: rgba(0,0,0,.1);
 			// NOTE: Replaced the above with below, as I couldn't figure out how to get
 			// resizing working without this.
             .on("mouseover", function(d) {
-                d3.select(this).transition(20).attr("r", function(d) {
-                	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 6;
-                });
-				self.link.filter(function(l) {
-					return l.source == d || l.target == d
-				}).transition(20).style("stroke-width", 8)
-					.style("stroke", "rgba(0,0,0,.3)");
+                self.onNodeMouseOver(d, this);
             })
             .on("mouseout", function(d) {
-                d3.select(this).transition(20).attr("r", function(d) {
-                	return self.nodeSizeScale(d.page_rank) +DEFAULT_RADIUS
-                });
-				self.link.filter(function(l) {
-					return l.source == d || l.target == d
-				}).transition(20)
-					.style("stroke-width", 1)
-					.style("stroke", "rgba(0,0,0,.1)");
+            	if (!d.isActive) self.onNodeMouseOut(d, this);
             })
 			// handle click
 			.on("click", self.onNodeClick)
 			.merge(self.node);
+
 
 		self.label = svg.append("g")
             .attr("class", "labels")
@@ -386,20 +371,49 @@ function GlobalGraph (graph) {
 
 	// Handler for node clicks; d = node datum; this = svg element
 	this.onNodeClick = function (d) {
-		// dijkstra!
+		d.isActive = !d.isActive;
 		if (self.doShowSteps) self.dijkstra(d);
-		// self.toggleNodeIsActive(d, this);
+
+		self.link.transition(20)
+			.style("stroke-width", 1)
+			.style("stroke", "rgba(0,0,0,.1)");
+
+		if (d.isActive) {
+			self.onNodeMouseOver(d, this); 
+		} else {
+			self.onNodeMouseOut(d, this);
+		}	
 	};
 
 
 
-	// Eventhandler callback function for all node mouseover events
-	this.onNodeMouseOver = function (d) {
-		// self.handleToolTipEvent(d);
+	this.onNodeMouseOver = function (d, ele) {
+		d3.select(ele).transition(20)
+        	.attr("r", function(d) {
+        		return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 6;
+        	});
+
+
+		self.link.filter(function(l) {
+				return l.source == d || l.target == d
+			})
+			.transition(20)
+			.style("stroke-width", 2)
+			.style("stroke", "black");
 	}
 
-	this.onNodeMouseOut = function (d) {
-		// d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
+	this.onNodeMouseOut = function (d, ele) {
+		d3.select(ele).transition(20)
+        	.attr("r", function(d) {
+            	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS;
+            });
+
+		self.link.filter(function(l) {
+				return l.source == d || l.target == d
+			})
+			.transition(20)
+			.style("stroke-width", 1)
+			.style("stroke", "rgba(0,0,0,.1)");
 	}
 
 	// Drag Start Event Handler
@@ -524,15 +538,7 @@ function GlobalGraph (graph) {
         self.simulation.alphaTarget(0.3).restart();
     };
 
-    
 
-
-
-
-
-
-
-	
 
 	// // Tool Tip Div Setup
 	// this.toolTipDiv = d3.select('#graphContainer') //select div containing svg
@@ -565,23 +571,6 @@ function GlobalGraph (graph) {
 	// 		.text(d.id);
 	
 	// }
-
-
-	// Todo - could use for pinning nodes?
-	// Selecting and Deselecting Nodes
-	this.toggleNodeIsActive = function (d, ele) {
-		if (typeof d.isActive === undefined) d.isActive = false; // saftey check
-
-		d3.select(ele).transition().duration(200)
-			.attr('r', function (d) { return d.isActive ? DEFAULT_RADIUS : DEFAULT_RADIUS + 5 })
-			.style('fill', function (d) { return d.isActive ? 'black' : 'green' });
-
-		d.isActive = !d.isActive; // update node state
-	};
-
-	
-
-  
 
 	
 
