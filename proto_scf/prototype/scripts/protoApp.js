@@ -99,7 +99,8 @@ function GlobalGraph (graph) {
 
 	// Global Properties
 	this.width = $('#graphContainer').innerWidth();
-	this.height = this.width * .8;
+
+	this.height = $('#graphControl').height(); // 30 = top and bottom padding of main.container 
 	this.nodeBorderPadding = 8; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
 
 
@@ -181,8 +182,10 @@ function GlobalGraph (graph) {
     this.onToggleGravity = function (buttonEl) {
 
 		self.gravityState.doGravity = !self.gravityState.doGravity;
+
         self.gravityWellLabels.attr("display", self.gravityState.doGravity ? "inline" : "none");
         var activeGravityFieldParams = self.getActiveGravityField().defaultParams;
+
 
 		if ( self.gravityState.doGravity ) {
 			self.simulationStateControl.switchStates(self.gravityState.previousParams, activeGravityFieldParams);
@@ -301,22 +304,49 @@ function GlobalGraph (graph) {
 			// resizing working without this.
             .on("mouseover", function(d) {
                 d3.select(this).transition(20).attr("r", function(d) {
-                	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 6;
+                	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 7;
                 });
+
+                 d3.select(this).style("stroke","black");
+
 				self.link.filter(function(l) {
 					return l.source == d || l.target == d
 				}).transition(20).style("stroke-width", 8)
 					.style("stroke", "rgba(0,0,0,.3)");
+
+				self.node.filter(function(n) {
+				    var highlight = false;
+				    n.src_dst_links.forEach(function(l) {
+				        if (l.target == d || l.source == d) { highlight = true;}
+                    });
+                    if (n == d) {highlight = false}
+                    return highlight;
+                }).style("stroke","grey").transition(20).attr("r", function(d) {
+                	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 4;
+                });
             })
             .on("mouseout", function(d) {
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) +DEFAULT_RADIUS
                 });
+                d3.select(this).style("stroke","white");
+
 				self.link.filter(function(l) {
 					return l.source == d || l.target == d
 				}).transition(20)
 					.style("stroke-width", 1)
 					.style("stroke", "rgba(0,0,0,.1)");
+
+				self.node.filter(function(n) {
+				    var highlight = false;
+				    n.src_dst_links.forEach(function(l) {
+				        if (l.target == d || l.source == d) { highlight = true;}
+                    });
+                    if (n == d) {highlight = false}
+                    return highlight;
+                }).style("stroke","white").transition(20).attr("r", function(d) {
+                	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS;
+                });
             })
 			// handle click
 			.on("click", self.onNodeClick)
@@ -329,6 +359,9 @@ function GlobalGraph (graph) {
             .enter().append("text")
             .attr("class", "label")
             .text(function(d) { return d.id; })
+			.each(function(d,i) {
+				d.thisWidth = this.getComputedTextLength();
+			})
 
 			//handle dragging by text
 			.call(d3.drag()
@@ -368,11 +401,16 @@ function GlobalGraph (graph) {
             .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
 
         self.label
-            .attr("x", function(d) { return d.x; })
-            .attr("y", function (d) { return d.y; })
-            .style("font-size", "10px").style("fill", "#645cc3");
+             .attr("x", function(d) {
+            	return d.x - (d.thisWidth / 3);
+            })
+            .attr("y", function (d) { 
+            	return d.y + self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 13;
+            })
+            .style("font-size", "12px").style("fill", "#000000");
+	
 
-		self.gravity
+		    self.gravity
             .attr("cx", function(d) { return d.x = Math.max(self.nodeBorderPadding, Math.min(self.width - self.nodeBorderPadding, d.x)); })
             .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
 
@@ -380,9 +418,10 @@ function GlobalGraph (graph) {
             .attr("x", function(d) { return d.x; })
             .attr("y", function (d) { return d.y; })
             .attr("font-size", "20px")
-			.attr("fill", "#6a0dc3")
-			.attr("fill-opacity", 0.3);
+			      .attr("fill", "#6a0dc3")
+	      		.attr("fill-opacity", 0.3);
     };
+
 
 
 
@@ -810,6 +849,12 @@ function GlobalGraph (graph) {
     	$('span', buttonEl).text(self.doShowNodeLabels ? "ON" : "OFF");
     }
 
+    this.onToggleSteps = function (buttonEl) {
+    	self.doShowSteps = !self.doShowSteps;
+    	$(buttonEl).toggleClass('checked');
+    	$('span', buttonEl).text(self.doShowSteps ? "ON" : "OFF");
+    }
+
 
 
     /******  INITIALIZE  ******/
@@ -851,7 +896,7 @@ function ProtoApp () {
 		$('#refreshGraph').on('click', this.onRefreshGraph);
 		$('#addStubData').on('click', this.onAddStubData);
 		$('#toggleNode').on('click', this.onToggleNode);
-		$('#ToggleGravity, #ToggleNodeLabels').on('click', this.onToggle);
+		$('#ToggleGravity, #ToggleNodeLabels, #ToggleSteps').on('click', this.onToggle);
 
 		// Parameter Sliders
 		$('#linkForceSlider, #chargeForceSlider, #collisionForceSlider, #gravityForceSlider, #edgeConnectivitySlider')

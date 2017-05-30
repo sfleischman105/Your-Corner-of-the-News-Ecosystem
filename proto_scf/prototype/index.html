@@ -10,12 +10,8 @@
   <link href="./styles/style.css" media="all" rel="stylesheet" />
 </head>
 
-<body>
+<body class="noGrav">
   <main class="container content">
-
-    <section class="title">
-      <a href="/">Your Corner of the News Ecosystem</a>
-    </section>
 
     <!-- <section>
       <p>
@@ -26,20 +22,21 @@
       </p>
     </section> -->
 
-    <section id="graphContainer" class="eight columns alpha">
+    <section id="graphContainer" class="nine columns alpha">
       <svg></svg>
     </section>
 
      
 
-    <section id="graphControl" class="four columns  ">
+    <section id="graphControl" class="three columns  ">
 
-      <h1>Graph Control</h1>
+      <h1>Your Corner of the News Ecosystem</h1>
       
       <div id="globalGraphControl"> 
         <button id="refreshGraph" class="one-half column alpha">Refresh Graph</button>
         <button id="ToggleGravity" class="one-half column">Gravity : <span>OFF</span></button>
         <button id="ToggleNodeLabels" class="one-half column alpha checked">Node Labels : <span>ON</span></button>
+        <button id="ToggleSteps" class="one-half column checked">Node Distance : <span>ON</span></button>
       </div>
       <hr class="clear">
 
@@ -65,25 +62,29 @@
         <span id="collisionForceSliderSpan" class="center">0</span>
         <span id="collisionForceSliderMax" class="right">0</span>
         <input id="collisionForceSlider" type="range" min="-25" max="25" step="1"/>
-        
 
-        <h6>Gravity Force Strength</h6>
-        <span id="gravityForceSliderMin" class="left">0</span>
-        <span id="gravityForceSliderSpan" class="center">0</span>
-        <span id="gravityForceSliderMax" class="right">0</span>
-        <input id="gravityForceSlider" type="range"  min="0" max="1" step="0.01" />
 
         <h6>Edge Connectivity</h6>
         <span id="edgeConnectivitySliderMin" class="left">0</span>
         <span id="edgeConnectivitySliderSpan" class="center">0</span>
         <span id="edgeConnectivitySliderMax" class="right">0</span>
         <input id="edgeConnectivitySlider" type="range"  min="0.1" max="100" step=".1" />
+
+
+        <div class="grav">
+        <h6>Gravity Force Strength</h6>
+        <span id="gravityForceSliderMin" class="left">0</span>
+        <span id="gravityForceSliderSpan" class="center">0</span>
+        <span id="gravityForceSliderMax" class="right">0</span>
+        <input id="gravityForceSlider" type="range"  min="0" max="1" step="0.01" />
+        </div>
+        
       </div>
     </section>
 
    
 
-
+<!--
     <section class='twelve columns alpha'>
       <h2>Design Rationale</h2>
 
@@ -144,11 +145,12 @@
       <p>We might need a relational database in the future to organize user’s profile with history data for a larger dataset. For the relational database, it need to read data from the JSON file and we can get more information about users from that database easily.</p>
     </section>
 
+
     <div class="footer">
       <a href="https://cse442-17s.github.io/">CSE 442 Data Visualization</a> -
       <a href="http://www.washington.edu">University of Washington</a>
     </div>
-
+-->
 
   </main>
   <script type="text/javascript" src="./scripts/jquery-3.2.1.min.js"></script>
