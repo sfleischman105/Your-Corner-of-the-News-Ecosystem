@@ -307,22 +307,49 @@ function GlobalGraph (graph) {
 			// resizing working without this.
             .on("mouseover", function(d) {
                 d3.select(this).transition(20).attr("r", function(d) {
-                	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 6;
+                	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 7;
                 });
+
+                 d3.select(this).style("stroke","grey");
+
 				self.link.filter(function(l) {
 					return l.source == d || l.target == d
 				}).transition(20).style("stroke-width", 8)
 					.style("stroke", "rgba(0,0,0,.3)");
+
+				self.node.filter(function(n) {
+				    var highlight = false;
+				    n.src_dst_links.forEach(function(l) {
+				        if (l.target == d || l.source == d) { highlight = true;}
+                    });
+                    if (n == d) {highlight = false}
+                    return highlight;
+                }).style("stroke","grey").transition(20).attr("r", function(d) {
+                	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 4;
+                });
             })
             .on("mouseout", function(d) {
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) +DEFAULT_RADIUS
                 });
+                d3.select(this).style("stroke","white");
+
 				self.link.filter(function(l) {
 					return l.source == d || l.target == d
 				}).transition(20)
 					.style("stroke-width", 1)
 					.style("stroke", "rgba(0,0,0,.1)");
+
+				self.node.filter(function(n) {
+				    var highlight = false;
+				    n.src_dst_links.forEach(function(l) {
+				        if (l.target == d || l.source == d) { highlight = true;}
+                    });
+                    if (n == d) {highlight = false}
+                    return highlight;
+                }).style("stroke","white").transition(20).attr("r", function(d) {
+                	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS;
+                });
             })
 			// handle click
 			.on("click", self.onNodeClick)
