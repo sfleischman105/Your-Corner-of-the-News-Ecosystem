@@ -194,6 +194,8 @@ function GlobalGraph (graph) {
 	// Handler function for turning on and off gravity wells
 	this.onToggleGravity = function (buttonEl) {
 		self.gravityState.doGravity = !self.gravityState.doGravity;
+		$('body').toggleClass('noGrav');
+
 		var activeGravityFieldParams = self.gravityState.gravityFields[self.gravityState.activeGravityField].defaultParams;
 
 		if ( self.gravityState.doGravity ) {

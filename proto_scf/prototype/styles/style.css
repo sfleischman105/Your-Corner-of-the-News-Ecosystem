@@ -107,7 +107,12 @@ hr.clear { clear :both; }
   left: 0; right: 0;
   margin-top: -4px;
 }
-
+.grav {
+  transition: opacity .3s;
+}
+body.noGrav .grav {
+  opacity: 0;
+}
 
 /* PROTOTYPE SPECIFIC STYLING */
 
