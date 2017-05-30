@@ -35,7 +35,7 @@ ol { margin: 1em; }
 
 .content {
 
-  padding: 15px 20px;
+  /*padding: 0px 20px;*/
   background-color: #ffffff;
 }
 
@@ -46,12 +46,27 @@ ol { margin: 1em; }
 
 
 /* Graph Controls */
+#graphControl {
+    height: 100vh;
+    overflow-y: scroll;
+}
+#graphControl > * {
+    padding-right: 20px;
+}
+
+#globalGraphControl > button {
+  padding-left:0;
+  padding-right: 0;
+  font-size: 10px;
+}
 button.checked { 
   background-color: #eee;
   color: rgba(0,155,0,1);
   border-color: rgba(0,155,0,1);
 }
+
 hr.clear { clear :both; }
+
 #simulationControls {
   position: relative;
   clear: both;
@@ -92,7 +107,12 @@ hr.clear { clear :both; }
   left: 0; right: 0;
   margin-top: -4px;
 }
-
+.grav {
+  transition: opacity .3s;
+}
+body.noGrav .grav {
+  opacity: 0;
+}
 
 /* PROTOTYPE SPECIFIC STYLING */
 
@@ -164,3 +184,9 @@ hr.clear { clear :both; }
 }
 
 .footer { clear: both; }
+
+
+
+
+
+
