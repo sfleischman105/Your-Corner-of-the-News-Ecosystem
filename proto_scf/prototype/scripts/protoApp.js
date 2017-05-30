@@ -310,7 +310,7 @@ function GlobalGraph (graph) {
                 	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 7;
                 });
 
-                 d3.select(this).style("stroke","grey");
+                 d3.select(this).style("stroke","black");
 
 				self.link.filter(function(l) {
 					return l.source == d || l.target == d
@@ -408,9 +408,9 @@ function GlobalGraph (graph) {
             	return d.x - (d.thisWidth / 3);
             })
             .attr("y", function (d) { 
-            	return d.y + self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 10;
+            	return d.y + self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 13;
             })
-            .style("font-size", "10px").style("fill", "#645cc3");
+            .style("font-size", "12px").style("fill", "#000000");
 	};
 
 
