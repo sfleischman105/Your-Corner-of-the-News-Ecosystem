@@ -320,6 +320,9 @@ function GlobalGraph (graph) {
             .enter().append("text")
             .attr("class", "label")
             .text(function(d) { return d.id; })
+			.each(function(d,i) {
+				d.thisWidth = this.getComputedTextLength();
+			})
 
 			//handle dragging by text
 			.call(d3.drag()
@@ -359,8 +362,12 @@ function GlobalGraph (graph) {
             .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
 
         self.label
-            .attr("x", function(d) { return d.x; })
-            .attr("y", function (d) { return d.y; })
+            .attr("x", function(d) {
+            	return d.x - (d.thisWidth / 3);
+            })
+            .attr("y", function (d) { 
+            	return d.y + self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 10;
+            })
             .style("font-size", "10px").style("fill", "#645cc3");
 	};
 
@@ -765,6 +772,12 @@ function GlobalGraph (graph) {
     	$('span', buttonEl).text(self.doShowNodeLabels ? "ON" : "OFF");
     }
 
+    this.onToggleSteps = function (buttonEl) {
+    	self.doShowSteps = !self.doShowSteps;
+    	$(buttonEl).toggleClass('checked');
+    	$('span', buttonEl).text(self.doShowSteps ? "ON" : "OFF");
+    }
+
 
 
     /******  INITIALIZE  ******/
@@ -806,7 +819,7 @@ function ProtoApp () {
 		$('#refreshGraph').on('click', this.onRefreshGraph);
 		$('#addStubData').on('click', this.onAddStubData);
 		$('#toggleNode').on('click', this.onToggleNode);
-		$('#ToggleGravity, #ToggleNodeLabels').on('click', this.onToggle);
+		$('#ToggleGravity, #ToggleNodeLabels, #ToggleSteps').on('click', this.onToggle);
 
 		// Parameter Sliders
 		$('#linkForceSlider, #chargeForceSlider, #collisionForceSlider, #gravityForceSlider, #edgeConnectivitySlider')
