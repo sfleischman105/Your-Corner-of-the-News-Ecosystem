@@ -102,7 +102,7 @@ function GlobalGraph (graph) {
 
 	this.height = $('#graphControl').height(); // 30 = top and bottom padding of main.container 
 	this.nodeBorderPadding = 8; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
-	
+
 
     // Simulation Master Control
 	this.simulationStateControl = {
@@ -155,22 +155,6 @@ function GlobalGraph (graph) {
 	}
 
 
-    /******  GRAVITY  ******/
-
-	this.gravityState = {
-
-		doGravity : false,
-		activeGravityField : 'TLD',
-		gravityFields : {
-			'TLD': build_gravitational_field(self.graph.nodes, function (node) { return node.id.split(/\.(.+)/)[1] }, false, self.width, self.height)
-		},
-		previousParams : {
-			"linkForceStrength" : DEFAULT_LINK_FORCE_STRENGTH,
-			"chargeForceStrength" : DEFAULT_CHARGE_FORCE_STRENGTH,
-			"gravityForceStrength": DEFAULT_GRAVITY_FORCE_STRENGTH
-		}
-	};
-
     this.getActiveGravityField = function () {
         return this.gravityState.gravityFields[this.gravityState.activeGravityField];
     };
@@ -178,6 +162,25 @@ function GlobalGraph (graph) {
     this.onToggleGravity = function (buttonEl) {
 
 		self.gravityState.doGravity = !self.gravityState.doGravity;
+
+        if (self.dijkstraSet && self.gravityState.doGravity) {
+            //set a gravitational field
+            self.gravityState.gravityFields.dijkstra = build_gravitational_field(self.node, function (d) {
+                if (d.id == self.dijkstraSet) {
+                    console.log(d.id);
+                    return 0;
+                }
+                if (!d.distance) {
+                    return (5.0);
+                }
+                var i = 0.0;
+                while (d.distance > i && i < 5) {
+                    i += 0.5;
+                }
+                return i;
+            }, true, self.width, self.height);
+            self.gravityState.activeGravityField = "dijkstra";
+        }
 
         self.gravityWellLabels.attr("display", self.gravityState.doGravity ? "inline" : "none");
         var activeGravityFieldParams = self.getActiveGravityField().defaultParams;
@@ -268,6 +271,21 @@ function GlobalGraph (graph) {
 		.domain([3720875,319284353])
 		.range([0, 8])
 		.clamp(true);
+
+    /******  GRAVITY  ******/
+    this.gravityState = {
+
+        doGravity : false,
+        activeGravityField : 'TLD',
+        gravityFields : {
+            'TLD': build_gravitational_field(self.node, function (node) { return node.id.split(/\.(.+)/)[1] }, false, self.width, self.height)
+        },
+        previousParams : {
+            "linkForceStrength" : DEFAULT_LINK_FORCE_STRENGTH,
+            "chargeForceStrength" : DEFAULT_CHARGE_FORCE_STRENGTH,
+            "gravityForceStrength": DEFAULT_GRAVITY_FORCE_STRENGTH
+        }
+    };
 
 
 	// Modular function for declaring what to do with nodes
@@ -427,6 +445,7 @@ function GlobalGraph (graph) {
 	// Handler for node clicks; d = node datum; this = svg element
 	this.onNodeClick = function (d) {
 		// dijkstra!
+        self.dijkstraSet = d.id;
 		if (self.doShowSteps) self.dijkstra(d);
 		if (!self.legendsvgDi) self.initDijkstraLegentd();
 		if (self.doShowDijkstraLegend) self.updateDijkstraLegend(); // gives us the optino to turn it off if we want
@@ -642,6 +661,7 @@ function GlobalGraph (graph) {
 
         var current = first;
         current.distance = 0;
+        current.visited = true;
         var done = false;
         var i = 0;
         tick();
@@ -777,8 +797,8 @@ function GlobalGraph (graph) {
 			.attr("id", "di-linear-gradient")
 			.attr("x1", "0%").attr("y1", "0%")
 			.attr("x2", "100%").attr("y2", "0%")
-			.selectAll("stop") 
-	    	.data(self.color_scale.range() )                  
+			.selectAll("stop")
+	    	.data(self.color_scale.range() )
 	    	.enter().append("stop")
 	    	.attr("offset", function(d,i) { return i/(self.color_scale.range().length-1); })
 	    	.attr("stop-color", function(d) { return d; });
@@ -786,12 +806,12 @@ function GlobalGraph (graph) {
     }
 
     this.updateDijkstraLegend = function () {
-		
+
 		self.legendsvgDi.transition(100).attr('opacity', (self.doShowDijkstraLegend) ? 1 : 0);
 
     }
 
-	
+
 
 
 	/******  EDGE CONTROL  ******/

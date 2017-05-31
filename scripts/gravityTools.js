@@ -9,9 +9,10 @@ const DEFAULT_GRAVITY_FIELD_PARAMS =  {
 };
 
 // function for generating gravitational field from data
-function build_gravitational_field(data, keyFunction, asLinear, width, height) {
+function build_gravitational_field(selection, keyFunction, asLinear, width, height) {
     var wells = {};
-    for (i = 0; i < data.length; i++) {
+    var data = selection.data();
+    for (var i = 0; i < data.length; i++) {
         var key = keyFunction(data[i]);
         if (key in wells) {
             wells[key] += 1; //will add x, y when all keys are known
@@ -38,10 +39,11 @@ function build_gravitational_field(data, keyFunction, asLinear, width, height) {
 
 function place_wells(wells, asLinear, width, height) {
     var size =  Object.keys(wells).length;
+    var keys = Object.keys(wells).sort();
     if (asLinear) {
         var i = 1.0;
-        for (var key in wells) {
-            wells[key] = {'x': width * (i / (size + 1)), 'y': height * .5, 'id': key};
+        for (var k = 0; k < keys.length; k++) {
+            wells[keys[k]] = {'x': width * (i / (size + 1)), 'y': height * .5, 'id': keys[k]};
             i++;
         }
     } else {
