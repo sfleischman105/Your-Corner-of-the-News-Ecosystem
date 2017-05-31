@@ -496,6 +496,16 @@ function GlobalGraph (graph) {
 	};
 
 
+
+	// Eventhandler callback function for all node mouseover events
+	this.onNodeMouseOver = function (d) {
+		// self.handleToolTipEvent(d);
+	}
+
+	this.onNodeMouseOut = function (d) {
+		// d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
+	}
+
 	// Drag Start Event Handler
 	this.dragStarted = function (d) {
 		if (!d3.event.active) {
