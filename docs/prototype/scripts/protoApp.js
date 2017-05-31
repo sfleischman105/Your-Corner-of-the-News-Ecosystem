@@ -154,11 +154,12 @@ function GlobalGraph (graph) {
 
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
+		console.log("onNodeMouseOver");
 		self.handleToolTipEvent(d);
 	}
 
 	this.onNodeMouseOut = function (d) {
-		// d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
+		d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
 	}
 
 	// Tool Tip Div Setup

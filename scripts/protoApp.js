@@ -30,6 +30,7 @@ function GlobalGraph (graph) {
 
 	this.graph = graph; // the data used by the simulation
 	this.original_edges = this.graph.edges.slice();
+	this.toolTipData = {};
 
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
@@ -343,6 +344,7 @@ function GlobalGraph (graph) {
 
             .on("mouseover", function(d) {
             	// self.label.attr("display", self.doShowNodeLabels ? "inline" : "none");
+            	self.onNodeMouseOver(d);
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 7;
                 });
@@ -374,6 +376,7 @@ function GlobalGraph (graph) {
 					.attr("display", "inline");
             })
             .on("mouseout", function(d) {
+                self.onNodeMouseOut(d);
             	self.label.attr("display", self.doShowNodeLabels ? "inline" : "none")
 
                 d3.select(this).transition(20).attr("r", function(d) {
@@ -499,11 +502,11 @@ function GlobalGraph (graph) {
 
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
-		// self.handleToolTipEvent(d);
+		self.handleToolTipEvent(d);
 	}
 
 	this.onNodeMouseOut = function (d) {
-		// d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
+		d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
 	}
 
 	// Drag Start Event Handler
@@ -653,6 +656,71 @@ function GlobalGraph (graph) {
         this.simulation.force("gravityForceY", this.gravityState.doGravity ? this.gravityForceY : null);
         self.simulation.alphaTarget(0.3).restart();
     };
+
+    
+
+
+
+
+
+
+
+	
+
+	 // Tool Tip Div Setup
+	 this.toolTipDiv = d3.select('#graphContainer') //select div containing svg
+	 	.append('div')
+	 	.attr('class', 'toolTipDiv');
+
+	 this.toolTipDiv.append('i') // add i element for close button
+	 	.attr('class', 'close fa fa-close') // add classes for font awesome styling
+	 	.on('click', function () { // lisent for click to hide tooltip
+			d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0);
+	 	});
+
+	 this.toolTipDiv.append('ul').attr("id", "toolTipDivList");
+
+	 this.handleToolTipEvent = function (d) {
+	 	console.log(d);
+	 	var parseJSONtoHTML = function (ul, json) {
+			for (var i = 0; i < json.length; i++) {
+				ul.append("li")
+					.append("a")
+					.attr('target', json[i].link)
+					.text("[" + json[i].subreddit + "] " + json[i].title);
+			}
+		};
+	 	if (self.toolTipData[d.id] === undefined) {
+            self.toolTipData[d.id] = topKByDomain(d.id, 5, function (json) {
+                // show tool tip
+				d3.select('div.toolTipDiv')
+                // .style('top', d.y) // not sure why these two weren't working
+                // .style('left', d.x)
+                    .call(function () { // so i just call ananoynous function
+                        $('div.toolTipDiv').css('top', d.y).css('left', d.x); // to do it with jquery
+                    })
+                    .style('opacity', 1);
+
+                d3.select('div.toolTipDiv ul').remove();
+                var ul = d3.select('div.toolTipDiv').append('ul').attr("id", "toolTipDivList");
+				parseJSONtoHTML(ul, json);
+            });
+        } else {
+            // show tool tip
+            d3.select('div.toolTipDiv')
+            // .style('top', d.y) // not sure why these two weren't working
+            // .style('left', d.x)
+                .call(function () { // so i just call ananoynous function
+                    $('div.toolTipDiv').css('top', d.y).css('left', d.x); // to do it with jquery
+                })
+                .style('opacity', 1);
+
+            d3.select('div.toolTipDiv ul').remove();
+            var ul = d3.select(div.toolTipDiv).append('ul').attr("id", "toolTipDivList");
+            parseJSONtoHTML(ul, self.toolTipData[d.id]);
+	 	}
+	 };
+
 
 	// Todo - could use for pinning nodes?
 	// Selecting and Deselecting Nodes
