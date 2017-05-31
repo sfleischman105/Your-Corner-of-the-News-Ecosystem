@@ -15,6 +15,7 @@ const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
 const DEFAULT_COLLISION_FORCE_RADIUS = 3;
 const DEFAULT_EDGE_CONNECTIONS = 0;
 const DEFAULT_RADIUS = 8;
+const DEFAULT_ALPHA_TARGET = 0.03;
 
 /* ========================== */
 
@@ -180,8 +181,8 @@ function GlobalGraph (graph) {
 
 
     this.onToggleGravity = function (buttonEl) {
-
 		self.gravityState.doGravity = !self.gravityState.doGravity;
+		$('.grav').css('opacity', ( self.gravityState.doGravity ? 1 : 0 ));
 
         self.gravityWellLabels.attr("display", self.gravityState.doGravity ? "inline" : "none");
         var activeGravityFieldParams = self.getActiveGravityField().defaultParams;
@@ -303,6 +304,7 @@ function GlobalGraph (graph) {
 			// NOTE: Replaced the above with below, as I couldn't figure out how to get
 			// resizing working without this.
             .on("mouseover", function(d) {
+            	d.isActive = true;
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 7;
                 });
@@ -326,6 +328,7 @@ function GlobalGraph (graph) {
                 });
             })
             .on("mouseout", function(d) {
+            	d.isActive = false;
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) +DEFAULT_RADIUS
                 });
@@ -359,6 +362,7 @@ function GlobalGraph (graph) {
             .enter().append("text")
             .attr("class", "label")
             .text(function(d) { return d.id; })
+            .style("font-size", "12px").style("fill", "#000000")
 			.each(function(d,i) {
 				d.thisWidth = this.getComputedTextLength();
 			})
@@ -402,15 +406,18 @@ function GlobalGraph (graph) {
 
         self.label
              .attr("x", function(d) {
-            	return d.x - (d.thisWidth / 3);
+            	return d.x - (d.thisWidth / 2);
             })
             .attr("y", function (d) { 
             	return d.y + self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 13;
             })
-            .style("font-size", "12px").style("fill", "#000000");
+            .style('font-weight', function (d) {
+            	return d.isActive ? 'bold' : 'normal';
+            });
+            
 	
 
-		    self.gravity
+		self.gravity
             .attr("cx", function(d) { return d.x = Math.max(self.nodeBorderPadding, Math.min(self.width - self.nodeBorderPadding, d.x)); })
             .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
 
@@ -449,7 +456,7 @@ function GlobalGraph (graph) {
 	// Drag Start Event Handler
 	this.dragStarted = function (d) {
 		if (!d3.event.active) {
-            self.restartAllSimulations(0.3);
+            self.restartAllSimulations(DEFAULT_ALPHA_TARGET);
         }
 		d.fx = d.x;
 		d.fy = d.y;
@@ -474,7 +481,7 @@ function GlobalGraph (graph) {
     // Gravity Drag Start Event Handler
     this.gravityDragStarted = function (d) {
         if (!d3.event.active) {
-            self.restartAllSimulations(0.3);
+            self.restartAllSimulations(DEFAULT_ALPHA_TARGET);
         }
         d3.select(this).raise().classed("active", true);
     };
@@ -573,17 +580,17 @@ function GlobalGraph (graph) {
     this.linkForceUpdate = function(value) {
     	if (!!value) self.simulationStateControl.parameters.linkForceStrength = value;
         this.linkForce.strength(self.linkForceStrengthHandler);
-        self.simulation.alphaTarget(0.3).restart(); // reset simulation
+        self.simulation.alphaTarget(DEFAULT_ALPHA_TARGET).restart(); // reset simulation
     };
     this.chargeForceUpdate = function(value) {
     	if (!!value) self.simulationStateControl.parameters.chargeForceStrength = value;
         this.chargeForce.strength([value]);
-        self.simulation.alphaTarget(0.3).restart(); // reset simulation
+        self.simulation.alphaTarget(DEFAULT_ALPHA_TARGET).restart(); // reset simulation
     };
     this.collisionForceUpdate = function(value) {
     	if (!!value) self.simulationStateControl.parameters.collisionForceRadius = value;
         this.collisionForce.strength(value);
-        self.simulation.alphaTarget(0.3).restart(); // reset simulation
+        self.simulation.alphaTarget(DEFAULT_ALPHA_TARGET).restart(); // reset simulation
     };
 
     this.gravityForceUpdate = function(value) {
@@ -594,7 +601,7 @@ function GlobalGraph (graph) {
         }
         this.simulation.force("gravityForceX", this.gravityState.doGravity ? this.gravityForceX : null);
         this.simulation.force("gravityForceY", this.gravityState.doGravity ? this.gravityForceY : null);
-        self.simulation.alphaTarget(0.3).restart();
+        self.simulation.alphaTarget(DEFAULT_ALPHA_TARGET).restart();
     };
 
     
@@ -811,7 +818,7 @@ function GlobalGraph (graph) {
 
 
 		self.linkForce.strength(self.linkForceStrengthHandler).links(new_edges);
-		self.simulation.alphaTarget(0.3).restart();
+		self.simulation.alphaTarget(DEFAULT_ALPHA_TARGET).restart();
 
 	};
 
