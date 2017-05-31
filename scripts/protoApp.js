@@ -163,11 +163,15 @@ function GlobalGraph (graph) {
 
 		self.gravityState.doGravity = !self.gravityState.doGravity;
 
+		// assume data has loaded before user clicks this button, then build appropriate field once if needed
+        if (self.gravityState.gravityFields.domainOrigin === undefined) {
+            self.gravityState.gravityFields.domainOrigin = build_gravitational_field(self.node, function (node) { return node.id.split(/\.(.+)/)[1] }, false, self.width, self.height);
+        }
+
         if (self.dijkstraSet && self.gravityState.doGravity) {
-            //set a gravitational field
+            //update the dijkstra gravitational field (even if domain is current)
             self.gravityState.gravityFields.dijkstra = build_gravitational_field(self.node, function (d) {
                 if (d.id == self.dijkstraSet) {
-                    console.log(d.id);
                     return 0;
                 }
                 if (!d.distance) {
@@ -179,8 +183,11 @@ function GlobalGraph (graph) {
                 }
                 return i;
             }, true, self.width, self.height);
-            self.gravityState.activeGravityField = "dijkstra";
         }
+
+        //choose appropriate active field
+        var activeFieldSelection = document.getElementById("activeGravityField");
+        self.gravityState.activeGravityField = activeFieldSelection.options[activeFieldSelection.selectedIndex].value;
 
         self.gravityWellLabels.attr("display", self.gravityState.doGravity ? "inline" : "none");
         var activeGravityFieldParams = self.getActiveGravityField().defaultParams;
@@ -276,9 +283,9 @@ function GlobalGraph (graph) {
     this.gravityState = {
 
         doGravity : false,
-        activeGravityField : 'TLD',
+        activeGravityField : 'domainOrigin',
         gravityFields : {
-            'TLD': build_gravitational_field(self.node, function (node) { return node.id.split(/\.(.+)/)[1] }, false, self.width, self.height)
+            'domainOrigin': undefined //leave undefined because building now might not have all data required
         },
         previousParams : {
             "linkForceStrength" : DEFAULT_LINK_FORCE_STRENGTH,
@@ -556,7 +563,6 @@ function GlobalGraph (graph) {
     // forceX for active gravity field / wells
     this.gravityForceX = d3.forceX(function (d) {
         var activeGravityField = self.getActiveGravityField();  // create temporary reference to the "active" gravity field
-        if (d.well) return activeGravityField.gravityWells[d.well].x; // this forces single grav well limitation
 		return activeGravityField.getGravityWellPosition(d).x;
     }).strength([DEFAULT_GRAVITY_FORCE_STRENGTH]);
 
