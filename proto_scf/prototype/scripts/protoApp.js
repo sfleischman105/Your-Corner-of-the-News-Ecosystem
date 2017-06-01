@@ -675,6 +675,65 @@ function GlobalGraph (graph) {
 
 
 
+		var defs = svg.append("defs");
+
+		
+		defs.append("linearGradient")
+			.attr("id", "di-linear-gradient")
+			.attr("x1", "0%").attr("y1", "0%")
+			.attr("x2", "100%").attr("y2", "0%")
+			.selectAll("stop") 
+	    	.data(self.color_scale.range() )                  
+	    	.enter().append("stop")
+	    	.attr("offset", function(d,i) { return i/(self.color_scale.range().length-1); })
+	    	.attr("stop-color", function(d) { return d; });
+
+
+		var legendWidth = 1 * 0.6,
+			legendHeight = 10;
+
+		//Color Legend container
+		var legendsvgDi = svg.append("g")
+			.attr("class", "legendWrapper")
+			.attr("transform", "translate(" + (660) + "," + (650) + ")");
+
+		//Draw the Rectangle
+		legendsvgDi.append("rect")
+					.attr("class", "legendRec")
+					.attr("width", 250)
+					.attr("height", 20)
+					.style("fill", "url(#di-linear-gradient)");
+			
+		//Append title
+		legendsvgDi.append("text")
+			.attr("class", "legendTitle")
+			.attr("x", 9)
+			.attr("y", -3)
+			.style("text-anchor", "bottom")
+			.text("Network Distance Between Nodes");
+
+		legendsvgDi.append("text")
+			.attr("class", "legendTitle")
+			.attr("x", 2)
+			.attr("y", 30)
+			.style("font-size", "12px")
+			.style("text-anchor", "bottom")
+			.text("Closer");
+
+
+		legendsvgDi.append("text")
+			.attr("class", "legendTitle")
+			.attr("x", 210)
+			.attr("y", 30)
+			.style("font-size", "12px")
+			.style("text-anchor", "bottom")
+			.text("Further");
+
+
+
+		
+
+
         // Function to change the color of each node.
         function tick() {
         	var dis;
