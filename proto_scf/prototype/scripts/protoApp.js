@@ -118,7 +118,7 @@ function GlobalGraph (graph) {
 			"collisionForceRadius": DEFAULT_COLLISION_FORCE_RADIUS,
 
 			// Force Parameters
-			"gravityForceStrength": DEFAULT_GRAVITY_FORCE_STRENGTH,
+			"gravityForceStrength": DEFAULT_GRAVITY_FORCE_STRENGTH
 
 		},
 
@@ -303,12 +303,15 @@ function GlobalGraph (graph) {
 			// NOTE: Replaced the above with below, as I couldn't figure out how to get
 			// resizing working without this.
             .on("mouseover", function(d) {
+            	// self.label.attr("display", self.doShowNodeLabels ? "inline" : "none");
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 7;
                 });
 
                  d3.select(this).style("stroke","black");
 
+				var ids = [];
+				ids.push(d.id);
 				self.link.filter(function(l) {
 					return l.source == d || l.target == d
 				}).transition(20).style("stroke-width", 8)
@@ -317,15 +320,32 @@ function GlobalGraph (graph) {
 				self.node.filter(function(n) {
 				    var highlight = false;
 				    n.src_dst_links.forEach(function(l) {
-				        if (l.target == d || l.source == d) { highlight = true;}
+				        if (l.source == d) {
+				        	highlight = true;
+				        } else if(l.target == d) {
+				        	highlight = true;
+						}
                     });
-                    if (n == d) {highlight = false}
+				    if(highlight){ids.push(n.label);}
+				    if (n == d) {
+                    	highlight = false;
+                    }
                     return highlight;
                 }).style("stroke","grey").transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 4;
                 });
+				self.label.filter(function(d) {
+					for(var i = 0; i < ids.length; i++) {
+						console.log(d.text);
+						if(ids[i] == d.id) return false;
+					}
+					return true;
+				}).transition(10).attr("display", "none");
+				console.log(ids);
+
             })
             .on("mouseout", function(d) {
+            	self.label.attr("display", self.doShowNodeLabels ? "inline" : "none");
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) +DEFAULT_RADIUS
                 });
@@ -506,8 +526,7 @@ function GlobalGraph (graph) {
 	/******  FORCES  ******/
 
     // Saving a reference to each force applied to the graph as a variable to allow live adjustments:
-    this.linkForceStrengthHandler = function (d) { 
-
+    this.linkForceStrengthHandler = function (d) {
 		return self.log_edge_scale(d.count) * self.simulationStateControl.parameters.linkForceStrength; 
 	}
     // force for links. Saving reference for slider adjustment
