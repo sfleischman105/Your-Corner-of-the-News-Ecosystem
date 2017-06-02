@@ -1,25 +1,19 @@
-# Your Corner of the News Ecosystem
+Your Corner of the News Ecosystem
+===============
+[View the public project page](https://github.com/CSE442-17S/Your-Corner-of-the-News-Ecosystem)
 
-**Team Members**
+## Team Members
 
-- Conor Kelly
-- Brendan King
-- Stephen Fleischman
-- Jingwei Zhang
+- [Conor Kelly (cKellyDesign)](https://github.com/cKellyDesign)
+- [Brendan King (kingb12)](https://github.com/kingb12)
+- [Stephen Fleischman (sfleischman105)](https://github.com/sfleischman105)
+- [Jingwei Zhang ()]()
 
-## Setup
-1. Clone repo
-2. Open terminal; Navigate to repo directory
-3. run `$ python -m SimpleHTTPServer 8080`
-4. Open [http://localhost:8080](http://localhost:8080)
+## Project
 
-## Project Goals
+In today’s divisive political climate, Americans are becoming increasingly aware of their consumption of political news. Serious questions have been raised about how we share, read, and propagate news. While user behavior can be studied and surveyed, understanding how political websites relate and link to one another is a fundamental step to understanding user consumption of news. For example, a user who frequents the site reuters.com might also frequent the site politco.com, in hopes of diversifying their consumption of news. Unfortunately for the user, there is no direct way to see how similar the two sites are.
 
-We plan to expose the links and connections between news sources and to examine how user’s become separated into “Echo Chambers” via the Facebook “Filter Bubble” effect. Furthermore, we plan to utilize this to see how individual profiles compare with aggregate usage and trust trends. There are two identified end users of our visualization. Firstly, users of social media, specifically Facebook, will use this tool to examine their actual news spheres and how that compares to their demographic profile. Secondly, News Sources shall be able to utilize this tool to identify which news spheres demographic profiles (input) most likely will fall. 
+Our group felt that many of the discussions concerning user engagement with political news sites centered around the bubble created by social media. Rather than looking at how users interacted with websites, we set out to explore something deeper: the connections between these political news sites. Analyzing how news sites relate to each other hits two birds with one stone, as it shows where news sites get their news, alongside implicating the diversity of news viewers receive when visiting multiple sites. Our Project aims to visualize and allow user exploration of these hidden connections between news sites.
 
-The aim for this project is to allow users to visually see what sites and “Bubbles” of ideologically similar sites their news is coming from. More so, users will be able to see what sources of news they are being excluded from, and how these sources relate to one another. If any user isn’t curious about their own sources of news, they will still be able to utilize our visualization to see the different “groups” of news sources, and how they relate to one another. 
-
-## Data
-
-We plan to use existing DataSets concerning the relation between different News  Sites through the GDELT project. (http://gdeltproject.org/#downloading). We are also looking into utilizing the Facebook API to extract and analyze data on a User's exposure to News Sources.
-
+[Live Project](https://github.com/CSE442-17S/Your-Corner-of-the-News-Ecosystem) |
+[Poster](https://github.com/CSE442-17S/Your-Corner-of-the-News-Ecosystem)
