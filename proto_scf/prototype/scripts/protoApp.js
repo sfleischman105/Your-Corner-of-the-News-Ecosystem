@@ -670,7 +670,6 @@ function GlobalGraph (graph) {
 			.text("Further");
 
 
-
         // Function to change the color of each node.
         function tick() {
         	var dis;
