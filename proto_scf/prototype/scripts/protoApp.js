@@ -428,6 +428,8 @@ function GlobalGraph (graph) {
 	this.onNodeClick = function (d) {
 		// dijkstra!
 		if (self.doShowSteps) self.dijkstra(d);
+		if (!self.legendsvgDi) self.initDijkstraLegentd();
+		if (self.doShowDijkstraLegend) self.updateDijkstraLegend(); // gives us the optino to turn it off if we want
 		// self.toggleNodeIsActive(d, this);
 	};
 
@@ -600,6 +602,7 @@ function GlobalGraph (graph) {
 
 	/******  DIJKSTRA  ******/
 
+	this.doShowDijkstraLegend = true; // controls legend container opacity
     this.firstStep = null;
     this.doShowSteps = true;
 	this.stepCount = 30;
@@ -612,6 +615,7 @@ function GlobalGraph (graph) {
 			if (first === null) return false; // exit if no first
 		}
 		self.firstStep = first;
+
 
         // Function to change the color of each node.
         function tick() {
@@ -720,6 +724,72 @@ function GlobalGraph (graph) {
                 .nodes(subgraph_nodes.nodes)
 				.on("tick", self.ticked));
     };
+
+    this.initDijkstraLegentd = function () {
+
+    	var legendWidth = 1 * 0.6,
+			legendHeight = 10;
+
+		//Color Legend container
+		self.legendsvgDi = svg.append("g")
+			.attr("class", "legendWrapper")
+			.attr("transform", "translate(" + (self.width - 275) + "," + (self.height - 67) + ")")
+			.attr("opacity", 0);
+
+		//Draw the Rectangle
+		self.legendsvgDi.append("rect")
+					.attr("class", "legendRec")
+					.attr("width", (self.width * .25))
+					.attr("height", 20)
+					.style("fill", "url(#di-linear-gradient)");
+
+		//Append title
+		self.legendsvgDi.append("text")
+			.attr("class", "legendTitle")
+			.attr("x", (self.width * .25 * .5))
+			.attr("y", -9)
+			.style("text-anchor", "middle")
+
+			.text("Network Distance Between Nodes");
+
+		self.legendsvgDi.append("text")
+			.attr("class", "legendTitle")
+			.attr("x", 2)
+			.attr("y", 36)
+			.style("font-size", "12px")
+			.style("text-anchor", "bottom")
+			.text("Closer");
+
+
+		self.legendsvgDi.append("text")
+			.attr("class", "legendTitle")
+			.attr("x", ((self.width * .25) - 40))
+			.attr("y", 36)
+			.style("font-size", "12px")
+			.style("text-anchor", "bottom")
+			.text("Further");
+
+
+
+		self.defs = self.legendsvgDi.append("defs");
+
+		self.defs.append("linearGradient")
+			.attr("id", "di-linear-gradient")
+			.attr("x1", "0%").attr("y1", "0%")
+			.attr("x2", "100%").attr("y2", "0%")
+			.selectAll("stop") 
+	    	.data(self.color_scale.range() )                  
+	    	.enter().append("stop")
+	    	.attr("offset", function(d,i) { return i/(self.color_scale.range().length-1); })
+	    	.attr("stop-color", function(d) { return d; });
+
+    }
+
+    this.updateDijkstraLegend = function () {
+		
+		self.legendsvgDi.transition(100).attr('opacity', (self.doShowDijkstraLegend) ? 1 : 0);
+
+    }
 
 	
 
