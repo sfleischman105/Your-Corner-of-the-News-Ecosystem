@@ -9,19 +9,22 @@ const DEFAULT_GRAVITY_FIELD_PARAMS =  {
 };
 
 // function for generating gravitational field from data
-function build_gravitational_field(selection, keyFunction, asLinear, width, height) {
-    var wells = {};
-    var data = selection.data();
-    for (var i = 0; i < data.length; i++) {
-        var key = keyFunction(data[i]);
-        if (key in wells) {
-            wells[key] += 1; //will add x, y when all keys are known
-        } else {
-            wells[key] = 1;
+function build_gravitational_field(selection, keyFunction, asLinear, width, height, defaultWells) {
+    var usingArgumentWells = (defaultWells !== undefined);
+    var wells = (usingArgumentWells) ? defaultWells : {};
+    if (!usingArgumentWells) {
+        var data = selection.data();
+        for (var i = 0; i < data.length; i++) {
+            var key = keyFunction(data[i]);
+            if (key in wells) {
+                wells[key] += 1; //will add x, y when all keys are known
+            } else {
+                wells[key] = 1;
+            }
         }
     }
-    return {
-        gravityWells : place_wells(wells, asLinear, width, height),
+    var result =  {
+        gravityWells : (usingArgumentWells) ? wells : place_wells(wells, asLinear, width, height),
         defaultParams: DEFAULT_GRAVITY_FIELD_PARAMS,
         keyFunction : keyFunction,
         updateGravityPosition  : function (d) {
@@ -35,6 +38,7 @@ function build_gravitational_field(selection, keyFunction, asLinear, width, heig
             return this.gravityWells[well]; // dynamically return x position of gravity well
         }
     }
+    return result;
 }
 
 function place_wells(wells, asLinear, width, height) {

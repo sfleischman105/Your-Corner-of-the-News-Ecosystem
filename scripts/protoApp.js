@@ -160,55 +160,83 @@ function GlobalGraph (graph) {
     };
 
     this.onToggleGravity = function (buttonEl) {
+        return new Promise(function (resolve, reject) {
+			self.gravityState.doGravity = !self.gravityState.doGravity;
 
-		self.gravityState.doGravity = !self.gravityState.doGravity;
+			// assume data has loaded before user clicks this button, then build appropriate field once if needed
+			if (self.gravityState.gravityFields.domainOrigin === undefined) {
+				self.gravityState.gravityFields.domainOrigin = build_gravitational_field(self.node, function (node) {
+					return node.id.split(/\.(.+)/)[1]
+				}, false, self.width, self.height);
+			}
 
-		// assume data has loaded before user clicks this button, then build appropriate field once if needed
-        if (self.gravityState.gravityFields.domainOrigin === undefined) {
-            self.gravityState.gravityFields.domainOrigin = build_gravitational_field(self.node, function (node) { return node.id.split(/\.(.+)/)[1] }, false, self.width, self.height);
-        }
+			//if dijkstra has never been run before:
+            if (self.dijkstraSet && self.gravityState.doGravity && self.gravityState.gravityFields.dijkstra === undefined) {
+                self.updateDijkstraGravityField();
+            }
 
-        if (self.dijkstraSet && self.gravityState.doGravity) {
-            //update the dijkstra gravitational field (even if domain is current)
-            self.gravityState.gravityFields.dijkstra = build_gravitational_field(self.node, function (d) {
-                if (d.id == self.dijkstraSet) {
-                    return 0;
-                }
-                if (!d.distance) {
-                    return (5.0);
-                }
-                var i = 0.0;
-                while (d.distance > i && i < 5) {
-                    i += 0.5;
-                }
-                return i;
-            }, true, self.width, self.height);
-        }
+			//choose appropriate active field
+			var activeFieldSelection = document.getElementById("activeGravityField");
+			self.gravityState.activeGravityField = activeFieldSelection.options[activeFieldSelection.selectedIndex].value;
 
-        //choose appropriate active field
-        var activeFieldSelection = document.getElementById("activeGravityField");
-        self.gravityState.activeGravityField = activeFieldSelection.options[activeFieldSelection.selectedIndex].value;
-
-        self.gravityWellLabels.attr("display", self.gravityState.doGravity ? "inline" : "none");
-        var activeGravityFieldParams = self.getActiveGravityField().defaultParams;
+			self.gravityWellLabels.attr("display", self.gravityState.doGravity ? "inline" : "none");
+			var activeGravityFieldParams = self.getActiveGravityField().defaultParams;
 
 
-		if ( self.gravityState.doGravity ) {
-			self.simulationStateControl.switchStates(self.gravityState.previousParams, activeGravityFieldParams);
+			if (self.gravityState.doGravity) {
+				self.simulationStateControl.switchStates(self.gravityState.previousParams, activeGravityFieldParams);
 
-		} else {
-			self.simulationStateControl.switchStates(activeGravityFieldParams, self.gravityState.previousParams);
-		}
+			} else {
+				self.simulationStateControl.switchStates(activeGravityFieldParams, self.gravityState.previousParams);
+			}
 
-		window.protoApp.updateSliders(self.simulationStateControl.parameters);
+			window.protoApp.updateSliders(self.simulationStateControl.parameters);
 
-		$(buttonEl).toggleClass('checked');
-		$('span', buttonEl).text(self.gravityState.doGravity ? 'ON' : 'OFF');
-		self.renderGravityWells();
-		self.gravityForceUpdate();
-		self.updateCenterForce();
+			$(buttonEl).toggleClass('checked');
+			$('span', buttonEl).text(self.gravityState.doGravity ? 'ON' : 'OFF');
 
-	}
+            self.updateDijkstraGravityField().then(self.reloadGravity);
+			resolve();
+    	});
+	};
+
+
+    this.updateDijkstraGravityField = function () {
+        return new Promise(function (resolve, reject) {
+            if (self.dijkstraSet && self.gravityState.doGravity) {
+                //update the dijkstra gravitational field (even if domain is current)
+                var dijkstraWells = {};
+                d3.range(0, 5, 0.5).forEach(function (d) {
+                    dijkstraWells[d] = 0;
+                });
+                dijkstraWells = place_wells(dijkstraWells, true, self.width, self.height);
+                self.gravityState.gravityFields.dijkstra = build_gravitational_field(self.node, function (d) {
+                    if (d.id === self.dijkstraSet) {
+                        return 0;
+                    }
+                    if (!d.distance) {
+                        return (4.5);
+                    }
+                    var i = 0.0;
+                    while (d.distance > i && i < 4.5) {
+                        i += 0.5;
+                    }
+                    return i;
+                }, true, self.width, self.height, dijkstraWells);
+            }
+            resolve();
+        });
+    };
+
+    this.reloadGravity = function () {
+        return new Promise(function(resolve, reject) {
+			self.renderGravityWells();
+        	self.gravityForceUpdate();
+			self.updateCenterForce();
+			resolve();
+        });
+
+    };
 
 	// todo - add d3 colors for different sets of gravity wells
 	this.renderGravityWells = function () {
@@ -339,7 +367,6 @@ function GlobalGraph (graph) {
 				self.label.attr("display", "none");
 				self.label.filter(function(d) {
 					for(var i = 0; i < ids.length; i++) {
-						console.log(d.text);
 						if(ids[i] == d.id) return true;
 					}
 					return false;
@@ -451,9 +478,19 @@ function GlobalGraph (graph) {
 
 	// Handler for node clicks; d = node datum; this = svg element
 	this.onNodeClick = function (d) {
-		// dijkstra!
+        // dijkstra!
         self.dijkstraSet = d.id;
-		if (self.doShowSteps) self.dijkstra(d);
+        function doDijkstra () {
+        	return self.dijkstra(d);
+		}
+        if (self.doShowSteps) {
+                if (self.dijkstraSet && self.gravityState.doGravity && self.gravityState.activeGravityField == 'dijkstra') {
+                	self.dijkstra(d).then(self.onToggleGravity).then(self.onToggleGravity);
+                } else {
+                	self.dijkstra(d);
+				}
+        }
+    };
 		if (!self.legendsvgDi) self.initDijkstraLegentd();
 		if (self.doShowDijkstraLegend) self.updateDijkstraLegend(); // gives us the optino to turn it off if we want
 		// self.toggleNodeIsActive(d, this);
@@ -635,29 +672,29 @@ function GlobalGraph (graph) {
     // the starting node. Also calls 'tick'() to change color corresponding to distance
     // Modifies the distance attribute of each node
 	this.dijkstra = function(first) {
-		if (typeof first === 'undefined') {
-			first = self.firstStep;
-			if (first === null) return false; // exit if no first
-		}
-		self.firstStep = first;
+	    return new Promise(function(resolve, reject) {
+            if (typeof first === 'undefined') {
+                first = self.firstStep;
+                if (first === null) return false; // exit if no first
+            }
+            self.firstStep = first;
 
-
-        // Function to change the color of each node.
-        function tick() {
-        	var dis;
-            self.node.filter(function(d){
-                return !d.visited
-            }).transition(5).style("fill", function(d) {
-            	dis = d.distance;
-                return self.color_scale(d.distance);
-            }).text(dis);
-             self.node.filter(function(d){
-             		return d.distance == 0;
-             	}).transition(10).style("fill", "LawnGreen");
+            // Function to change the color of each node.
+            function tick() {
+                var dis;
+                self.node.filter(function (d) {
+                    return !d.visited
+                }).transition(5).style("fill", function (d) {
+                    dis = d.distance;
+                    return self.color_scale(d.distance);
+                }).text(dis);
+                self.node.filter(function (d) {
+                    return d.distance == 0;
+                }).transition(10).style("fill", "LawnGreen");
 
         }
         var unvisited = [];
-        this.graph.nodes.forEach(function (d) {
+        self.graph.nodes.forEach(function (d) {
             if (d != first) {
                 d.distance = Infinity;
                 unvisited.push(d);
@@ -665,41 +702,57 @@ function GlobalGraph (graph) {
             }
         });
 
-        var current = first;
-        current.distance = 0;
-        current.visited = true;
-        var done = false;
-        var i = 0;
-        tick();
-        var timer = d3.interval(stepi, 350);
-        function stepi() {
+            var current = first;
+            current.distance = 0;
             current.visited = true;
-            current.src_dst_links.forEach(function (link) {
-                var tar = link.target;
-                if (!tar.visited) {
-                    // USE LINK.COUNT for Weights. Otherwise we use just 1 for degrees of seperation
-                    var dist = (current.distance + Math.sqrt(1000 / link.count));
-                    // var dist = current.distance + 1;
-                    // var dist = self.st_dev_scale((link.count - tar.mean) / tar.st_dev);
-                    tar.distance = Math.min(dist, tar.distance);
-                    // **screaming internally**
-                }
-            });
+            var done = false;
+            var i = 0;
             tick();
-            if (unvisited.length == 0 || current.distance == Infinity) {
-                // done = true;
-                console.log('finally done?', i);
-                timer.stop();
-                return true;
-            }
 
-            unvisited.sort(function (a, b) {
-                return b.distance - a.distance
-            });
-            current = unvisited.pop();
-            return false;
-        }
+            //set up a step as a promise for sync
+            function stepi() {
+                return new Promise(function (resolve, reject) {
+					current.visited = true;
+					current.src_dst_links.forEach(function (link) {
+						var tar = link.target;
+						if (!tar.visited) {
+							// USE LINK.COUNT for Weights. Otherwise we use just 1 for degrees of seperation
+							var dist = (current.distance + Math.sqrt(1000 / link.count + 0.00000000000001));
+							// var dist = current.distance + 1;
+							// var dist = self.st_dev_scale((link.count - tar.mean) / tar.st_dev);
+							tar.distance = Math.min(dist, tar.distance);
+							// **screaming internally**
+						}
+					});
+					tick();
+					if (unvisited.length == 0 || current.distance == Infinity) {
+						// done = true;
+						console.log('finally done?', i);
+						if (unvisited.length == 0) {
+							resolve();
+						}
+						return true;
+					}
 
+					unvisited.sort(function (a, b) {
+						return b.distance - a.distance
+					});
+					current = unvisited.pop();
+					resolve();
+					return false;
+				});
+			}
+
+			//actually run dijkstra
+			function loop() {
+				if (unvisited.length > 0) {
+					return stepi().then(loop);
+                } else {
+					resolve();
+				}
+			}
+			loop();
+        });
     };
 
     // Color scale for Djikstra's based on distance
