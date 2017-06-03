@@ -19,7 +19,7 @@ Our group felt that many of the discussions concerning user engagement with poli
 [Poster](/poster.pdf) |
 [Source](https://github.com/CSE442-17S/Your-Corner-of-the-News-Ecosystem/) |
 
-![alt text](/docs/media/dreadme_pic.png?raw=true)
+![alt text](/docs/media/readme_pic.png?raw=true)
 
 ## Dataset
 
