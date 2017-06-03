@@ -118,11 +118,11 @@ body.noGrav .grav {
 
 .link {
   stroke-width: 1;
-  stroke: rgba(0,0,0,.1);
+  stroke: rgba(0,0,0,.046);
 }
 
 .node {
-  fill: #454545;
+  fill: #7c7c7c;
     stroke: #fff;
     stroke-width: 2px;
 }

@@ -102,8 +102,7 @@ function GlobalGraph (graph) {
 
 	this.height = $('#graphControl').height(); // 30 = top and bottom padding of main.container 
 	this.nodeBorderPadding = 8; //number of pixels to preserve between the SVG border and any node. Keeps nodes bounded in the space.
-
-
+	
 
     // Simulation Master Control
 	this.simulationStateControl = {
@@ -118,7 +117,7 @@ function GlobalGraph (graph) {
 			"collisionForceRadius": DEFAULT_COLLISION_FORCE_RADIUS,
 
 			// Force Parameters
-			"gravityForceStrength": DEFAULT_GRAVITY_FORCE_STRENGTH,
+			"gravityForceStrength": DEFAULT_GRAVITY_FORCE_STRENGTH
 
 		},
 
@@ -157,6 +156,7 @@ function GlobalGraph (graph) {
 
 
     /******  GRAVITY  ******/
+
 	this.gravityState = {
 
 		doGravity : false,
@@ -174,10 +174,6 @@ function GlobalGraph (graph) {
     this.getActiveGravityField = function () {
         return this.gravityState.gravityFields[this.gravityState.activeGravityField];
     };
-
-	
-
-
 
     this.onToggleGravity = function (buttonEl) {
 
@@ -259,7 +255,6 @@ function GlobalGraph (graph) {
 		.selectAll(".link")
 		.data(graph.edges);
 
-    
 
 	// d3 selection containing all node circles
 	this.node = svg.append("g")
@@ -293,39 +288,42 @@ function GlobalGraph (graph) {
 				.on("drag", self.dragged)
 				.on("end", self.dragEnded))
 
-			// handle tooltip
-			// .on("mouseover", self.onNodeMouseOver)
-
-			// Handle mouse out
-			// .on("mouseout", self.onNodeMousseOut)
-
-				//   stroke: rgba(0,0,0,.1);
-			// NOTE: Replaced the above with below, as I couldn't figure out how to get
-			// resizing working without this.
             .on("mouseover", function(d) {
+            	// self.label.attr("display", self.doShowNodeLabels ? "inline" : "none");
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 7;
                 });
+                 d3.select(this).style("stroke","#575757");
 
-                 d3.select(this).style("stroke","black");
-
+				var ids = [];
+				ids.push(d.id);
 				self.link.filter(function(l) {
 					return l.source == d || l.target == d
-				}).transition(20).style("stroke-width", 8)
-					.style("stroke", "rgba(0,0,0,.3)");
+				}).transition(20).style("stroke-width", 7)
+					.style("stroke", "rgba(0,0,0,.25)");
 
 				self.node.filter(function(n) {
 				    var highlight = false;
-				    n.src_dst_links.forEach(function(l) {
-				        if (l.target == d || l.source == d) { highlight = true;}
-                    });
-                    if (n == d) {highlight = false}
+				    n.src_dst_links.forEach(function(l) { if (l.source == d || l.target == d) highlight = true;});
+				    if(highlight){ids.push(n.label);}
+				    if (n == d) highlight = false;
                     return highlight;
                 }).style("stroke","grey").transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 4;
                 });
+				self.label.attr("display", "none");
+				self.label.filter(function(d) {
+					for(var i = 0; i < ids.length; i++) {
+						console.log(d.text);
+						if(ids[i] == d.id) return true;
+					}
+					return false;
+				 }).transition(100)
+					.attr("display", "inline");
             })
             .on("mouseout", function(d) {
+            	self.label.attr("display", self.doShowNodeLabels ? "inline" : "none")
+
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) +DEFAULT_RADIUS
                 });
@@ -385,7 +383,6 @@ function GlobalGraph (graph) {
 			.merge(self.link);
 	};
 
-
 	// Callback function for "tick" event (entropy occuring over time!)
 	this.ticked = function () {
 		self.link
@@ -400,15 +397,14 @@ function GlobalGraph (graph) {
         	.attr("cx", function(d) { return d.x = Math.max(self.nodeBorderPadding, Math.min(self.width - self.nodeBorderPadding, d.x)); })
             .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
 
-        self.label
-             .attr("x", function(d) {
-            	return d.x - (d.thisWidth / 3);
+        self.label.attr("x", function(d) {
+            	return d.x + self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 7;
             })
-            .attr("y", function (d) { 
-            	return d.y + self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 13;
+            .attr("y", function (d) {
+            	return d.y + 4 ;
             })
-            .style("font-size", "12px").style("fill", "#000000");
-	
+            .style("font-size", "12px").style("fill", "#1727a5").style("font-weight", 550);
+
 
 		    self.gravity
             .attr("cx", function(d) { return d.x = Math.max(self.nodeBorderPadding, Math.min(self.width - self.nodeBorderPadding, d.x)); })
@@ -435,16 +431,6 @@ function GlobalGraph (graph) {
 		// self.toggleNodeIsActive(d, this);
 	};
 
-
-
-	// Eventhandler callback function for all node mouseover events
-	this.onNodeMouseOver = function (d) {
-		// self.handleToolTipEvent(d);
-	}
-
-	this.onNodeMouseOut = function (d) {
-		// d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
-	}
 
 	// Drag Start Event Handler
 	this.dragStarted = function (d) {
@@ -496,7 +482,6 @@ function GlobalGraph (graph) {
         }
     };
 
-
 	this.log_edge_scale = d3.scaleLog()
     	.domain([d3.min(link_counts), d3.max(link_counts)])
     	.range([0, .01]);
@@ -506,8 +491,7 @@ function GlobalGraph (graph) {
 	/******  FORCES  ******/
 
     // Saving a reference to each force applied to the graph as a variable to allow live adjustments:
-    this.linkForceStrengthHandler = function (d) { 
-
+    this.linkForceStrengthHandler = function (d) {
 		return self.log_edge_scale(d.count) * self.simulationStateControl.parameters.linkForceStrength; 
 	}
     // force for links. Saving reference for slider adjustment
@@ -597,49 +581,6 @@ function GlobalGraph (graph) {
         self.simulation.alphaTarget(0.3).restart();
     };
 
-    
-
-
-
-
-
-
-
-	
-
-	// // Tool Tip Div Setup
-	// this.toolTipDiv = d3.select('#graphContainer') //select div containing svg
-	// 	.append('div')
-	// 	.attr('class', 'toolTipDiv');
-
-	// this.toolTipDiv.append('i') // add i element for close button
-	// 	.attr('class', 'close fa fa-close') // add classes for font awesome styling
-	// 	.on('click', function () { // lisent for click to hide tooltip
-	// 		d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0);
-	// 	});
-
-	// this.toolTipDiv.append('h3') // h3 for title
-	// 	.attr('class', 'toolTipTitle')
-	// 		.append('a') // a within h3 for linking to domain
-	// 		.attr('target', '_blank');
-
-	// this.handleToolTipEvent = function (d) {
-	// 	// show tool tip
-	// 	d3.select('div.toolTipDiv')
-	// 		// .style('top', d.y) // not sure why these two weren't working
-	// 		// .style('left', d.x)
-	// 		.call(function(){ // so i just call ananoynous function 
-	// 			$('div.toolTipDiv').css('top', d.y).css('left',d.x); // to do it with jquery
-	// 		})
-	// 		.style('opacity', 1);
-
-	// 	d3.select('h3.toolTipTitle a') // Handle link url and text
-	// 		.attr('href', '//' + d.id)
-	// 		.text(d.id);
-	
-	// }
-
-
 	// Todo - could use for pinning nodes?
 	// Selecting and Deselecting Nodes
 	this.toggleNodeIsActive = function (d, ele) {
@@ -654,7 +595,6 @@ function GlobalGraph (graph) {
 
 	
 
-  
 
 	
 
@@ -674,7 +614,7 @@ function GlobalGraph (graph) {
 		self.firstStep = first;
 
 
-
+		// todo - move this out of dijkstra
 		var defs = svg.append("defs");
 
 		
@@ -731,9 +671,6 @@ function GlobalGraph (graph) {
 
 
 
-		
-
-
         // Function to change the color of each node.
         function tick() {
         	var dis;
@@ -761,12 +698,10 @@ function GlobalGraph (graph) {
         current.distance = 0;
         var done = false;
         var i = 0;
-
         tick();
         var timer = d3.interval(stepi, 350);
         function stepi() {
             current.visited = true;
-            // current.total_distance = 0;
             current.src_dst_links.forEach(function (link) {
                 var tar = link.target;
                 if (!tar.visited) {
@@ -774,8 +709,8 @@ function GlobalGraph (graph) {
                     var dist = (current.distance + Math.sqrt(1000 / link.count));
                     // var dist = current.distance + 1;
                     // var dist = self.st_dev_scale((link.count - tar.mean) / tar.st_dev);
-
                     tar.distance = Math.min(dist, tar.distance);
+                    // **screaming internally**
                 }
             });
             tick();
@@ -871,9 +806,9 @@ function GlobalGraph (graph) {
 
 		self.linkForce.strength(self.linkForceStrengthHandler).links(new_edges);
 		self.simulation.alphaTarget(0.3).restart();
-
 	};
 
+    // Removes links that fall below the designated value
     this.edgeConnectionsUpdate = function(value) {
 		temp_links = self.original_edges.slice();
 		for (var i = 0; i < temp_links.length; i++) {
@@ -882,7 +817,6 @@ function GlobalGraph (graph) {
 			}
 		}
 		self.updateEdges(temp_links);
-
     };
 
 
