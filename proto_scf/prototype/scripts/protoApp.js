@@ -14,7 +14,7 @@ const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
 const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
 const DEFAULT_COLLISION_FORCE_RADIUS = 3;
 const DEFAULT_EDGE_CONNECTIONS = 0;
-const DEFAULT_RADIUS = 8;
+const DEFAULT_RADIUS = 9;
 
 /* ========================== */
 
@@ -314,7 +314,6 @@ function GlobalGraph (graph) {
 				self.label.attr("display", "none");
 				self.label.filter(function(d) {
 					for(var i = 0; i < ids.length; i++) {
-						console.log(d.text);
 						if(ids[i] == d.id) return true;
 					}
 					return false;
@@ -618,14 +617,10 @@ function GlobalGraph (graph) {
         	var dis;
             self.node.filter(function(d){
                 return !d.visited
-            }).transition(5).style("fill", function(d) {
+            }).transition(15).style("fill", function(d) {
             	dis = d.distance;
                 return self.color_scale(d.distance);
             }).text(dis);
-             self.node.filter(function(d){
-             		return d.distance == 0;
-             	}).transition(10).style("fill", "LawnGreen");
-
         }
         var unvisited = [];
         this.graph.nodes.forEach(function (d) {
@@ -635,13 +630,13 @@ function GlobalGraph (graph) {
                 d.visited = false;
             }
         });
-
         var current = first;
         current.distance = 0;
-        var done = false;
+        // Set beginning Color
+        self.node.transition(3).style("fill", function(d) {return self.color_scale(d.distance);});
+
         var i = 0;
-        tick();
-        var timer = d3.interval(stepi, 350);
+        var timer = d3.interval(stepi, 100, 600);
         function stepi() {
             current.visited = true;
             current.src_dst_links.forEach(function (link) {
@@ -657,8 +652,6 @@ function GlobalGraph (graph) {
             });
             tick();
             if (unvisited.length == 0 || current.distance == Infinity) {
-                // done = true;
-                console.log('finally done?', i);
                 timer.stop();
                 return true;
             }
@@ -674,7 +667,7 @@ function GlobalGraph (graph) {
 
     // Color scale for Djikstra's based on distance
     this.color_scale = d3.scaleLinear()
-        .domain([0, 0.63, 1.00, 1.55, 2.39, 3.0, 4.6, 5.1, 5.5])
+        .domain([0, 0.66, 1.04, 1.55, 2.39, 3.0, 4.6, 5.1, 5.5])
         .range(["LawnGreen","GreenYellow","yellow","orange","orangered", "salmon","red", "crimson","FireBrick"])
 		.clamp(true);
 
