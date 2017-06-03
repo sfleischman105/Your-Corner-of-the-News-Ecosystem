@@ -118,7 +118,7 @@ body.noGrav .grav {
 
 .link {
   stroke-width: 1;
-  stroke: rgba(0,0,0,.1);
+  stroke: rgba(0,0,0,.046);
 }
 
 .node {
