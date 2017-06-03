@@ -428,6 +428,8 @@ function GlobalGraph (graph) {
 	this.onNodeClick = function (d) {
 		// dijkstra!
 		if (self.doShowSteps) self.dijkstra(d);
+		if (!self.legendsvgDi) self.initDijkstraLegentd();
+		if (self.doShowDijkstraLegend) self.updateDijkstraLegend(); // gives us the optino to turn it off if we want
 		// self.toggleNodeIsActive(d, this);
 	};
 
@@ -600,6 +602,7 @@ function GlobalGraph (graph) {
 
 	/******  DIJKSTRA  ******/
 
+	this.doShowDijkstraLegend = true; // controls legend container opacity
     this.firstStep = null;
     this.doShowSteps = true;
 	this.stepCount = 30;
@@ -671,7 +674,6 @@ function GlobalGraph (graph) {
             return false;
         }
 
-        if (!!!self.legendsvgDi) self.initDijkstraLegentd();
     };
 
     // Color scale for Djikstra's based on distance
@@ -731,7 +733,8 @@ function GlobalGraph (graph) {
 		//Color Legend container
 		self.legendsvgDi = svg.append("g")
 			.attr("class", "legendWrapper")
-			.attr("transform", "translate(" + (660) + "," + (650) + ")");
+			.attr("transform", "translate(" + (660) + "," + (650) + ")")
+			.attr("opacity", 0);
 
 		//Draw the Rectangle
 		self.legendsvgDi.append("rect")
@@ -783,7 +786,7 @@ function GlobalGraph (graph) {
 
     this.updateDijkstraLegend = function () {
 		
-		self.legendsvgDi.attr('opacity', (self.doShowDijkstraLegend) ? 1 : 0);
+		self.legendsvgDi.transition(100).attr('opacity', (self.doShowDijkstraLegend) ? 1 : 0);
 
     }
 
