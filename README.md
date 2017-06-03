@@ -15,12 +15,15 @@ In today’s divisive political climate, Americans are becoming increasingly awa
 
 Our group felt that many of the discussions concerning user engagement with political news sites centered around the bubble created by social media. Rather than looking at how users interacted with websites, we set out to explore something deeper: the connections between these political news sites. Analyzing how news sites relate to each other hits two birds with one stone, as it shows where news sites get their news, alongside implicating the diversity of news viewers receive when visiting multiple sites. Our Project aims to visualize and allow user exploration of these hidden connections between news sites.
 
+This project was created using D3.js
+
 [Live Project](https://cse442-17s.github.io/Your-Corner-of-the-News-Ecosystem/final/) |
+[Video](https://vimeo.com/219804031) |
 [Poster](https://cse442-17s.github.io/Your-Corner-of-the-News-Ecosystem/media/poster.pdf) |
-[Source](https://github.com/CSE442-17S/Your-Corner-of-the-News-Ecosystem/) |
+[Source](https://github.com/CSE442-17S/Your-Corner-of-the-News-Ecosystem/)
 
 ![alt text](https://cse442-17s.github.io/Your-Corner-of-the-News-Ecosystem/media/readme_pic.png)
 
 ## Dataset
 
-We used Data from the GDELT Project
+We used Data from the [GDELT Project](http://gdeltproject.org/), which aggregated the number of links to and from news sites. 
