@@ -733,28 +733,29 @@ function GlobalGraph (graph) {
 		//Color Legend container
 		self.legendsvgDi = svg.append("g")
 			.attr("class", "legendWrapper")
-			.attr("transform", "translate(" + (660) + "," + (650) + ")")
+			.attr("transform", "translate(" + (self.width - 275) + "," + (self.height - 67) + ")")
 			.attr("opacity", 0);
 
 		//Draw the Rectangle
 		self.legendsvgDi.append("rect")
 					.attr("class", "legendRec")
-					.attr("width", 250)
+					.attr("width", (self.width * .25))
 					.attr("height", 20)
 					.style("fill", "url(#di-linear-gradient)");
 
 		//Append title
 		self.legendsvgDi.append("text")
 			.attr("class", "legendTitle")
-			.attr("x", 9)
-			.attr("y", -3)
-			.style("text-anchor", "bottom")
+			.attr("x", (self.width * .25 * .5))
+			.attr("y", -9)
+			.style("text-anchor", "middle")
+
 			.text("Network Distance Between Nodes");
 
 		self.legendsvgDi.append("text")
 			.attr("class", "legendTitle")
 			.attr("x", 2)
-			.attr("y", 30)
+			.attr("y", 36)
 			.style("font-size", "12px")
 			.style("text-anchor", "bottom")
 			.text("Closer");
@@ -762,8 +763,8 @@ function GlobalGraph (graph) {
 
 		self.legendsvgDi.append("text")
 			.attr("class", "legendTitle")
-			.attr("x", 210)
-			.attr("y", 30)
+			.attr("x", ((self.width * .25) - 40))
+			.attr("y", 36)
 			.style("font-size", "12px")
 			.style("text-anchor", "bottom")
 			.text("Further");
