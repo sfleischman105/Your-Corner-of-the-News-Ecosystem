@@ -118,7 +118,7 @@ function GlobalGraph (graph) {
 			"collisionForceRadius": DEFAULT_COLLISION_FORCE_RADIUS,
 
 			// Force Parameters
-			"gravityForceStrength": DEFAULT_GRAVITY_FORCE_STRENGTH,
+			"gravityForceStrength": DEFAULT_GRAVITY_FORCE_STRENGTH
 
 		},
 
@@ -303,29 +303,50 @@ function GlobalGraph (graph) {
 			// NOTE: Replaced the above with below, as I couldn't figure out how to get
 			// resizing working without this.
             .on("mouseover", function(d) {
+            	// self.label.attr("display", self.doShowNodeLabels ? "inline" : "none");
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 7;
                 });
 
-                 d3.select(this).style("stroke","black");
+                 d3.select(this).style("stroke","#3d3d3d");
 
+				var ids = [];
+				ids.push(d.id);
 				self.link.filter(function(l) {
 					return l.source == d || l.target == d
-				}).transition(20).style("stroke-width", 8)
-					.style("stroke", "rgba(0,0,0,.3)");
+				}).transition(20).style("stroke-width", 7)
+					.style("stroke", "rgba(0,0,0,.25)");
 
 				self.node.filter(function(n) {
 				    var highlight = false;
 				    n.src_dst_links.forEach(function(l) {
-				        if (l.target == d || l.source == d) { highlight = true;}
+				        if (l.source == d) {
+				        	highlight = true;
+				        } else if(l.target == d) {
+				        	highlight = true;
+						}
                     });
-                    if (n == d) {highlight = false}
+				    if(highlight){ids.push(n.label);}
+				    if (n == d) {
+                    	highlight = false;
+                    }
                     return highlight;
                 }).style("stroke","grey").transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 4;
                 });
+				self.label.attr("display", "none");
+				self.label.filter(function(d) {
+					for(var i = 0; i < ids.length; i++) {
+						console.log(d.text);
+						if(ids[i] == d.id) return true;
+					}
+					return false;
+				 }).transition(100)
+					.attr("display", "inline");
             })
             .on("mouseout", function(d) {
+            	self.label.attr("display", self.doShowNodeLabels ? "inline" : "none")
+
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) +DEFAULT_RADIUS
                 });
@@ -400,15 +421,14 @@ function GlobalGraph (graph) {
         	.attr("cx", function(d) { return d.x = Math.max(self.nodeBorderPadding, Math.min(self.width - self.nodeBorderPadding, d.x)); })
             .attr("cy", function(d) { return d.y = Math.max(self.nodeBorderPadding, Math.min(self.height - self.nodeBorderPadding, d.y)); });
 
-        self.label
-             .attr("x", function(d) {
-            	return d.x - (d.thisWidth / 3);
+        self.label.attr("x", function(d) {
+            	return d.x + self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 7;
             })
-            .attr("y", function (d) { 
-            	return d.y + self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 13;
+            .attr("y", function (d) {
+            	return d.y + 4 ;
             })
-            .style("font-size", "12px").style("fill", "#000000");
-	
+            .style("font-size", "12px").style("fill", "#1727a5").style("font-weight", 550);
+
 
 		    self.gravity
             .attr("cx", function(d) { return d.x = Math.max(self.nodeBorderPadding, Math.min(self.width - self.nodeBorderPadding, d.x)); })
@@ -506,8 +526,7 @@ function GlobalGraph (graph) {
 	/******  FORCES  ******/
 
     // Saving a reference to each force applied to the graph as a variable to allow live adjustments:
-    this.linkForceStrengthHandler = function (d) { 
-
+    this.linkForceStrengthHandler = function (d) {
 		return self.log_edge_scale(d.count) * self.simulationStateControl.parameters.linkForceStrength; 
 	}
     // force for links. Saving reference for slider adjustment
@@ -812,10 +831,25 @@ function GlobalGraph (graph) {
 
 		self.linkForce.strength(self.linkForceStrengthHandler).links(new_edges);
 		self.simulation.alphaTarget(0.3).restart();
-
 	};
+    //
+    // this.updateEdges2 = function() {
+    	//
+	// }
 
     this.edgeConnectionsUpdate = function(value) {
+        // self.graph.links.splice(0, self.graph.links.length);
+        // var temp_links = self.original_edges.slice();
+		// for (var i = 0; i < temp_links.length; i++) {
+		// 	if (temp_links[i].count < self.edge_scale(value)) {
+         //            self.graph.links.push(temp_links[i]);
+		// 	}
+		// }
+		// self.updateEdges(self.graph.links);
+		// // updateEdges2();
+
+
+
 		temp_links = self.original_edges.slice();
 		for (var i = 0; i < temp_links.length; i++) {
 			if (temp_links[i].count < self.edge_scale(value)) {
