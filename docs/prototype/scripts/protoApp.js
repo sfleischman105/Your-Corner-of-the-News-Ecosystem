@@ -154,25 +154,26 @@ function GlobalGraph (graph) {
 
 	// Eventhandler callback function for all node mouseover events
 	this.onNodeMouseOver = function (d) {
+		console.log("onNodeMouseOver");
 		self.handleToolTipEvent(d);
 	}
 
 	this.onNodeMouseOut = function (d) {
-		// d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
+		d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0); // hide tooltip
 	}
 
 	// Tool Tip Div Setup
-	this.toolTipDiv = d3.select('#graphContainer') //select div containing svg
+	this.redditStoriesDiv = d3.select('#graphContainer') //select div containing svg
 		.append('div')
 		.attr('class', 'toolTipDiv');
 
-	this.toolTipDiv.append('i') // add i element for close button
+	this.redditStoriesDiv.append('i') // add i element for close button
 		.attr('class', 'close fa fa-close') // add classes for font awesome styling
 		.on('click', function () { // lisent for click to hide tooltip
 			d3.select('.toolTipDiv').transition().duration(200).style('opacity', 0);
 		});
 
-	this.toolTipDiv.append('h3') // h3 for title
+	this.redditStoriesDiv.append('h3') // h3 for title
 		.attr('class', 'toolTipTitle')
 			.append('a') // a within h3 for linking to domain
 			.attr('target', '_blank');
@@ -183,7 +184,7 @@ function GlobalGraph (graph) {
 			// .style('top', d.y) // not sure why these two weren't working
 			// .style('left', d.x)
 			.call(function(){ // so i just call ananoynous function 
-				$('div.toolTipDiv').css('top', d.y).css('left',d.x); // to do it with jquery
+				$('div.redditStoriesDiv').css('top', d.y).css('left',d.x); // to do it with jquery
 			})
 			.style('opacity', 1);
 
