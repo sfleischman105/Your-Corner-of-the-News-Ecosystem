@@ -889,10 +889,20 @@ function ProtoApp () {
 	this.globalGraph;
 	this.globalGraphData = null;
 	this.globalGraphIsActive = false;
+	this.doShowIntroSlides = true; // turn this to false when working so you don't have to go through the slides every refresh!
 
 	this.initialize = function () {
 		this.globalGraph = window.globalGraph;
-		this.initIntroSlide();
+		if (this.doShowIntroSlides) {
+			this.initIntroSlide();
+		} else {
+			$('#introOverlay').hide();
+			self.globalGraph.initialize();
+			self.addEventListeners();
+			self.setSliderDefaults();
+			this.globalGraphIsActive = true;
+		}
+		
 	},
 
 	// Subscribe to button clicks
@@ -948,12 +958,12 @@ function ProtoApp () {
 
 		self.globalGraph.initialize();
 
-		setTimeout(function(){
-			self.addEventListeners();
-			self.setSliderDefaults();
 
-			self.globalGraphIsActive = true;
-		},500);
+		self.addEventListeners();
+		self.setSliderDefaults();
+
+		self.globalGraphIsActive = true;
+
 	},
 
 	this.onToggle = function (e) {
