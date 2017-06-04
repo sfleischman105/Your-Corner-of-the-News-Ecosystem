@@ -19,11 +19,12 @@ This project was created using D3.js
 
 [Live Project](https://cse442-17s.github.io/Your-Corner-of-the-News-Ecosystem/final/) |
 [Video](https://vimeo.com/219804031) |
-[Poster](https://cse442-17s.github.io/Your-Corner-of-the-News-Ecosystem/media/poster.pdf) |
+[Poster](/poster.pdf) |
 [Source](https://github.com/CSE442-17S/Your-Corner-of-the-News-Ecosystem/)
 
-![alt text](https://cse442-17s.github.io/Your-Corner-of-the-News-Ecosystem/media/readme_pic.png)
+![alt text](/docs/media/readme_pic.png?raw=true)
 
 ## Dataset
 
 We used Data from the [GDELT Project](http://gdeltproject.org/), which aggregated the number of links to and from news sites. 
+
