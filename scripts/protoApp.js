@@ -30,6 +30,7 @@ function GlobalGraph (graph) {
 
 	this.graph = graph; // the data used by the simulation
 	this.original_edges = this.graph.edges.slice();
+	this.redditStoriesData = {};
 
 	this.node_index = _index(self.graph.nodes); // a lookup-index for fast operations on individual or clusters of nodes
 	this.edge_index = _index(self.graph.edges); // a lookup-index for fast operations on individual or clusters of edges
@@ -343,6 +344,7 @@ function GlobalGraph (graph) {
 
             .on("mouseover", function(d) {
             	// self.label.attr("display", self.doShowNodeLabels ? "inline" : "none");
+            	self.onNodeMouseOver(d);
                 d3.select(this).transition(20).attr("r", function(d) {
                 	return self.nodeSizeScale(d.page_rank) + DEFAULT_RADIUS + 7;
                 });
@@ -374,6 +376,7 @@ function GlobalGraph (graph) {
 					.attr("display", "inline");
             })
             .on("mouseout", function(d) {
+                self.onNodeMouseOut(d);
             	self.label.attr("display", self.doShowNodeLabels ? "inline" : "none")
 
                 d3.select(this).transition(20).attr("r", function(d) {
@@ -480,9 +483,6 @@ function GlobalGraph (graph) {
 	this.onNodeClick = function (d) {
         // dijkstra!
         self.dijkstraSet = d.id;
-        function doDijkstra () {
-        	return self.dijkstra(d);
-		}
         if (self.doShowSteps) {
                 if (self.dijkstraSet && self.gravityState.doGravity && self.gravityState.activeGravityField == 'dijkstra') {
                 	self.dijkstra(d).then(self.onToggleGravity).then(self.onToggleGravity);
@@ -490,11 +490,23 @@ function GlobalGraph (graph) {
                 	self.dijkstra(d);
 				}
         }
-		if (!self.legendsvgDi) self.initDijkstraLegentd();
-		if (self.doShowDijkstraLegend) self.updateDijkstraLegend(); // gives us the optino to turn it off if we want
+		if (self.doShowSteps && !self.legendsvgDi) self.initDijkstraLegentd();
+		if (self.doShowSteps && self.doShowDijkstraLegend) self.updateDijkstraLegend(); // gives us the optino to turn it off if we want
 		// self.toggleNodeIsActive(d, this);
 	};
 
+
+
+	// Eventhandler callback function for all node mouseover events
+	this.onNodeMouseOver = function (d) {
+		if (self.doShowRedditStories) {
+			self.handleToolTipEvent(d);
+        }
+	};
+
+	this.onNodeMouseOut = function (d) {
+		// d3.select('.toolTipDiv').transition().duration(300).style('opacity', 0); // hide tooltip
+	};
 
 	// Drag Start Event Handler
 	this.dragStarted = function (d) {
@@ -644,6 +656,57 @@ function GlobalGraph (graph) {
         self.simulation.alphaTarget(0.3).restart();
     };
 
+    
+
+
+
+
+
+
+
+	
+
+	 // Tool Tip Div Setup
+	 this.redditStoriesDiv = d3.select('#redditStories') //select div containing svg
+	 	.attr('class', 'redditStoriesDiv');
+
+	 this.redditStoriesHr = d3.select('#redditStoriesHr');
+	
+	 this.redditStoriesDiv.append('ul').attr("id", "redditStoriesDivList");
+
+	 this.handleToolTipEvent = function (d) {
+	 	var parseJSONtoHTML = function (ul, json) {
+			for (var i = 0; i < json.length; i++) {
+				ul.append("li")
+					.append("a")
+                    .attr('href', json[i].link)
+                    .attr('target', '_blank')
+					.text("[" + json[i].subreddit + "] " + json[i].title);
+			}
+		};
+	 	if (self.redditStoriesData[d.id] === undefined) {
+            self.redditStoriesData[d.id] = topKByDomain(d.id, 5, function (json) {
+                // show tool tip
+				d3.select('div.redditStoriesDiv');
+                // .style('top', d.y) // not sure why these two weren't working
+                // .style('left', d.x)
+                d3.select('div.redditStoriesDiv h4').remove();
+                d3.select('div.redditStoriesDiv ul').remove();
+                var h4 = d3.select('div.redditStoriesDiv').append('h4').text(d.id);
+                var ul = d3.select('div.redditStoriesDiv').append('ul').attr("id", "redditStoriesDivList");
+				parseJSONtoHTML(ul, json);
+            });
+        } else {
+            // show tool tip
+            d3.select('div.redditStoriesDiv h4').remove();
+            d3.select('div.redditStoriesDiv ul').remove();
+            var h4 = d3.select('div.redditStoriesDiv').append('h4').text(d.id);
+            var ul = d3.select('div.redditStoriesDiv').append('ul').attr("id", "redditStoriesDivList");
+            parseJSONtoHTML(ul, self.redditStoriesData[d.id]);
+	 	}
+	 };
+
+
 	// Todo - could use for pinning nodes?
 	// Selecting and Deselecting Nodes
 	this.toggleNodeIsActive = function (d, ele) {
@@ -666,6 +729,7 @@ function GlobalGraph (graph) {
 	this.doShowDijkstraLegend = true; // controls legend container opacity
     this.firstStep = null;
     this.doShowSteps = true;
+    this.doShowRedditStories = true;
 	this.stepCount = 30;
     // Given a starting node, runs djikstras algorthm to determine the distances each node is from
     // the starting node. Also calls 'tick'() to change color corresponding to distance
@@ -924,13 +988,21 @@ function GlobalGraph (graph) {
     	self.label.attr("display", self.doShowNodeLabels ? "inline" : "none");
     	$(buttonEl).toggleClass('checked');
     	$('span', buttonEl).text(self.doShowNodeLabels ? "ON" : "OFF");
-    }
+    };
 
     this.onToggleSteps = function (buttonEl) {
     	self.doShowSteps = !self.doShowSteps;
     	$(buttonEl).toggleClass('checked');
     	$('span', buttonEl).text(self.doShowSteps ? "ON" : "OFF");
-    }
+    };
+
+    this.onToggleRedditStories = function (buttonEl) {
+        self.doShowRedditStories = !self.doShowRedditStories;
+        $(buttonEl).toggleClass('checked');
+        $('span', buttonEl).text(self.doShowRedditStories ? "ON" : "OFF");
+        self.redditStoriesHr.style("display", self.doShowRedditStories ? "block" : "none");
+        self.redditStoriesDiv.style("display", self.doShowRedditStories ? "block" : "none");
+    };
 
 
 
@@ -982,7 +1054,7 @@ function ProtoApp () {
 		$('#refreshGraph').on('click', this.onRefreshGraph);
 		$('#addStubData').on('click', this.onAddStubData);
 		$('#toggleNode').on('click', this.onToggleNode);
-		$('#ToggleGravity, #ToggleNodeLabels, #ToggleSteps').on('click', this.onToggle);
+		$('#ToggleGravity, #ToggleNodeLabels, #ToggleSteps, #ToggleRedditStories').on('click', this.onToggle);
 
 		// Parameter Sliders
 		$('#linkForceSlider, #chargeForceSlider, #collisionForceSlider, #gravityForceSlider, #edgeConnectivitySlider')

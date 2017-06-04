@@ -63,7 +63,7 @@ ol { margin: 1em; }
   position: relative;
 }
 
-.toolTipDiv {
+.redditStoriesDiv {
   display: block;
   opacity: 0;
   top: 0; left: 0; 
@@ -76,7 +76,7 @@ ol { margin: 1em; }
   font-weight: bold;
 }
 
-.toolTipDiv .close {
+.redditStoriesDiv .close {
 
   font-size: 18px;
   line-height: 24px;
@@ -94,18 +94,18 @@ ol { margin: 1em; }
   transition: color .2s;
 }
 
-.toolTipDiv .close:hover {
+.redditStoriesDiv .close:hover {
   color: black;
 }
 
-.toolTipDiv h3 {
+.redditStoriesDiv h3 {
   font-weight: bold;
   margin-top: 7px;
   color: black;
 }
 
-.toolTipDiv h3 a,
-.toolTipDiv h3 a:hover {
+.redditStoriesDiv h3 a,
+.redditStoriesDiv h3 a:hover {
   color: black;
   cursor: pointer;
 }

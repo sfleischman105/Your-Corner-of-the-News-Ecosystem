@@ -1,0 +1,208 @@
+<!DOCTYPE HTML>
+<html xml:lang="en" lang="en">
+<head>
+  <title>CSE442 | Your Corner of the News Ecosystem</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" media="all" rel="stylesheet">
+  <link href="./styles/normalize.css" media="all" rel="stylesheet" />
+  <link href="./styles/skeleton.css" media="all" rel="stylesheet" />
+  <link href="./styles/style.css" media="all" rel="stylesheet" />
+</head>
+
+<body class="noGrav">
+  <main class="container content">
+
+    <!-- <section>
+      <p>
+        <strong>Team Members</strong>: Conor Kelly, Brendan King, Stephen Fleischman, Jingwei Zhang
+      </p>
+      <p>
+      <strong>Guiding Question :</strong> How might we allow the user to explore the interconnectivity of the online news ecosystem and allow the user to compare their personal filter bubble to the "global graph" network?
+      </p>
+    </section> -->
+
+    <section id="graphContainer" class="nine columns alpha">
+      <svg></svg>
+    </section>
+
+     
+
+    <section id="graphControl" class="three columns  ">
+
+      <h1>Your Corner of the News Ecosystem</h1><i class="fa fa-question intro"></i>
+      
+      <div id="globalGraphControl"> 
+        <button id="refreshGraph" class="one-half column alpha">Refresh Graph</button>
+        <button id="ToggleNodeLabels" class="one-half column checked">Node Labels : <span>ON</span></button>
+        <button id="ToggleSteps" class="one-half alpha column checked">Node Distance : <span>ON</span></button>
+        <button id="ToggleRedditStories" class="one-half column checked">Reddit Stories : <span>ON</span></button>
+
+        <hr class="clear"/>
+
+        <label for="activeGravityField">Active Gravity Field:</label>
+        <select id="activeGravityField">
+          <option value="domainOrigin" selected>Domain Origin</option>
+          <option value="dijkstra">Degree of Separation (Selected Node)</option>
+        </select>
+        <button id="ToggleGravity" class="one-half column">Gravity : <span>OFF</span></button>
+
+      </div>
+      <hr class="clear" id="redditStoriesHr">
+      <div id="redditStories">
+        <h3>Reddit Stories</h3>
+      </div>
+      <hr class="clear">
+      <div id="simulationControls"> 
+        <h3>Simulation Parameters</h3>
+
+        <h6>Link Force Strength Multiplier</h6>
+        <span id="linkForceSliderMin" class="left">0</span>
+        <span id="linkForceSliderSpan" class="center">0</span>
+        <span id="linkForceSliderMax" class="right">0</span>
+        <input id="linkForceSlider" type="range" min="0" max="50" step="1" />
+        
+
+        <h6>Charge Force Strength</h6>
+        <span id="chargeForceSliderMin" class="left">0</span>
+        <span id="chargeForceSliderSpan" class="center">0</span>
+        <span id="chargeForceSliderMax" class="right">0</span>
+        <input id="chargeForceSlider" type="range" min="-300" max="0" step="0.1" />
+        
+
+        <h6>Collision Force Radius</h6>
+        <span id="collisionForceSliderMin" class="left">0</span>
+        <span id="collisionForceSliderSpan" class="center">0</span>
+        <span id="collisionForceSliderMax" class="right">0</span>
+        <input id="collisionForceSlider" type="range" min="-25" max="25" step="1"/>
+
+
+        <h6>Edge Connectivity</h6>
+        <span id="edgeConnectivitySliderMin" class="left">0</span>
+        <span id="edgeConnectivitySliderSpan" class="center">0</span>
+        <span id="edgeConnectivitySliderMax" class="right">0</span>
+        <input id="edgeConnectivitySlider" type="range"  min="0.1" max="100" step=".1" />
+
+
+        <div class="grav">
+        <h6>Gravity Force Strength</h6>
+        <span id="gravityForceSliderMin" class="left">0</span>
+        <span id="gravityForceSliderSpan" class="center">0</span>
+        <span id="gravityForceSliderMax" class="right">0</span>
+        <input id="gravityForceSlider" type="range"  min="0" max="1" step="0.01" />
+        </div>
+        
+      </div>
+    </section>
+
+   <div id="introOverlay" class="active">
+
+
+    <ul class="introSlidesList">
+
+
+      <li class="introSlideItem">
+        <span class="preheader">Welcome to</span>
+        <h3>Your Corner of the News Ecosystem</h3>
+        <p>In today's divisive political climate, Americans are becoming increasingly aware of their consumption of political news. Serious questions have arise about how we share, read, and propagate news. While user behavior can be studied and evaluated, <b>understanding relationships between sources of news content and how they hyperlink to one another</b> is a fundamental in understanding the structure of a larger news ecosystem.</p>
+      </li>
+
+      <li class="introSlideItem">
+        <h3>The Data</h3>
+        <p>The data driving this visualization comes from the <a href="#" target="_blank">GDELT Project</a>, and consists of political news sites and the aggregate hyperlink counts between sites. This version of the visualization uses a small, manually curated subset of this massive dataset.</p>
+      </li>
+      <li class="introSlideItem">
+        <h3>The Visualization</h3>
+        <p>This exploratory visualization leverages a D3 force-directed layout simulation to render an interactive network graph, parameters of which can be modified by the sliders on the right.</p>
+        <p><b>Nodes</b> represent news websites and are sized according to the sites' total hyperlink counts. The nodes can also be hovered over and dragged around to better reveal the structure of graph.</p>
+        <p><b>Links</b> represent aggregate counts of hyperlinks between websites and will highlight when hovering over an adjacent node.</p>
+        <p><b>Clicking</b> on a node will color nodes in the graph based on network distance between the selected node and all other nodes in the network using Dijkstra's algorithm. Colors can be cleared by clicking Reset Graph on the right.</p>
+        <p><b>Gravitational forces</b> affecting node positioning can also be applied applied to further reveal groupings within the graph and can even be used to accentuate Dijkstra graph distance.</p>
+      </li>
+      <li class="introSlideItem">
+        <h3>Potential Futures</h3>
+        <p>Perhaps what is most exciting about this proof-of-concept visualization is the potential for further iterations, focusing on non-english speaking sites, including more data points, more gravity fields, incorporating user data from social media APIs, and so much more!</p>
+        <span class="endCloseOverlay">Happy Exploring!!</span>
+      </li>
+      <div id="introSlideDots"></div>
+    </ul>
+
+    <i class="fa fa-close overlayClose"></i>
+   </div>
+
+<!--
+    <section class='twelve columns alpha'>
+      <h2>Design Rationale</h2>
+
+      <div class="six columns alpha">
+        <h4>Network Graph</h4>
+        <p>After an initial discussion about project goals and framing, and inspired by GDELT's visualization, we decided to use a network graph to represent connections between various sources of news media content. We are using nodes to represent user curated urls scrapped from reddit pages, binned by domain for the sake of scale. Edges are still being being defined but for this proof of concept they represent hyperlinks between sources.</p>
+      </div>
+
+      <div class="six columns">
+        <h4>Tooltip</h4>
+        <p>The tooltip is an important feature in this type of visualization as it provides the current primary means of drilling down into the data. Here we can include additional information and content relating to the node in focus. A challenge this method brings to the table is occlusion, when showing the tooltip the div container and content overlay other nodes, making them difficult to get to.</p>
+      </div>
+
+      <div class="six columns alpha">
+        <h4>Spatial/Structural Encoding</h4>
+        <p>Perhaps the most important ability of any exploratory visualization is the capacity to view a given dataset at different cross sections, promoting insights for the user. We chose to encode this cross sectioning via the spatial positioning of nodes to form an overall graph structure. Reshaping the graph according to various attribute affinities will allow users to quickly infer deeper relational patterns among nodes.</p>
+      </div>
+
+      <div class="six columns">
+        <h4>Color Encoding</h4>
+        <p>In this prototype we are using color encoding to indicate selection and node distance independently. When Step Mode is enabled, selecting a node will update the colors of connected nodes to encode their distance from the selected node. Currently this color scheme uses several standard css colors but can easily be converted to use a gradient scale, representing closer connections with more saturated color.</p>
+      </div>
+    </section>
+
+    <section class='twelve columns alpha'>
+      <h2>Development Process</h2>
+      <p>In the early stages of the process our team identified key components to research, test, and build and diverged in independent exploration. We then converged on a subset of critical features to test in our prototyping assignment.</p>
+      <div class="six columns alpha">
+        <h4>Web Scraping</h4>
+        <p>While the Initial DataSet through the GDELT project was decent, we wanted to try and supplement that dataset with an additional dataset to analyze. As our visualization uses a simple graph model of nodes / edges, there were many possibilities. We decided to scrape reddit for information, as we felt the site was large enough to find some “links” between news sites. Politically-Oriented subreddits were chosen to be scraped, and the top 1000 or so posts were collected and processed. For the top news sites in each subreddit, we established an association between those sites. In the end, we are left with a graph of news sites linked by this associativity.</p>
+      </div>
+
+      <div class="six columns">
+        <h4>Front End Setup</h4>
+        <p>Our initial concept was to initialize a single page app which handled and manipulated D3 instances throughout the DOM. We initialize a new “GlobalGraph” object to render and maintain the main visualization while external data sources and user interactions are handled by the SPA. We attempted to use DRY (Don’t Repeat Yourself) coding resulting in somewhat fragmented code. I’m not too sure how to strike a balance between not repeating code and not dispersing functionality throughout the file. The GlobalGraph object grew way too big and will either have to be broken down or dissolved altogether. The initialization of the GlobalGraph chould be moved inside of the SPA to enable multiple graphs on a page.</p>
+      </div>
+
+      <div class="six columns alpha">
+        <h4>D3 Forces / Structuring</h4>
+        <p>A significant challenge in getting any graph to visualize well is position nodes and edges in a meaningful way that allows users to easily interpret structure in the graph. With force layouts, it is challenging to make an arbitrary graph present well, so we focused on a concrete example. Future work will allow adjustments to forces and their parameters as an element of user interaction with the visualization, allowing users to have sub-graphs cluster, push apart, etc.</p>
+
+<p>In short, positioning is a vital part of a good network visualization but also one of the most challenging. In our prototype, we aimed to have all nodes visually separated and meaningfully dispersed.We also wanted the graph centered in the display, and for link structure to have some distinguishable impact on graph layout (i.e. nodes that are closely connected in the graph should appear closer together). We were able to accomplish these with simulated electrical charge, centering forces, and link based forces.</p>
+
+<p>We also support highlighting of subgraphs, provided to the visualization as a list of nodes (this could be a list of a user’s visited web sites, for example). Currently, our highlights primarily distinguish matching nodes by color. We made attempts at separating and clustering sub graphs with forces, but had mixed results. Next steps will involve meaningful force responses when selecting a sub graph, as well as highlighting edges (with shading) which participate in these sub graphs. Color and shading of edges will allow a user to quickly distinguish a component, and this can be enhanced with force interactions with the rest of the graph, as well as other labelled components.</p>
+      </div>
+
+      <div class="six columns">
+        <h4>Djikstra algorithm</h4>
+        <p>One the biggest difficulties when working with a connected graph is producing a visualization where insights can be gathered. Graphs provide great insight into the overall relation between nodes and groups of nodes, but they fall flat when trying to look at how a specific node relates to other nodes. To address this, we wanted a way to perceive the distance from a selected node to every other node. Luckily, a specific algorithm had already been invented for this very task; Dijkstra’s Algorithm! We implemented this so when a node is clicked, the rest of the nodes change their color based on their distance from the selected node. The color scale goes from Green to Red as the distance increases. In the future this will be a linear scale where transitions are more smooth. For now, this works fine as a proof of concept.</p>
+      </div>
+    </section>
+
+    <section class='twelve columns alpha'>
+      <h2>Next Steps</h2>
+      <p>The hardest part so far has been finding a decent system and setup of visualization. Questions alike “How do we organize the data Schema” and “How do we handle Events” took a large time to both decide on, and to actually implement. Now that we’ve got these details mostly ironed out and implemented, our focus will be shifted towards using this framework to power a visualization where meaningful insights can be gathered. </p>
+      <p>One of the next steps for us is to further organize and Drill down our data. The datasets work well as prototypes, but they are very much unrefined. The question to “What defines a ‘link’ between sites?” is a big question that we will need to invest serious time towards. Scraping the web gives us many possibilities, but it’s up to us on figuring out a meaningful relation between the each site, and furthermore displaying that.</p>
+      <p>More so, our prototype needs serious refinement in the UI side. Buttons and Interactions are not very user-friendly, with unclear purposes. The design overall is very rough and messy, and tools alike our tooltip need serious refinement.</p>
+      <p>We might need a relational database in the future to organize user’s profile with history data for a larger dataset. For the relational database, it need to read data from the JSON file and we can get more information about users from that database easily.</p>
+    </section>
+
+
+    <div class="footer">
+      <a href="https://cse442-17s.github.io/">CSE 442 Data Visualization</a> -
+      <a href="http://www.washington.edu">University of Washington</a>
+    </div>
+-->
+
+  </main>
+  <script type="text/javascript" src="./scripts/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
+  <script type="text/javascript" src="./scripts/redditRetrieval.js"></script>
+  <script type="text/javascript" src="./scripts/protoApp.js"></script>
+  <script type="text/javascript" src="./scripts/gravityTools.js"></script>
+</body>
+</html>
