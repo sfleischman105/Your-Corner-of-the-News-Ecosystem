@@ -40,7 +40,7 @@ function GlobalGraph (graph) {
         d.links = [];
         d.target_links = [];
         d.src_dst_links = [];
-        d.distance = 0;
+        d.distance = 0.001;
         d.visited = false;
     });
 
@@ -674,7 +674,7 @@ function GlobalGraph (graph) {
 	    return new Promise(function(resolve, reject) {
             if (typeof first === 'undefined') {
                 first = self.firstStep;
-                if (first === null) return false; // exit if no first
+                if (first === null || frst.distance == 0) return false; // exit if no first
             }
             self.firstStep = first;
 
