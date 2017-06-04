@@ -891,9 +891,7 @@ function ProtoApp () {
 
 	this.initialize = function () {
 		this.globalGraph = window.globalGraph;
-		this.globalGraph.initialize();
-		this.addEventListeners();
-		this.setSliderDefaults();
+		this.initIntroSlide();
 	},
 
 	// Subscribe to button clicks
@@ -908,6 +906,47 @@ function ProtoApp () {
 			.on('change', this.onControlSliderChange);
 		
 	};
+
+	this.initIntroSlide = function () {
+		var $slidesEl = $('.introSlidesList'),
+			$slideItems = $('.introSlideItem'),
+			slideCount = $slideItems.length;
+
+		$slideItems.each(function(i, el) {
+			$(el).data('index', i);
+			if (!i) $(el).addClass('active');
+			if (i) $(el).hide();
+
+			var dotEl = $('<i class="slideDot"></i>')
+				.addClass(i ? '' : 'active')
+				.data('index', i)
+				.on('click', self.updateIntroSlides);
+
+			$('#introSlideDots').append(dotEl);
+		});
+
+		$('.endCloseOverlay').on('click', self.onInitOverlayClose);
+	},
+
+	this.updateIntroSlides = function (e) {
+		var index = $(this).data('index');
+
+		$('.slideDot.active').removeClass('active');
+		$('.introSlideItem.active').removeClass('active').delay(400).hide();
+		$('.introSlideItem').eq(index).delay(400).show().addClass('active');
+		$(this).addClass('active');
+
+	},
+
+	this.onInitOverlayClose = function() { 
+		$('#introOverlay').removeClass('active').delay(400).hide();
+		self.globalGraph.initialize();
+
+		setTimeout(function(){
+			self.addEventListeners();
+			self.setSliderDefaults();
+		},500);
+	},
 
 	this.onToggle = function (e) {
 		var handlerStr = 'on' + this.id;

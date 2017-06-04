@@ -210,7 +210,14 @@ body.noGrav .grav {
 
 .introSlideItem {
 
+  opacity: 0;
+  transition: opacity .4s;
 }
+.introSlideItem.active {
+
+  opacity: 1;
+}
+
 .introSlideItem .preheader {
   display: block;
   position: relative;
@@ -237,5 +244,50 @@ body.noGrav .grav {
   color: #C684FC;
 }
 
+#introSlideDots {
+  display: block;
+  position: absolute;
+  left: 0; right: 0; bottom: 15vh;
+  text-align: center;
+}
+
+#introSlideDots .slideDot {
+  display: inline-block;
+  position: relative;
+  padding: 3px;
+  border: 2px solid #eee;
+  border-radius: 100%;
+  margin: 0 5px;
+  background-color: transparent;
+  /*transition: border .4s, background-color .4s;*/
+  cursor: pointer;
+}
+#introSlideDots > i:first-child {
+  margin-left: 0;
+}
+#introSlideDots .slideDot:hover {
+  color: white;
+}
+
+#introSlideDots .slideDot.active {
+    background-color: white;
+    border-width: 4px;
+    margin: 0 1px -2px;
+}
+
+.endCloseOverlay {
+  display: inline-block;
+  position: relative;
+  padding: 3px 6px;
+  border: 1px solid #C684FC;
+  color: #C684FC;
+  cursor: pointer;
+  transition: all .4s;
+  margin-top: 12px;
+}
+.endCloseOverlay:hover {
+  border-color: white;
+  color: white;
+}
 
 
