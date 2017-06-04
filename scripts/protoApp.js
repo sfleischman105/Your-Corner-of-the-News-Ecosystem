@@ -960,12 +960,21 @@ function ProtoApp () {
 	var self = this;
 	this.globalGraph;
 	this.globalGraphData = null;
+	this.globalGraphIsActive = false;
+	this.doShowIntroSlides = true; // turn this to false when working so you don't have to go through the slides every refresh!
 
 	this.initialize = function () {
 		this.globalGraph = window.globalGraph;
-		this.globalGraph.initialize();
-		this.addEventListeners();
-		this.setSliderDefaults();
+		if (this.doShowIntroSlides) {
+			this.initIntroSlide();
+		} else {
+			$('#introOverlay').hide();
+			self.globalGraph.initialize();
+			self.addEventListeners();
+			self.setSliderDefaults();
+			this.globalGraphIsActive = true;
+		}
+		
 	},
 
 	// Subscribe to button clicks
@@ -980,6 +989,95 @@ function ProtoApp () {
 			.on('change', this.onControlSliderChange);
 		
 	};
+
+	this.initIntroSlide = function () {
+		var $slidesEl = $('.introSlidesList'),
+			$slideItems = $('.introSlideItem'),
+			slideCount = $slideItems.length;
+
+		$slideItems.each(function(i, el) {
+			$(el).data('index', i);
+			if (!i) $(el).addClass('active');
+			if (i) $(el).hide();
+
+			var dotEl = $('<i class="slideDot"></i>')
+				.addClass(i ? '' : 'active')
+				.data('index', i)
+				.on('click', self.updateIntroSlides);
+
+			$('#introSlideDots').append(dotEl);
+		});
+
+		$('.endCloseOverlay, .overlayClose').on('click', self.onInitOverlayClose).css('opacity', 1);
+		$('.intro').on('click', function (e) {
+			$('#introOverlay').show().addClass('active');
+			$(window).on('keydown', self.handleIntroKeyDown);
+		});
+
+		$(window).on('keydown', self.handleIntroKeyDown);
+	},
+
+	this.updateIntroSlides = function (e) {
+		var index;
+		if (typeof e !== "number") {
+			index = $(this).data('index');
+		} else {
+			index = e;
+		}
+
+		$('.slideDot.active').removeClass('active');
+		$('.introSlideItem.active').removeClass('active').delay(400).hide();
+		$('.introSlideItem').eq(index).delay(400).show().addClass('active');
+
+		if (typeof e !== "number") {
+			$(this).addClass('active');
+		} else {
+			$('.slideDot').eq(index).addClass('active');
+		}
+
+
+	},
+
+	this.onInitOverlayClose = function() { 
+		$('#introOverlay').removeClass('active').delay(400).hide();
+		$(window).off('keydown', self.handleIntroKeyDown);
+		if (self.globalGraphIsActive) return;
+
+		self.globalGraph.initialize();
+
+
+		self.addEventListeners();
+		self.setSliderDefaults();
+
+		self.globalGraphIsActive = true;
+
+	},
+
+	this.handleIntroKeyDown = function (e) {
+		var index = $('.introSlideItem.active').data('index');
+
+		switch (e.keyCode) {
+			case 37: // left
+				if (index === 0) return;
+				index--;
+				self.updateIntroSlides(index);
+			break;
+
+			case 39: // right
+				index++;
+				if (index === $('.introSlideItem').length) return self.onInitOverlayClose();
+				self.updateIntroSlides(index);
+			break;
+
+			case 27: // escape
+				self.onInitOverlayClose()
+			break;
+
+			case 13: // enter
+				if (index === $('.introSlideItem').length - 1) self.onInitOverlayClose();
+			break;
+		}
+	}
 
 	this.onToggle = function (e) {
 		var handlerStr = 'on' + this.id;

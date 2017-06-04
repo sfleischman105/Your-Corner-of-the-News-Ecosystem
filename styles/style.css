@@ -186,7 +186,131 @@ body.noGrav .grav {
 .footer { clear: both; }
 
 
+#introOverlay {
+  display: none;
+  position: fixed;
+}
 
+#introOverlay.active {
+  display: block;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-color: rgba(0,0,0,0.8);
+  color: white;
+}
 
+.introSlidesList {
+  list-style: none;
+  margin: none;
+  padding: none;
+  position: absolute;
+  top: 15vh; bottom: 15vh;
+  left: 25%; right: 25%;
 
+}
 
+.introSlideItem {
+
+  opacity: 0;
+  transition: opacity .4s;
+}
+.introSlideItem.active {
+
+  opacity: 1;
+}
+
+.introSlideItem .preheader {
+  display: block;
+  position: relative;
+  margin-bottom: -12px;
+}
+.introSlideItem h3 {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.introSlideItem p {
+    font-size: 16px;
+    margin-bottom: 14px;
+}
+
+.introSlideItem a {
+  color: #C684FC;
+  text-decoration: underline;
+  font-style: italic;
+}
+.introSlideItem b {
+  color: #C684FC;
+}
+
+#introSlideDots {
+  display: block;
+  position: absolute;
+  left: 0; right: 0; bottom: 10vh;
+  text-align: center;
+}
+
+#introSlideDots .slideDot {
+  display: inline-block;
+  position: relative;
+  padding: 3px;
+  border: 2px solid #eee;
+  border-radius: 100%;
+  margin: 0 5px;
+  background-color: transparent;
+  /*transition: border .4s, background-color .4s;*/
+  cursor: pointer;
+}
+#introSlideDots > i:first-child {
+  margin-left: 0;
+}
+#introSlideDots .slideDot:hover {
+  color: white;
+}
+
+#introSlideDots .slideDot.active {
+    background-color: white;
+    border-width: 4px;
+    margin: 0 1px -2px;
+}
+
+.endCloseOverlay {
+  display: inline-block;
+  position: relative;
+  padding: 3px 6px;
+  border: 1px solid #C684FC;
+  color: #C684FC;
+  cursor: pointer;
+  transition: all .4s;
+  margin-top: 12px;
+}
+.endCloseOverlay:hover {
+  border-color: white;
+  color: white;
+}
+.overlayClose {
+  position: absolute;
+  top: 15vh;
+  right: 25%;
+  opacity: 0;
+  color: #ccc;
+  transition: opacity .4s, color .4s;
+  padding: 5px;
+  cursor: pointer;
+}
+.overlayClose:hover {
+  color: white;
+}
+
+.intro {
+  position: absolute;
+  top: 40px;
+  right: 20px;
+  color: #aaa;
+  cursor: pointer;
+  transition: color .4s;
+}
+.intro:hover {
+  color: #333;
+}
