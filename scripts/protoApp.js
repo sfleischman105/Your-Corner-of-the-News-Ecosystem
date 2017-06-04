@@ -1017,21 +1017,36 @@ function ProtoApp () {
 		$('.endCloseOverlay, .overlayClose').on('click', self.onInitOverlayClose).css('opacity', 1);
 		$('.intro').on('click', function (e) {
 			$('#introOverlay').show().addClass('active');
-		})
+			$(window).on('keydown', self.handleIntroKeyDown);
+		});
+
+		$(window).on('keydown', self.handleIntroKeyDown);
 	},
 
 	this.updateIntroSlides = function (e) {
-		var index = $(this).data('index');
+		var index;
+		if (typeof e !== "number") {
+			index = $(this).data('index');
+		} else {
+			index = e;
+		}
 
 		$('.slideDot.active').removeClass('active');
 		$('.introSlideItem.active').removeClass('active').delay(400).hide();
 		$('.introSlideItem').eq(index).delay(400).show().addClass('active');
-		$(this).addClass('active');
+
+		if (typeof e !== "number") {
+			$(this).addClass('active');
+		} else {
+			$('.slideDot').eq(index).addClass('active');
+		}
+
 
 	},
 
 	this.onInitOverlayClose = function() { 
 		$('#introOverlay').removeClass('active').delay(400).hide();
+		$(window).off('keydown', self.handleIntroKeyDown);
 		if (self.globalGraphIsActive) return;
 
 		self.globalGraph.initialize();
@@ -1043,6 +1058,32 @@ function ProtoApp () {
 		self.globalGraphIsActive = true;
 
 	},
+
+	this.handleIntroKeyDown = function (e) {
+		var index = $('.introSlideItem.active').data('index');
+
+		switch (e.keyCode) {
+			case 37: // left
+				if (index === 0) return;
+				index--;
+				self.updateIntroSlides(index);
+			break;
+
+			case 39: // right
+				index++;
+				if (index === $('.introSlideItem').length) return self.onInitOverlayClose();
+				self.updateIntroSlides(index);
+			break;
+
+			case 27: // escape
+				self.onInitOverlayClose()
+			break;
+
+			case 13: // enter
+				if (index === $('.introSlideItem').length - 1) self.onInitOverlayClose();
+			break;
+		}
+	}
 
 	this.onToggle = function (e) {
 		var handlerStr = 'on' + this.id;
