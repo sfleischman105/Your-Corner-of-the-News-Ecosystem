@@ -888,6 +888,7 @@ function ProtoApp () {
 	var self = this;
 	this.globalGraph;
 	this.globalGraphData = null;
+	this.globalGraphIsActive = false;
 
 	this.initialize = function () {
 		this.globalGraph = window.globalGraph;
@@ -925,7 +926,7 @@ function ProtoApp () {
 			$('#introSlideDots').append(dotEl);
 		});
 
-		$('.endCloseOverlay').on('click', self.onInitOverlayClose);
+		$('.endCloseOverlay, .overlayClose').on('click', self.onInitOverlayClose).css('opacity', 1);
 	},
 
 	this.updateIntroSlides = function (e) {
@@ -940,11 +941,15 @@ function ProtoApp () {
 
 	this.onInitOverlayClose = function() { 
 		$('#introOverlay').removeClass('active').delay(400).hide();
+		if (self.globalGraphIsActive) return;
+
 		self.globalGraph.initialize();
 
 		setTimeout(function(){
 			self.addEventListeners();
 			self.setSliderDefaults();
+
+			self.globalGraphIsActive = true;
 		},500);
 	},
 

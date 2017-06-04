@@ -289,5 +289,10 @@ body.noGrav .grav {
   border-color: white;
   color: white;
 }
+.overlayClose {
+  position: absolute;
+  top: 15vh;
+  right: 25%;
+}
 
 
