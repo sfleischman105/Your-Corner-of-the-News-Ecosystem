@@ -14,7 +14,7 @@ const DEFAULT_CHARGE_FORCE_STRENGTH = -30;
 const DEFAULT_GRAVITY_FORCE_STRENGTH = 0.05;
 const DEFAULT_COLLISION_FORCE_RADIUS = 3;
 const DEFAULT_EDGE_CONNECTIONS = 0;
-const DEFAULT_RADIUS = 8;
+const DEFAULT_RADIUS = 9;
 
 /* ========================== */
 
@@ -40,7 +40,7 @@ function GlobalGraph (graph) {
         d.links = [];
         d.target_links = [];
         d.src_dst_links = [];
-        d.distance = 0;
+        d.distance = 0.001;
         d.visited = false;
     });
 
@@ -674,23 +674,19 @@ function GlobalGraph (graph) {
 	    return new Promise(function(resolve, reject) {
             if (typeof first === 'undefined') {
                 first = self.firstStep;
-                if (first === null) return false; // exit if no first
+                if (first === null || frst.distance == 0) return false; // exit if no first
             }
             self.firstStep = first;
 
             // Function to change the color of each node.
             function tick() {
-                var dis;
-                self.node.filter(function (d) {
-                    return !d.visited
-                }).transition(5).style("fill", function (d) {
-                    dis = d.distance;
-                    return self.color_scale(d.distance);
-                }).text(dis);
-                self.node.filter(function (d) {
-                    return d.distance == 0;
-                }).transition(10).style("fill", "LawnGreen");
-
+        	var dis;
+            self.node.filter(function(d){
+                return !d.visited
+            }).transition(15).style("fill", function(d) {
+            	dis = d.distance;
+                return self.color_scale(d.distance);
+            }).text(dis);
         }
         var unvisited = [];
         self.graph.nodes.forEach(function (d) {
@@ -701,62 +697,60 @@ function GlobalGraph (graph) {
             }
         });
 
-            var current = first;
+        // Set beginning Color
+        self.node.transition(3).style("fill", function(d) {return self.color_scale(d.distance);});
+        var timer = d3.interval(loop, 100, 600);
+        var current = first;
             current.distance = 0;
+
             current.visited = true;
-            var done = false;
             var i = 0;
-            tick();
+           // Set beginning Color
+            self.node.transition(3).style("fill", function(d) {return self.color_scale(d.distance);});
 
             //set up a step as a promise for sync
-            function stepi() {
-                return new Promise(function (resolve, reject) {
-					current.visited = true;
-					current.src_dst_links.forEach(function (link) {
-						var tar = link.target;
-						if (!tar.visited) {
-							// USE LINK.COUNT for Weights. Otherwise we use just 1 for degrees of seperation
-							var dist = (current.distance + Math.sqrt(1000 / link.count + 0.00000000000001));
-							// var dist = current.distance + 1;
-							// var dist = self.st_dev_scale((link.count - tar.mean) / tar.st_dev);
-							tar.distance = Math.min(dist, tar.distance);
-							// **screaming internally**
-						}
-					});
-					tick();
-					if (unvisited.length == 0 || current.distance == Infinity) {
-						// done = true;
-						console.log('finally done?', i);
-						if (unvisited.length == 0) {
-							resolve();
-						}
-						return true;
-					}
-
-					unvisited.sort(function (a, b) {
-						return b.distance - a.distance
-					});
-					current = unvisited.pop();
-					resolve();
-					return false;
+      	function stepi() {
+		  	return new Promise(function (resolve, reject) {
+				current.visited = true;
+			  	current.src_dst_links.forEach(function (link) {
+					  var tar = link.target;
+					  if (!tar.visited) {
+					  // USE LINK.COUNT for Weights. Otherwise we use just 1 for degrees of seperation
+					  var dist = (current.distance + Math.sqrt(1000 / link.count + 0.00000000000001));
+					  // var dist = current.distance + 1;
+					  // var dist = self.st_dev_scale((link.count - tar.mean) / tar.st_dev);
+					  tar.distance = Math.min(dist, tar.distance);
+					  // **screaming internally**
+					  }
 				});
-			}
+			  	tick();
+			  if (unvisited.length == 0 || current.distance == Infinity) {
+				  resolve();
+				  return true;
+			  }
+			  unvisited.sort(function (a, b) {
+				  return b.distance - a.distance
+			  });
+			  current = unvisited.pop();
+			  resolve();
+			  return false;
+		  });
+	  }
 
-			//actually run dijkstra
-			function loop() {
-				if (unvisited.length > 0) {
-					return stepi().then(loop);
-                } else {
-					resolve();
-				}
+	 	function loop() {
+			if (unvisited.length > 0) {
+				return stepi();
+			} else {
+				resolve();
 			}
-			loop();
-        });
-    };
+		}
+
+    });
+	};
 
     // Color scale for Djikstra's based on distance
     this.color_scale = d3.scaleLinear()
-        .domain([0, 0.63, 1.00, 1.55, 2.39, 3.0, 4.6, 5.1, 5.5])
+        .domain([0, 0.66, 1.04, 1.55, 2.39, 3.0, 4.6, 5.1, 5.5])
         .range(["LawnGreen","GreenYellow","yellow","orange","orangered", "salmon","red", "crimson","FireBrick"])
 		.clamp(true);
 
