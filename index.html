@@ -47,7 +47,7 @@
         <span id="linkForceSliderMin" class="left">0</span>
         <span id="linkForceSliderSpan" class="center">0</span>
         <span id="linkForceSliderMax" class="right">0</span>
-        <input id="linkForceSlider" type="range" min="0" max="50" step="1" "/>
+        <input id="linkForceSlider" type="range" min="0" max="50" step="1" />
         
 
         <h6>Charge Force Strength</h6>
@@ -82,7 +82,37 @@
       </div>
     </section>
 
-   
+   <div id="introOverlay" class="active">
+
+
+    <ul class="introSlidesList">
+
+
+      <li class="introSlideItem">
+        <span class="preheader">Welcome to</span>
+        <h3>Your Corner of the News Ecosystem</h3>
+        <p>In today's divisive political climate, Americans are becoming increasingly aware of their consumption of political news. Serious questions have arise about how we share, read, and propagate news. While user behavior can be studied and evaluated, <b>understanding relationships between sources of news content and how they hyperlink to one another</b> is a fundamental in understanding the structure of a larger news ecosystem.</p>
+      </li>
+
+      <li class="introSlideItem">
+        <h3>The Data</h3>
+        <p>The data driving this visualization comes from the <a href="#" target="_blank">GDELT Project</a>, and consists of political news sites and the aggregate hyperlink counts between sites. This version of the visualization uses a small, manually curated subset of this massive dataset.</p>
+      </li>
+      <li class="introSlideItem">
+        <h3>The Visualization</h3>
+        <p>This exploratory visualization leverages a D3 force-directed layout simulation to render an interactive network graph, parameters of which can be modified by the sliders on the right.</p>
+        <p><b>Nodes</b> represent news websites and are sized according to the sites' total hyperlink counts. The nodes can also be hovered over and dragged around to better reveal the structure of graph.</p>
+        <p><b>Links</b> represent aggregate counts of hyperlinks between websites and will highlight when hovering over an adjacent node.</p>
+        <p><b>Clicking</b> on a node will color nodes in the graph based on network distance between the selected node and all other nodes in the network using Dijkstra's algorithm. Colors can be cleared by clicking Reset Graph on the right.</p>
+        <p><b>Gravitational forces</b> affecting node positioning can also be applied applied to further reveal groupings within the graph and can even be used to accentuate Dijkstra graph distance.</p>
+      </li>
+      <li class="introSlideItem">
+        <h3>Potential Futures</h3>
+        <p>Perhaps what is most exciting about this proof-of-concept visualization is the potential for further iterations, focusing on non-english speaking sites, including more data points, more gravity fields, incorporating user data from social media APIs, and so much more!</p>
+      </li>
+
+    </div>
+   </div>
 
 <!--
     <section class='twelve columns alpha'>

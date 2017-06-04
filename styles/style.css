@@ -186,7 +186,56 @@ body.noGrav .grav {
 .footer { clear: both; }
 
 
+#introOverlay {
+  display: none;
+  position: fixed;
+}
 
+#introOverlay.active {
+  display: block;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-color: rgba(0,0,0,0.8);
+  color: white;
+}
+
+.introSlidesList {
+  list-style: none;
+  margin: none;
+  padding: none;
+  position: absolute;
+  top: 15vh; bottom: 15vh;
+  left: 25%; right: 25%;
+
+}
+
+.introSlideItem {
+
+}
+.introSlideItem .preheader {
+  display: block;
+  position: relative;
+  margin-bottom: -12px;
+}
+.introSlideItem h3 {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.introSlideItem p {
+    font-size: 16px;
+    margin-bottom: 14px;
+}
+
+.introSlideItem a {
+  color: #C684FC;
+  text-decoration: underline;
+  font-style: italic;
+}
+.introSlideItem b {
+  color: #C684FC;
+}
 
 
 
