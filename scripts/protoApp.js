@@ -490,7 +490,6 @@ function GlobalGraph (graph) {
                 	self.dijkstra(d);
 				}
         }
-    };
 		if (!self.legendsvgDi) self.initDijkstraLegentd();
 		if (self.doShowDijkstraLegend) self.updateDijkstraLegend(); // gives us the optino to turn it off if we want
 		// self.toggleNodeIsActive(d, this);
