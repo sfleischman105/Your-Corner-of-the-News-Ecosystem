@@ -927,6 +927,9 @@ function ProtoApp () {
 		});
 
 		$('.endCloseOverlay, .overlayClose').on('click', self.onInitOverlayClose).css('opacity', 1);
+		$('.intro').on('click', function (e) {
+			$('#introOverlay').show().addClass('active');
+		})
 	},
 
 	this.updateIntroSlides = function (e) {

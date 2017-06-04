@@ -293,6 +293,24 @@ body.noGrav .grav {
   position: absolute;
   top: 15vh;
   right: 25%;
+  opacity: 0;
+  color: #ccc;
+  transition: opacity .4s, color .4s;
+  padding: 5px;
+  cursor: pointer;
+}
+.overlayClose:hover {
+  color: white;
 }
 
-
+.intro {
+  position: absolute;
+  top: 40px;
+  right: 20px;
+  color: #aaa;
+  cursor: pointer;
+  transition: color .4s;
+}
+.intro:hover {
+  color: #333;
+}
