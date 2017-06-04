@@ -34,17 +34,25 @@
       
       <div id="globalGraphControl"> 
         <button id="refreshGraph" class="one-half column alpha">Refresh Graph</button>
-        <button id="ToggleGravity" class="one-half column">Gravity : <span>OFF</span></button>
         <button id="ToggleNodeLabels" class="one-half column alpha checked">Node Labels : <span>ON</span></button>
         <button id="ToggleSteps" class="one-half column checked">Node Distance : <span>ON</span></button>
+        <button id="ToggleRedditStories" class="one-half column alpha checked">Reddit Stories : <span>ON</span></button>
+
+        <hr class="clear"/>
+
         <label for="activeGravityField">Active Gravity Field:</label>
         <select id="activeGravityField">
           <option value="domainOrigin" selected>Domain Origin</option>
           <option value="dijkstra">Degree of Separation (Selected Node)</option>
         </select>
+        <button id="ToggleGravity" class="one-half column">Gravity : <span>OFF</span></button>
+
+      </div>
+      <hr class="clear" id="redditStoriesHr">
+      <div id="redditStories">
+        <h3>Reddit Stories</h3>
       </div>
       <hr class="clear">
-
       <div id="simulationControls"> 
         <h3>Simulation Parameters</h3>
 
