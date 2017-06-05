@@ -229,7 +229,7 @@ body.noGrav .grav {
 #introSlideDots {
   display: block;
   position: absolute;
-  left: 0; right: 0; bottom: 10vh;
+  left: 0; right: 0; bottom: -18px;
   text-align: center;
 }
 
