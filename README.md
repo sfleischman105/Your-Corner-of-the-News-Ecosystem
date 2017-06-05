@@ -7,7 +7,7 @@ Your Corner of the News Ecosystem
 - [Conor Kelly (cKellyDesign)](https://github.com/cKellyDesign)
 - [Brendan King (kingb12)](https://github.com/kingb12)
 - [Stephen Fleischman (sfleischman105)](https://github.com/sfleischman105)
-- [Jingwei Zhang ()]()
+- [Jingwei Zhang (HeatherJingweiZhang)](https://github.com/HeatherJingweiZhang)
 
 ## Project
 
@@ -17,7 +17,7 @@ Our group felt that many of the discussions concerning user engagement with poli
 
 This project was created using D3.js
 
-[Live Project](https://cse442-17s.github.io/Your-Corner-of-the-News-Ecosystem/final/) |
+[Live Project](https://cse442-17s.github.io/Your-Corner-of-the-News-Ecosystem/) |
 [Video](https://vimeo.com/219804031) |
 [Poster](/poster.pdf) |
 [Source](https://github.com/CSE442-17S/Your-Corner-of-the-News-Ecosystem/)
