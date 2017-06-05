@@ -19,7 +19,7 @@ This project was created using D3.js
 
 [Live Project](https://cse442-17s.github.io/Your-Corner-of-the-News-Ecosystem/) |
 [Video](https://vimeo.com/219804031) |
-[Poster](/poster.pdf) |
+[Poster](./poster.pdf) |
 [Source](https://github.com/CSE442-17S/Your-Corner-of-the-News-Ecosystem/)
 
 ![alt text](/docs/media/readme_pic.png?raw=true)
